@@ -11,5 +11,6 @@
 
 ChatThrottleLib.lua
 utils.lua
+PlayerFrameUtils.lua
 Hardcore.xml
 Hardcore.lua
