@@ -9,5 +9,6 @@
 ## SavedVariables: Hardcore_Settings
 
 ChatThrottleLib.lua
+PlayerFrameUtils.lua
 Hardcore.xml
 Hardcore.lua
