@@ -4,6 +4,7 @@ PlayerFrameSettings.Funcs = {};
 PlayerFrameSettings.Vars = {}
 PlayerFrameSettings.Vars.Loaded = false;
 PlayerFrameSettings.Vars.PlayerLoaded = false;
+PlayerFrameSettings.Vars.Enabled = true;
 
 PlayerFrameSettings.Tables = {};
 PlayerFrameSettings.Tables.Points = {};
@@ -101,8 +102,8 @@ function PlayerFrameSettings.Funcs.Msg(msg,dbg,custom)
 end
 
 -- [ Display Functions ] --
-function PlayerFrameSettings.Funcs.Display.Update(force)
-	if (PlayerFrameSettings.Vars.PlayerLoaded) then
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(force)
+	if (PlayerFrameSettings.Vars.PlayerLoaded and PlayerFrameSettings.Vars.Enabled) then
 		PlayerFrameSettings.Funcs.Info.Player();
 		PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\UI-TargetingFrame-DemonHunter.blp");
 		PlayerFrameTexture:ClearAllPoints();
@@ -121,7 +122,7 @@ function PlayerFrameSettings.Funcs.Display.Update(force)
 		end
 	end
 end
-function PlayerFrameSettings.Funcs.Display.UpdateLevel(level)
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameLevel(level)
 	if (PlayerFrameSettings.Vars.PlayerLoaded) then
 		if (level) then
 			PlayerFrameSettings.Funcs.FillLevelTextPointsTable(true);	-- Blizzard has updated the layout, so reset to new defaults
@@ -136,7 +137,7 @@ function PlayerFrameSettings.Funcs.Display.UpdateLevel(level)
 		end
 	end
 end
-function PlayerFrameSettings.Funcs.Display.UpdateRestIcon()
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon()
 	if (PlayerFrameSettings.Vars.PlayerLoaded) then
 		for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerRestIcon) do
 			if (k == 1) then
@@ -145,4 +146,3 @@ function PlayerFrameSettings.Funcs.Display.UpdateRestIcon()
 		end
 	end
 end
-
