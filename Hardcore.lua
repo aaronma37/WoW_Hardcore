@@ -56,6 +56,10 @@ local COMM_FIELD_DELIM = "|"
 local COMM_RECORD_DELIM = "^"
 local COMM_COMMANDS = {nil, "ADD", nil}
 
+--Player frame settings
+local PFU = _G.PlayerFrameSettings
+
+
 --stuff
 local PLAYER_NAME, _ = nil
 local PLAYER_GUID = nil
@@ -242,6 +246,16 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	if( not C_ChatInfo.IsAddonMessagePrefixRegistered(COMM_NAME) ) then
 		C_ChatInfo.RegisterAddonMessagePrefix(COMM_NAME)
 	end
+
+	-- Send sync command to addon	
+	if CTL then
+		CTL:SendAddonMessage("NORMAL", COMM_NAME, COMM_COMMANDS[1]..COMM_COMMAND_DELIM, "GUILD")
+	end
+ 
+	
+	PFU.Funcs.PlayerLoaded()
+	PFU.Funcs.Display.UpdatePlayerFrame(true)
+	PFU.Funcs.StartAnimating()
 end
 
 function Hardcore:PLAYER_LEAVING_WORLD()
