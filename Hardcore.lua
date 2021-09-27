@@ -26,6 +26,7 @@ Hardcore_Settings = {
 	level_list = {}
 }
 
+
 --[[ Local variables ]]--
 local debug = false
 
@@ -40,6 +41,10 @@ local COMM_COMMAND_DELIM = "$"
 local COMM_FIELD_DELIM = "|"
 local COMM_RECORD_DELIM = "^"
 local COMM_COMMANDS = {"SYNC", "ADD", "UPDATE"}
+
+--Player frame settings
+local PFU = _G.PlayerFrameSettings
+
 
 --stuff
 local PLAYER_NAME, _ = nil
@@ -164,6 +169,11 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	if CTL then
 		CTL:SendAddonMessage("NORMAL", COMM_NAME, COMM_COMMANDS[1]..COMM_COMMAND_DELIM, "GUILD")
 	end
+ 
+	
+	PFU.Funcs.PlayerLoaded()
+	PFU.Funcs.Display.UpdatePlayerFrame(true)
+	PFU.Funcs.StartAnimating()
 end
 
 function Hardcore:PLAYER_LEAVING_WORLD()
