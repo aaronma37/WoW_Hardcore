@@ -8,8 +8,8 @@ PlayerFrameSettings.Funcs = {};
 PlayerFrameSettings.Vars = {}
 PlayerFrameSettings.Vars.Loaded = false;
 PlayerFrameSettings.Vars.PlayerLoaded = false;
-PlayerFrameSettings.Vars.Enabled = true;
-PlayerFrameSettings.Vars.Mode = 1;  -- 0 image, 1 animated
+PlayerFrameSettings.Vars.PlayerFrame = {}
+PlayerFrameSettings.Vars.PlayerFrame.Animated = false
 
 PlayerFrameSettings.Tables = {};
 PlayerFrameSettings.Tables.Points = {};
@@ -17,6 +17,22 @@ PlayerFrameSettings.Tables.Points = {};
 PlayerFrameSettings.animation_frame = CreateFrame("Frame",nil,UIParent)
 
 PlayerFrameSettings.Funcs.Display = {};
+
+
+-- [ Texture info ] --
+local PlayerFrameTextureInfo = {Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp",
+                                OffsetX_0 = 16,
+                                OffsetX_1 = 50,
+                                OffsetY_0 = 30,
+                                OffsetY_1 = -4,
+                                }
+
+local PlayerFrameAnimatedTextureInfo = {Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_animated.blp",
+                                        OffsetX_0 = 16,
+                                        OffsetX_1 = 50,
+                                        OffsetY_0 = 30,
+                                        OffsetY_1 = -4,
+                                        }
 
 -- [ Player Loaded handler ] --
 function PlayerFrameSettings.Funcs.PlayerLoaded(reload)
@@ -109,19 +125,27 @@ function PlayerFrameSettings.Funcs.Msg(msg,dbg,custom)
 end
 
 -- [ Display Functions ] --
-function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(force)
-	if (PlayerFrameSettings.Vars.PlayerLoaded and PlayerFrameSettings.Vars.Enabled) then
-		-- PlayerFrameSettings.Funcs.Info.Player();
-		-- PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp");
-		PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_animated.blp");
-		--PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\flag_sprite_placeholder.blp");
-		-- PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\UI-PlayerFrame-Deathknight-Alliance.tga");
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(enabled, animated)
+  if animated then
+    PlayerFrameSettings.Vars.PlayerFrame.Animated = true 
+  else
+    PlayerFrameSettings.Vars.PlayerFrame.Animated = false 
+  end
+
+	if (PlayerFrameSettings.Vars.PlayerLoaded and enabled) then
+    local texture_info = {}
+    if PlayerFrameSettings.Vars.PlayerFrame.Animated then
+      texture_info = PlayerFrameTextureInfo
+    else
+      texture_info = PlayerFrameAnimatedTextureInfo
+    end
+    PlayerFrameTexture:SetTexture(texture_info.Str);
 		PlayerFrameTexture:ClearAllPoints();
 		for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerFrameTexture) do
 			if (k == 1) then
-				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 16), (v.OffsetY + 30));
+				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + texture_info.OffsetX_0), (v.OffsetY + texture_info.OffsetY_0));
 			else
-				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 50), (v.OffsetY - 4));
+				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + texture_info.OffsetX_1), (v.OffsetY + texture_info.OffsetY_1));
 			end
 		end
 		PlayerFrameTexture:SetTexCoord(0, 1, 0, 1);
