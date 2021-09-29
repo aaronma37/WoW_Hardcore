@@ -20,13 +20,11 @@ PlayerFrameSettings.Funcs.Display = {};
 
 -- [ Player Loaded handler ] --
 function PlayerFrameSettings.Funcs.PlayerLoaded(reload)
-	print("|cffed9121Hardcore|r: "..("Player loading frame" or ""))
 	PlayerFrameSettings.Vars.PlayerLoaded = false;
 	PlayerFrameSettings.Funcs.FillPlayerFramePointsTable(); -- Never reset manually, only when Blizzard updates the layout
 	PlayerFrameSettings.Funcs.FillLevelTextPointsTable(); -- Never reset manually, only when Blizzard updates the layout
 	PlayerFrameSettings.Funcs.FillRestIconPointsTable(); -- Never reset manually, only when Blizzard updates the layout
 	PlayerFrameSettings.Vars.PlayerLoaded = true;
-	print("|cffed9121Hardcore|r: "..("Player loading frame Fin" or ""))
 end
 
 -- [ Fill points tables with default data] --
@@ -112,30 +110,27 @@ end
 
 -- [ Display Functions ] --
 function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(force)
-	print("|cffed9121Hardcore|r: "..("Loading frame" or ""))
 	if (PlayerFrameSettings.Vars.PlayerLoaded and PlayerFrameSettings.Vars.Enabled) then
-		print("|cffed9121Hardcore|r: "..("Fin1" or ""))
 		-- PlayerFrameSettings.Funcs.Info.Player();
-		PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\temp-hardcore-frame.blp");
+		-- PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp");
+		PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_animated.blp");
+		--PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\flag_sprite_placeholder.blp");
 		-- PlayerFrameTexture:SetTexture("Interface\\AddOns\\Hardcore\\Textures\\UI-PlayerFrame-Deathknight-Alliance.tga");
-		print("|cffed9121Hardcore|r: "..("Fin2" or ""))
 		PlayerFrameTexture:ClearAllPoints();
 		for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerFrameTexture) do
 			if (k == 1) then
-				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 6), (v.OffsetY + 12));
+				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 16), (v.OffsetY + 30));
 			else
-				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 2), (v.OffsetY + 8));
+				PlayerFrameTexture:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 50), (v.OffsetY - 4));
 			end
 		end
-		print("|cffed9121Hardcore|r: "..("Fin3" or ""))
 		PlayerFrameTexture:SetTexCoord(0, 1, 0, 1);
-		-- PlayerFrameSettings.Funcs.Display.UpdateLevel();
-		-- PlayerFrameSettings.Funcs.Display.UpdateRestIcon();
+		PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameLevel();
+		PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon();
 		if (PlayerFrame:IsClampedToScreen() == false or force) then
 			PlayerFrame:SetClampedToScreen(true);
 		end
 	end
-	print("|cffed9121Hardcore|r: "..("Fin" or ""))
 end
 function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameLevel(level)
 	if (PlayerFrameSettings.Vars.PlayerLoaded) then
@@ -144,10 +139,8 @@ function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameLevel(level)
 		end
 		if (#PlayerFrameSettings.Tables.Points.PlayerLevelText >= 1) then
 			PlayerLevelText:ClearAllPoints();
-			if (PlayerFrameSettings_Vars.Mode == 7) then
-				for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerLevelText) do
-					PlayerLevelText:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX - 10), (v.OffsetY + 13.5));
-				end
+			for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerLevelText) do
+				PlayerLevelText:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX - 31), (v.OffsetY - 11));
 			end
 		end
 	end
@@ -156,7 +149,7 @@ function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon()
 	if (PlayerFrameSettings.Vars.PlayerLoaded) then
 		for k,v in pairs(PlayerFrameSettings.Tables.Points.PlayerRestIcon) do
 			if (k == 1) then
-				PlayerRestIcon:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 1.5), v.OffsetY);
+				PlayerRestIcon:SetPoint(v.Anchor, v.RelativeFrame, v.RelativeAnchor, (v.OffsetX + 1.5), v.OffsetY + 3);
 			end
 		end
 	end
@@ -192,7 +185,7 @@ function PlayerFrameSettings.Funcs.AnimateTexCoords(texture, textureWidth, textu
 	end
 end
 function PlayerFrameSettings.Funcs.Animate_OnUpdate(elapsed)
-	PlayerFrameSettings.Funcs.AnimateTexCoords(PlayerFrameTexture, 256, 256, 256, 256, 1, elapsed, 0.1)
+	PlayerFrameSettings.Funcs.AnimateTexCoords(PlayerFrameTexture, 1028, 256, 257, 128, 8, elapsed, 0.1)
 end
 
 function PlayerFrameSettings.Funcs.StartAnimating()
