@@ -23,8 +23,6 @@ Hardcore_Settings = {
 	enabled = true,
 	show_hc_player_frame = false,
 	show_hc_player_frame_animation = false,
-	show_hc_target_frame = false,
-	show_hc_party_frame = false,
 	notify = true,
 	death_list = {},
 	level_list = {}
@@ -85,13 +83,9 @@ local function SlashHandler(msg, editbox)
 	elseif cmd == "show" then
 		Hardcore_Frame:Show()
 	elseif cmd == "toggleHCPlayerFrame" then
-		Hardcore_Frame:ToggleHCPlayerFrame()
+		Hardcore:ToggleHCPlayerFrame()
 	elseif cmd == "toggleHCPlayerFrameAnimation" then
-		Hardcore_Frame:ToggleHCPlayerFrameAnimation()
-	--elseif cmd == "toggleHCTargetFrame" then
-	--	Hardcore_Frame:ToggleHCFrame(Hardcore_Settings.show_hc_target_frame)
-	--elseif cmd == "toggleHCPartyFrame" then
-	--	Hardcore_Frame:ToggleHCFrame(Hardcore_Settings.show_hc_party_frame)
+		Hardcore:ToggleHCPlayerFrameAnimation()
 	elseif cmd == "hide" then
 		--they can click the hide button, dont really need a command for this
 		Hardcore_Frame:Hide()
@@ -184,7 +178,7 @@ function Hardcore:PLAYER_ENTERING_WORLD()
  
 	
 	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame)
+	PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
 	PFU.Funcs.StartAnimating()
 end
 
@@ -514,27 +508,25 @@ function Hardcore:Enable(setting)
 end
 
 function Hardcore:ToggleHCPlayerFrame()
-  if  Hardcore_Settings.show_hc_player_frame == nil or Hardcore_Settings.show_hc_player_frame_animation == nil then
-    return
-  end
-  if Hardcore_Settings.show_hc_player_frame is true then
+  if Hardcore_Settings.show_hc_player_frame == true then
     Hardcore_Settings.show_hc_player_frame = false
   else
     Hardcore_Settings.show_hc_player_frame = true
   end
+  PFU.Funcs.PlayerLoaded()
   PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
+  PFU.Funcs.StartAnimating()
 end
 
 function Hardcore:ToggleHCPlayerFrameAnimation()
-  if  Hardcore_Settings.show_hc_player_frame == nil or Hardcore_Settings.show_hc_player_frame_animation == nil then
-    return
-  end
-  if Hardcore_Settings.show_hc_player_frame_animation is true then
+  if Hardcore_Settings.show_hc_player_frame_animation == true then
     Hardcore_Settings.show_hc_player_frame_animation = false
   else
     Hardcore_Settings.show_hc_player_frame_animation = true
   end
+  PFU.Funcs.PlayerLoaded()
   PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
+  PFU.Funcs.StartAnimating()
 end
 
 
