@@ -22,6 +22,7 @@ Hardcore_Settings = {
 	version = "0.2.3",
 	enabled = true,
 	show_hc_player_frame = false,
+	show_hc_minimap_frame = false,
 	show_hc_player_frame_animation = false,
 	notify = true,
 	death_list = {},
@@ -179,6 +180,7 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	
 	PFU.Funcs.PlayerLoaded()
 	PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
+	PFU.Funcs.Display.UpdateMinimapFrame(Hardcore_Settings.show_hc_minimap_frame)
 	PFU.Funcs.StartAnimating()
 end
 
