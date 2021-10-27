@@ -1,6 +1,87 @@
 local _G = _G
 
+local HCTI = _G.HCTextureInfo
+
+--- Config
+--
+function ShowColorPicker(r, g, b, a, changedCallback)
+ ColorPickerFrame:SetColorRGB(r,g,b);
+ ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a;
+ ColorPickerFrame.previousValues = {r,g,b,a};
+ ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc =
+  changedCallback, changedCallback, changedCallback;
+ ColorPickerFrame.func = myColorCallback
+ ColorPickerFrame:Hide(); -- Need to run the OnShow handler.
+ ColorPickerFrame:Show();
+end
+
+function myColorCallback(restore)
+ Hardcore:Print(Hardcore_Settings.ui_color_scheme[0])
+ local newR, newG, newB, newA;
+ if restore then
+  newR, newG, newB, newA = unpack(restore);
+ else
+  newA, newR, newG, newB = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB();
+ end
+ Hardcore:Print(newR)
+ Hardcore_Settings.ui_color_scheme = {newR, newG, newB, newA}
+
+        PlayerFrameSettings.Funcs.PlayerLoaded()
+        PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
+        PlayerFrameSettings.Funcs.StartAnimating()
+end
+
+function Hardcore_OptionsOnLoad(f)
+	f.name = GetAddOnMetadata("Hardcore", "Title")
+	f.okay = Hardcore.SetOptions
+	f.default = Hardcore.SetDefaultOptions
+	InterfaceOptions_AddCategory(f)
+end
+
+if InterfaceOptionsFrame then
+	InterfaceOptionsFrame:HookScript("OnShow", function(self)
+		-- Hardcore_OptionsOnShow()
+	end)
+end
+
+--- EndConfig
+
+
 _G.PlayerFrameSettings = {}
+
+
+local FramesToUpdate = {
+	{texture = PlayerFrameTexture, name = "PlayerFrameTexture"},
+	{texture = TargetFrame.borderTexture,name =  "TargetFrameTexture"},
+	{texture = TargetFrameToTTextureFrameTexture,name =  "TargetToTFrameTexture"},
+	{texture = PetFrameTexture,name =  "PetFrameTexture"},
+	{texture = PartyMemberFrame1Texture,name =  "PartyMember1FrameTexture"},
+	{texture = PartyMemberFrame2Texture,name =  "PartyMember2FrameTexture"},
+	{texture = PartyMemberFrame3Texture,name =  "PartyMember3FrameTexture"},
+	{texture = PartyMemberFrame4Texture,name =  "PartyMember4FrameTexture"},
+	{texture = MinimapBorder,name =  "MinimapFrameTexture"},
+}
+local LevelsToUpdate = {
+	{texture = TargetFrame.levelText, name = "TargetLevelText"},
+	{texture = PlayerLevelText, name =  "PlayerLevelText"},
+}
+local ButtonsToUpdate = {
+	{button = MinimapZoomIn, name = "MinimapZoomIn"},
+	{button = MinimapZoomOut, name = "MinimapZoomOut"},
+}
+    --MinimapZoomIn:SetNormalTexture(HCTI.PlayerFrame[Hardcore_Settings.player_frame].Str)
+    --
+    --MinimapZoneTextButton:Hide() not the border
+    -- local clockFrame, clockTime = TimeManagerClockButton:GetRegions()
+    --clockFrame:SetTexture(HCTI.PlayerFrame[Hardcore_Settings.player_frame].Str)
+    --clockFrame:Hide()
+
+
+    --MiniMapTrackingFrame:Hide()
+    --MiniMapWorldMapButton:Hide()
+    --GameTimeTexture:Hide() THIS IS THE SUN AND MOON!!!
+
+--TimeManagerClockButton:GetRegions()
 
 PlayerFrameSettings = _G.PlayerFrameSettings;
 PlayerFrameSettings.Funcs = {};
@@ -9,12 +90,10 @@ PlayerFrameSettings.Vars = {}
 PlayerFrameSettings.Vars.Loaded = false;
 PlayerFrameSettings.Vars.PlayerLoaded = false;
 PlayerFrameSettings.Vars.PlayerFrame = {}
-PlayerFrameSettings.Vars.PlayerFrame.Animated = false
 PlayerFrameSettings.Vars.PlayerFrame.AnimationInit = false
 
 PlayerFrameSettings.Vars.TargetFrame = {}
 PlayerFrameSettings.Vars.TargetFrame.Animated = false
-PlayerFrameSettings.Vars.TargetFrame.Enabled = true
 
 PlayerFrameSettings.Tables = {};
 PlayerFrameSettings.Tables.Points = {};
@@ -29,87 +108,6 @@ PlayerFrameSettings.accent_frames.minimap_border_texture = PlayerFrameSettings.a
 
 PlayerFrameSettings.Funcs.Display = {};
 
--- [ Texture info ] --
-local PlayerFrameTextureInfo = {
-    Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp",
-    AccentStr = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_accent.blp",
-    OffsetX_0 = 16,
-    OffsetX_1 = 50,
-    OffsetY_0 = 30,
-    OffsetY_1 = -4,
-    LevelOffsetX = -31,
-    LevelOffsetY = -11,
-    RestIconOffsetX = 1.5,
-    RestIconOffsetY = 3,
-    TexCoords = {0, 1, 0, 1},
-}
-local TargetFrameTextureInfo = {
-    Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp",
-    AccentStr = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_accent.blp",
-    OffsetX_0 = -50,
-    OffsetX_1 = -16,
-    OffsetY_0 = 30,
-    OffsetY_1 = -4,
-    LevelOffsetX = -.8,
-    LevelOffsetY = 1.2,
-    RestIconOffsetX = 1.5,
-    RestIconOffsetY = 3,
-    TexCoords = {1, 0, 0, 1},
-}
-
-local PlayerFrameAnimatedTextureInfo = {
-    Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_animated.blp",
-    OffsetX_0 = 16,
-    OffsetX_1 = 50,
-    OffsetY_0 = 30,
-    OffsetY_1 = -4,
-    LevelOffsetX = -31,
-    LevelOffsetY = -11,
-    RestIconOffsetX = 1.5,
-    RestIconOffsetY = 3,
-    TexCoords = {0, 1, 0, 1},
-}
-
-local OriginalTextureInfo = {
-    Str = "Interface\\TargetingFrame\\UI-TargetingFrame.blp",
-    OffsetX_0 = 0,
-    OffsetX_1 = 0,
-    OffsetY_0 = 0,
-    OffsetY_1 = 0,
-    LevelOffsetX = 0,
-    LevelOffsetY = 0,
-    RestIconOffsetX = 0,
-    RestIconOffsetY = 0,
-    TexCoords = {1, 0.09375, 0, .78125},
-}
-
-local HardcoreMinimapBorderInfo = {
-    Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_minimap_placeholder.blp",
-    AccentStr = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_accent.blp",
-    OffsetX_0 = 35,
-    OffsetX_1 = -10,
-    OffsetY_0 = 0,
-    OffsetY_1 = 45,
-    LevelOffsetX = 0,
-    LevelOffsetY = 0,
-    RestIconOffsetX = 0,
-    RestIconOffsetY = 0,
-    TexCoords = {-.001, 1, -.001, 1},
-}
-
-local OriginalMinimapBorderInfo = {
-    Str = "Interface\\Minimap\\UI-Minimap-Border",
-    OffsetX_0 = -65,
-    OffsetX_1 = 0,
-    OffsetY_0 = 33,
-    OffsetY_1 = -25,
-    LevelOffsetX = 0,
-    LevelOffsetY = 0,
-    RestIconOffsetX = 0,
-    RestIconOffsetY = 0,
-    TexCoords = {-.001, 1, -.001, 1},
-}
-
 
 function PlayerIsHardcore()
 	return true;
@@ -119,82 +117,57 @@ end
 -- [ Player Loaded handler ] --
 function PlayerFrameSettings.Funcs.PlayerLoaded(reload)
     PlayerFrameSettings.Vars.PlayerLoaded = false;
-    PlayerFrameSettings.Funcs.FillPlayerFramePointsTable(); -- Never reset manually, only when Blizzard updates the layout
-    PlayerFrameSettings.Funcs.FillLevelTextPointsTable(); -- Never reset manually, only when Blizzard updates the layout
     PlayerFrameSettings.Funcs.FillRestIconPointsTable(); -- Never reset manually, only when Blizzard updates the layout
-    PlayerFrameSettings.Funcs.FillMinimapPointsTable(); -- Never reset manually, only when Blizzard updates the layout
-    PlayerFrameSettings.Funcs.FillTargetFramePointsTable();
+
+    for _, v in ipairs(FramesToUpdate) do
+	    PlayerFrameSettings.Funcs.FillTexturePointsTable(v.texture, v.name);
+    end
+
+     for _, v in ipairs(LevelsToUpdate) do
+	    PlayerFrameSettings.Funcs.FillLevelTextPointsTable(v.texture, v.name);
+     end
+
     PlayerFrameSettings.Vars.PlayerLoaded = true;
 
     hooksecurefunc("TargetFrame_CheckClassification",function(self,lock)
-	    if (PlayerFrameSettings.Vars.TargetFrame.Enabled and PlayerIsHardcore()) then
-		   --PlayerFrameSettings.Funcs.FillTargetFramePointsTable();
-		   PlayerFrameSettings.Funcs.FillTargetLevelTextPointsTable()
-
-		   local texture_info = TargetFrameTextureInfo
-		   PlayerFrameSettings.Funcs.Display.UpdateTexture(TargetFrame.borderTexture, PlayerFrameSettings.Tables.Points.TargetFrameTexture, texture_info)
-
-		   PlayerFrameSettings.Funcs.Display.UpdateLevelText(TargetFrame.levelText, PlayerFrameSettings.Tables.Points.TargetLevelText ,texture_info);
+	    if (Hardcore_Settings.target_frame == "hardcore" and PlayerIsHardcore()) then
+		   PlayerFrameSettings.Funcs.FillLevelTextPointsTable(TargetFrame.levelText, "TargetLevelText")
+		   PlayerFrameSettings.Funcs.Display.UpdateTexture(TargetFrame.borderTexture, PlayerFrameSettings.Tables.Points.TargetFrameTexture, HCTI.TargetFrame.hardcore)
+		   PlayerFrameSettings.Funcs.Display.UpdateLevelText(TargetFrame.levelText, PlayerFrameSettings.Tables.Points.TargetLevelText ,HCTI.TargetFrame.hardcore);
 	    end
 end);
 end
 
--- [ Fill points tables with default data] --
-function PlayerFrameSettings.Funcs.FillPlayerFramePointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["PlayerFrameTexture"]) then
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (currently not used)
-        if (UnitExists("player")) then
-            PlayerFrameSettings.Tables.Points["PlayerFrameTexture"] = {};
-            local points = PlayerFrameTexture:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    PlayerFrameTexture:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.PlayerFrameTexture, {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-        end
-    end
+
+function PlayerFrameSettings.Funcs.FillTexturePointsTable(texture, var_name)
+	if (UnitExists("player")) then
+	    PlayerFrameSettings.Tables.Points[var_name] = {};
+	    local points = texture:GetNumPoints();
+	    local i = 1;
+	    while (i <= points) do
+		local anchor, relativeFrame, relativeAnchor, x, y =
+		    texture:GetPoint(i);
+		tinsert(PlayerFrameSettings.Tables.Points[var_name], {
+		    ["Anchor"] = anchor,
+		    ["RelativeFrame"] = relativeFrame,
+		    ["RelativeAnchor"] = relativeAnchor,
+		    ["OffsetX"] = x,
+		    ["OffsetY"] = y
+		});
+		i = i + 1;
+	    end
+	end
 end
-function PlayerFrameSettings.Funcs.FillTargetFramePointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["TargetFrameTexture"]) then
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (currently not used)
-        if (UnitExists("player")) then
-            PlayerFrameSettings.Tables.Points["TargetFrameTexture"] = {};
-            local points = TargetFrame.borderTexture:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    TargetFrame.borderTexture:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.TargetFrameTexture, {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-        end
-    end
-end
-function PlayerFrameSettings.Funcs.FillTargetLevelTextPointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["TargetLevelText"]) then
+function PlayerFrameSettings.Funcs.FillLevelTextPointsTable(level_text, var_name)
         -- Reset used if hooked to a dynamic layout update function from Blizzard (PlayerFrame_UpdateLevelTextAnchor)
-            PlayerFrameSettings.Tables.Points["TargetLevelText"] = {};
+            PlayerFrameSettings.Tables.Points[var_name] = {};
             TargetFrame.levelText:SetWordWrap(false); -- Fixes visual vertical misalignment discrepancy between login and UI reloads for 100+
-            local points = TargetFrame.levelText:GetNumPoints();
+            local points = level_text:GetNumPoints();
             local i = 1;
             while (i <= points) do
                 local anchor, relativeFrame, relativeAnchor, x, y =
-                    TargetFrame.levelText:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.TargetLevelText, {
+                    level_text:GetPoint(i);
+                tinsert(PlayerFrameSettings.Tables.Points[var_name], {
                     ["Anchor"] = anchor,
                     ["RelativeFrame"] = relativeFrame,
                     ["RelativeAnchor"] = relativeAnchor,
@@ -203,33 +176,8 @@ function PlayerFrameSettings.Funcs.FillTargetLevelTextPointsTable(reset)
                 });
                 i = i + 1;
             end
-    end
 end
-function PlayerFrameSettings.Funcs.FillLevelTextPointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["PlayerLevelText"]) then
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (PlayerFrame_UpdateLevelTextAnchor)
-        if (UnitExists("player")) then
-            PlayerFrameSettings.Tables.Points["PlayerLevelText"] = {};
-            PlayerLevelText:SetWordWrap(false); -- Fixes visual vertical misalignment discrepancy between login and UI reloads for 100+
-            local points = PlayerLevelText:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    PlayerLevelText:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.PlayerLevelText, {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-        end
-    end
-end
-function PlayerFrameSettings.Funcs.FillRestIconPointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["PlayerRestIcon"]) then
+function PlayerFrameSettings.Funcs.FillRestIconPointsTable()
         -- Reset used if hooked to a dynamic layout update function from Blizzard (currently not used)
         if (UnitExists("player")) then
             PlayerFrameSettings.Tables.Points["PlayerRestIcon"] = {};
@@ -248,85 +196,48 @@ function PlayerFrameSettings.Funcs.FillRestIconPointsTable(reset)
                 i = i + 1;
             end
         end
-    end
-end
--- [ Fill points tables with default data] --
-function PlayerFrameSettings.Funcs.FillMinimapPointsTable(reset)
-    if (reset or not PlayerFrameSettings.Tables.Points["MinimapTexture"]) then
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (currently not used)
-        if (UnitExists("player")) then
-            PlayerFrameSettings.Tables.Points["MinimapTexture"] = {};
-            local points = MinimapBorder:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    MinimapBorder:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.MinimapTexture, {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-        end
-    end
 end
 
 -- [ Display Functions ] --
 -- Update location of the level text
-function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(enabled, animated)
-    if animated == true and enabled == true then
-        PlayerFrameSettings.Vars.PlayerFrame.Animated = true
-    else
-        PlayerFrameSettings.Vars.PlayerFrame.Animated = false
-    end
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame()
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PlayerFrameTexture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.player_frame])
+    --XPBarTexture0:Hide()
 
-    local texture_info = {}
-    if enabled == true then
-        if PlayerFrameSettings.Vars.PlayerFrame.Animated == false then
-            texture_info = PlayerFrameTextureInfo
-        else
-            texture_info = PlayerFrameAnimatedTextureInfo
-        end
-    else
-        texture_info = OriginalTextureInfo
-    end
+    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.player_frame_texture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.player_frame], Hardcore_Settings.ui_color_scheme)
 
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PlayerFrameTexture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, texture_info)
-
-    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.player_frame_texture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, texture_info, {1,1,1,1})
     -- Without doing this, the pets face will be covered by player overlay
     PetFrame:SetFrameStrata("High")
 
     if PlayerFrameSettings.Vars.PlayerLoaded == true then
-        PlayerFrameSettings.Funcs.Display.UpdateLevelText(PlayerLevelText, PlayerFrameSettings.Tables.Points.PlayerLevelText ,texture_info);
+        PlayerFrameSettings.Funcs.Display.UpdateLevelText(PlayerLevelText, PlayerFrameSettings.Tables.Points.PlayerLevelText ,HCTI.PlayerFrame[Hardcore_Settings.player_frame]);
     end
-    PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon(texture_info);
+    PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon(HCTI.PlayerFrame[Hardcore_Settings.player_frame]);
 end
 
-function PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame(enabled)
-    local texture_info = {}
-    if enabled == true then
-        texture_info = HardcoreMinimapBorderInfo
-    else
-        texture_info = OriginalMinimapBorderInfo
-    end
+function PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(TargetFrameToTTextureFrameTexture, PlayerFrameSettings.Tables.Points.TargetToTFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.targetToT_frame])
+end
 
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(MinimapBorder, PlayerFrameSettings.Tables.Points.MinimapTexture, texture_info)
-    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.minimap_border_texture, PlayerFrameSettings.Tables.Points.MinimapTexture, texture_info, {1,1,1,1})
+function PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PetFrameTexture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.pet_frame])
+end
+
+function PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame1Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame2Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame3Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame4Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
+end
+
+function PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
+    PlayerFrameSettings.Funcs.Display.UpdateTexture(MinimapBorder, PlayerFrameSettings.Tables.Points.MinimapFrameTexture, HCTI.MinimapFrame[Hardcore_Settings.minimap_frame])
+    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.minimap_border_texture, PlayerFrameSettings.Tables.Points.MinimapFrameTexture, HCTI.MinimapFrame[Hardcore_Settings.minimap_frame], {1,1,1,1})
 end
 
 -- [ Display Functions ] --
--- Update location of the level text
-function PlayerFrameSettings.Funcs.Display.EnableTargetFrame(enabled, animated)
-    PlayerFrameSettings.Vars.TargetFrame.Enabled = enabled
-end
-
 function PlayerFrameSettings.Funcs.Display.UpdateTexture(texture, points, texture_info)
     texture:SetTexture(texture_info.Str);
-    --TargetFrame.borderTexture:SetTexture(texture_info.Str);
     texture:ClearAllPoints();
     for k, v in pairs(points) do
         if (k == 1) then
@@ -444,7 +355,7 @@ function PlayerFrameSettings.Funcs.AnimateTexCoords(texture, textureWidth,
     end
 end
 function PlayerFrameSettings.Funcs.Animate_OnUpdate(elapsed)
-    if PlayerFrameSettings.Vars.PlayerFrame.Animated == true then
+    if Hardcore_Settings.player_frame == "hardcore_animated" then
         PlayerFrameSettings.Funcs.AnimateTexCoords(PlayerFrameTexture, 1028,
                                                    256, 257, 128, 8, elapsed,
                                                    0.1)

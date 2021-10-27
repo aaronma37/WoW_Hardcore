@@ -11,6 +11,8 @@
 
 ChatThrottleLib.lua
 utils.lua
+TextureInfo.lua
 PlayerFrameUtils.lua
 Hardcore.xml
 Hardcore.lua
+BlizzardOptions.xml

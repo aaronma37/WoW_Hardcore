@@ -1,0 +1,286 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Button name="HCButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+                <Size>
+                        <AbsDimension x="20" y="20"/>
+                </Size>
+                <Scripts>
+                        <!-- <OnEnter function="MovAny_TooltipShow"/> -->
+                        <!-- <OnLeave function="MovAny_TooltipHide"/> -->
+                </Scripts>
+        </Button>
+
+        <!-- <CheckButton name="MACheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true"> -->
+        <!--         <Size> -->
+        <!--                 <AbsDimension x="20" y="20"/> -->
+        <!--         </Size> -->
+        <!--         <Scripts> -->
+        <!--                 <OnEnter function="MovAny_TooltipShow"/> -->
+        <!--                 <OnLeave function="MovAny_TooltipHide"/> -->
+        <!--         </Scripts> -->
+        <!-- </CheckButton> -->
+
+	<Frame name="HardcoreOptions" parent="UIParent">
+		<Scripts>
+			<OnLoad function="Hardcore_OptionsOnLoad"/>
+			<!-- <OnShow function="Hardcore_OptionsOnShow"/> -->
+		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+			<FontString name="HardcoreConfigurationText" inherits="GameFontNormal" text="Hardcore configuration">
+			<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreOptions" relativePoint="TOPLEFT">
+			<Offset>
+			<AbsDimension x="15" y="-20"/>
+			</Offset>
+			</Anchor>
+			</Anchors>
+			</FontString>
+
+			<FontString name="PlayerDropDownText" inherits="GameFontNormalSmall" text="Player frame texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="TargetDropDownText" inherits="GameFontNormalSmall" text="Target frame texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-70"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+			<FontString name="MinimapDropDownText" inherits="GameFontNormalSmall" text="Minimap frame texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-120"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+			<FontString name="PetFrameDropDownText" inherits="GameFontNormalSmall" text="Pet frame texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-170"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+			<FontString name="TargetOfTargetFrameDropDownText" inherits="GameFontNormalSmall" text="Target of target texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-220"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+			<FontString name="PartyFrameDropDownText" inherits="GameFontNormalSmall" text="Party frame texture">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-270"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+
+
+
+			<FontString name="HardcoreVersion" inherits="GameFontNormal" text="">
+			<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="HardcoreOptions" relativePoint="BOTTOMRIGHT">
+			<Offset>
+			<AbsDimension x="-19" y="20"/>
+			</Offset>
+			</Anchor>
+			</Anchors>
+			</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- <CheckButton name="HCPlayerFrameCB" inherits="OptionsCheckButtonTemplate" checked="true"> -->
+			<!-- 	<Anchors> -->
+			<!-- 		<Anchor point="TOPLEFT" relativeTo="HardcoreOptionList"> -->
+			<!-- 			<Offset> -->
+			<!-- 				<AbsDimension x="20" y="-20"></AbsDimension> -->
+			<!-- 			</Offset> -->
+			<!-- 		</Anchor> -->
+			<!-- 	</Anchors> -->
+			<!-- 	<Scripts> -->
+			<!-- 		<OnLoad>  _G[self:GetName().."Text"]:SetText("Enable hardcore player frame") </OnLoad> -->
+			<!-- 		<OnClick> Hardcore:OptionCheckboxChecked(self, "hc_player_frame") </OnClick> -->
+			<!-- 	</Scripts> -->
+			<!-- </CheckButton> -->
+			<!-- <CheckButton name="HCPlayerFrameAnimationCB" inherits="OptionsCheckButtonTemplate" checked="true"> -->
+			<!-- 	<Anchors> -->
+			<!-- 		<Anchor point="TOPLEFT" relativeTo="HCPlayerFrameCB"> -->
+			<!-- 			<Offset> -->
+			<!-- 				<AbsDimension x="0" y="-20"></AbsDimension> -->
+			<!-- 			</Offset> -->
+			<!-- 		</Anchor> -->
+			<!-- 	</Anchors> -->
+			<!-- 	<Scripts> -->
+			<!-- 		<OnLoad>  _G[self:GetName().."Text"]:SetText("Enable player frame animation") </OnLoad> -->
+			<!-- 		<OnClick> Hardcore:OptionCheckboxChecked(self, "hc_player_frame_animation") </OnClick> -->
+			<!-- 	</Scripts> -->
+			<!-- </CheckButton> -->
+			<!-- <CheckButton name="HCMinimapFrameCB" inherits="OptionsCheckButtonTemplate" checked="true"> -->
+			<!-- 	<Anchors> -->
+			<!-- 		<Anchor point="TOPLEFT" relativeTo="HCPlayerFrameAnimationCB"> -->
+			<!-- 			<Offset> -->
+			<!-- 				<AbsDimension x="0" y="-20"></AbsDimension> -->
+			<!-- 			</Offset> -->
+			<!-- 		</Anchor> -->
+			<!-- 	</Anchors> -->
+			<!-- 	<Scripts> -->
+			<!-- 		<OnLoad>  _G[self:GetName().."Text"]:SetText("Enable hardcore minimap") </OnLoad> -->
+			<!-- 		<OnClick> Hardcore:OptionCheckboxChecked(self, "hc_minimap_frame") </OnClick> -->
+			<!-- 	</Scripts> -->
+			<!-- </CheckButton> -->
+	   <!-- <Button inherits="UIPanelButtonTemplate" text="Set color scheme"> -->
+	   <!--   <Size x="130" y="25"/> -->
+		<!-- <Anchors> -->
+			<!-- <Anchor point="TOPLEFT" relativeTo="MinimapDropDownText"> -->
+				<!-- <Offset> -->
+					<!-- <AbsDimension x="0" y="-80"></AbsDimension> -->
+				<!-- </Offset> -->
+			<!-- </Anchor> -->
+		<!-- </Anchors> -->
+				<!-- <Scripts> -->
+					<!-- <OnClick> ShowColorPicker() </OnClick> -->
+				<!-- </Scripts> -->
+	   <!--   <NormalFont style="GameFontNormalSmall"/> -->
+	   <!-- </Button> -->
+
+	 <Button name="PLAYERFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="PlayerDropDownText">
+				<Offset>
+					<AbsDimension x="-18" y="-10"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(PLAYERFRAMEDROPDOWN, PLAYERFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+      </Button>
+
+
+	<Button name="TARGETFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-80"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(TARGETFRAMEDROPDOWN, TARGETFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+	</Button>
+
+	<Button name="MINIMAPFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-130"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(MINIMAPFRAMEDROPDOWN, MINIMAPFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+	</Button>
+	<Button name="PETFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-180"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(PETFRAMEDROPDOWN, PETFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+	</Button>
+	<Button name="TARGETTOTFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-230"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(TARGETTOTFRAMEDROPDOWN, TARGETTOTFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+	</Button>
+	<Button name="PARTYFRAMEFRAMEDROPDOWN" inherits="UIDropDownMenuTemplate">
+
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-280"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size x="150" y="60"/>
+         <Scripts>
+            <OnLoad>  UIDropDownMenu_Initialize(PARTYFRAMEFRAMEDROPDOWN, PARTYFRAMEFRAMEDROPDOWN_Init) </OnLoad>
+          </Scripts>
+	</Button>
+
+	   <Button inherits="UIPanelButtonTemplate" text="Set color scheme">
+	     <Size x="130" y="25"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="HardcoreConfigurationText">
+				<Offset>
+					<AbsDimension x="0" y="-500"></AbsDimension>
+				</Offset>
+			</Anchor>
+		</Anchors>
+				<Scripts>
+					<OnClick> ShowColorPicker() </OnClick>
+				</Scripts>
+	     <NormalFont style="GameFontNormalSmall"/>
+	   </Button>
+			<!-- <Button name="HardcorePickColor" inherits="UIPanelButtonTemplate" = text="S"> --> 
+			<!-- <Size> -->
+			<!-- <AbsDimension x="20" y="20"/> -->
+			<!-- </Size> -->
+			<!-- <Anchors> -->
+			<!-- <Anchor point="TOPLEFT" relativeTo="HardcoreOptions" relativePoint="TOPRIGHT"> -->
+			<!-- <Offset> -->
+			<!-- <AbsDimension x="4" y="0"/> -->
+			<!-- </Offset> -->
+			<!-- </Anchor> -->
+			<!-- </Anchors> -->
+			<!-- <!-1- <Scripts> -1-> -->
+			<!-- <!-1- <OnLoad> self.alwaysShowTooltip = true self.tooltipText = "Save as" </OnLoad> -1-> -->
+			<!-- <!-1- <OnClick> MovAny:ProfileSaveAsClicked(self) </OnClick> -1-> -->
+			<!-- <!-1- </Scripts> -1-> -->
+			<!-- </Button> -->
+		</Frames>
+	</Frame>
+</Ui>
