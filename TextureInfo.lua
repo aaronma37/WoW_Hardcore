@@ -4,6 +4,18 @@ _G.HCTextureInfo = {}
 
 HCTextureInfo = _G.HCTextureInfo
 
+-- [ Add dictionaries below to add texture metadata ] --
+-- @param Str             Path to texture 
+-- @param OffsetX_0       How many pts to offset left side of texture
+-- @param OffsetX_1       How many pts to offset right side of texture
+-- @param OffsetY_0       How many pts to offset top side of texture
+-- @param OffsetY_1       How many pts to offset bottom side of texture
+-- @param LevelOffsetX    How many pts to offset the level text horizontally
+-- @param LevelOffsetY    How many pts to offset the level text vertically
+-- @param TexCoords       Coordinates of texture
+-- @param AnimationInfo   Metadata for spritemaps
+ 
+
 -- Player frames --
 HCTextureInfo.PlayerFrame = {}
 HCTextureInfo.PlayerFrame.blizzard = {
@@ -42,9 +54,16 @@ HCTextureInfo.PlayerFrame.hardcore_animated = {
     RestIconOffsetX = 1.5,
     RestIconOffsetY = 3,
     TexCoords = {0, 1, 0, 1},
+    AnimationInfo =
+	    {
+		    TextureWidth = 1028,
+		    TextureHeight = 256,
+		    SpriteWidth = 257,
+		    SpriteHeight = 128,
+		    NumFrames = 8,
+		    Throttle = .1,
+	    }
 }
-
-
 -- Pet frames --
 HCTextureInfo.PetFrame = {}
 HCTextureInfo.PetFrame.blizzard = {
@@ -116,4 +135,27 @@ HCTextureInfo.MinimapFrame.hardcore = {
     RestIconOffsetX = 0,
     RestIconOffsetY = 0,
     TexCoords = {-.001, 1, -.001, 1},
+}
+
+HCTextureInfo.TestFrame = {}
+HCTextureInfo.TestFrame.animated = {
+    Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_animated.blp",
+    OffsetX_0 = 16,
+    OffsetX_1 = 50,
+    OffsetY_0 = 30,
+    OffsetY_1 = -4,
+    LevelOffsetX = -31,
+    LevelOffsetY = -11,
+    RestIconOffsetX = 1.5,
+    RestIconOffsetY = 3,
+    TexCoords = {0, 1, 0, 1},
+    AnimationInfo =
+	    {
+		    TextureWidth = 1024,
+		    TextureHeight = 1024,
+		    SpriteWidth = 113.777,
+		    SpriteHeight = 113.777,
+		    NumFrames = 56,
+		    Throttle = .05,
+	    }
 }

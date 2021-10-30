@@ -1,87 +1,33 @@
 local _G = _G
 
-local HCTI = _G.HCTextureInfo
-
---- Config
---
-function ShowColorPicker(r, g, b, a, changedCallback)
- ColorPickerFrame:SetColorRGB(r,g,b);
- ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a;
- ColorPickerFrame.previousValues = {r,g,b,a};
- ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc =
-  changedCallback, changedCallback, changedCallback;
- ColorPickerFrame.func = myColorCallback
- ColorPickerFrame:Hide(); -- Need to run the OnShow handler.
- ColorPickerFrame:Show();
-end
-
-function myColorCallback(restore)
- Hardcore:Print(Hardcore_Settings.ui_color_scheme[0])
- local newR, newG, newB, newA;
- if restore then
-  newR, newG, newB, newA = unpack(restore);
- else
-  newA, newR, newG, newB = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB();
- end
- Hardcore:Print(newR)
- Hardcore_Settings.ui_color_scheme = {newR, newG, newB, newA}
-
-        PlayerFrameSettings.Funcs.PlayerLoaded()
-        PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
-        PlayerFrameSettings.Funcs.StartAnimating()
-end
-
-function Hardcore_OptionsOnLoad(f)
-	f.name = GetAddOnMetadata("Hardcore", "Title")
-	f.okay = Hardcore.SetOptions
-	f.default = Hardcore.SetDefaultOptions
-	InterfaceOptions_AddCategory(f)
-end
-
-if InterfaceOptionsFrame then
-	InterfaceOptionsFrame:HookScript("OnShow", function(self)
-		-- Hardcore_OptionsOnShow()
-	end)
-end
-
---- EndConfig
-
-
 _G.PlayerFrameSettings = {}
 
+local TI = _G.HCTextureInfo
+local TU = _G.HCTextureUtils
+local test_frame = CreateFrame("Frame", nil, UIParent);
+local FrameData = {
+	PlayerFrameTexture = {texture = PlayerFrameTexture, points = nil},
+	TargetFrameTexture = {texture = TargetFrame.borderTexture, points = nil},
+	TargetToTFrameTexture = {texture = TargetFrameToTTextureFrameTexture, points = nil},
+	PetFrameTexture = {texture = PetFrameTexture, points = nil},
+	PartyMember1FrameTexture = {texture = PartyMemberFrame1Texture, points = nil},
+	PartyMember2FrameTexture = {texture = PartyMemberFrame2Texture, points = nil},
+	PartyMember3FrameTexture = {texture = PartyMemberFrame3Texture, points = nil},
+	PartyMember4FrameTexture = {texture = PartyMemberFrame4Texture, points = nil},
+	MinimapFrameTexture = {texture = MinimapBorder, points = nil},
+}
+local LevelFrameData = {
+	TargetLevelText = {texture = TargetFrame.levelText, points = nil},
+	PlayerLevelText = {texture = PlayerLevelText, points = nil},
+}
+local RestFrameData = {
+	PlayerRestIcon = {texture = PlayerRestIcon, points = nil},
+}
 
-local FramesToUpdate = {
-	{texture = PlayerFrameTexture, name = "PlayerFrameTexture"},
-	{texture = TargetFrame.borderTexture,name =  "TargetFrameTexture"},
-	{texture = TargetFrameToTTextureFrameTexture,name =  "TargetToTFrameTexture"},
-	{texture = PetFrameTexture,name =  "PetFrameTexture"},
-	{texture = PartyMemberFrame1Texture,name =  "PartyMember1FrameTexture"},
-	{texture = PartyMemberFrame2Texture,name =  "PartyMember2FrameTexture"},
-	{texture = PartyMemberFrame3Texture,name =  "PartyMember3FrameTexture"},
-	{texture = PartyMemberFrame4Texture,name =  "PartyMember4FrameTexture"},
-	{texture = MinimapBorder,name =  "MinimapFrameTexture"},
-}
-local LevelsToUpdate = {
-	{texture = TargetFrame.levelText, name = "TargetLevelText"},
-	{texture = PlayerLevelText, name =  "PlayerLevelText"},
-}
 local ButtonsToUpdate = {
 	{button = MinimapZoomIn, name = "MinimapZoomIn"},
 	{button = MinimapZoomOut, name = "MinimapZoomOut"},
 }
-    --MinimapZoomIn:SetNormalTexture(HCTI.PlayerFrame[Hardcore_Settings.player_frame].Str)
-    --
-    --MinimapZoneTextButton:Hide() not the border
-    -- local clockFrame, clockTime = TimeManagerClockButton:GetRegions()
-    --clockFrame:SetTexture(HCTI.PlayerFrame[Hardcore_Settings.player_frame].Str)
-    --clockFrame:Hide()
-
-
-    --MiniMapTrackingFrame:Hide()
-    --MiniMapWorldMapButton:Hide()
-    --GameTimeTexture:Hide() THIS IS THE SUN AND MOON!!!
-
---TimeManagerClockButton:GetRegions()
 
 PlayerFrameSettings = _G.PlayerFrameSettings;
 PlayerFrameSettings.Funcs = {};
@@ -95,9 +41,6 @@ PlayerFrameSettings.Vars.PlayerFrame.AnimationInit = false
 PlayerFrameSettings.Vars.TargetFrame = {}
 PlayerFrameSettings.Vars.TargetFrame.Animated = false
 
-PlayerFrameSettings.Tables = {};
-PlayerFrameSettings.Tables.Points = {};
-
 PlayerFrameSettings.animation_frame = CreateFrame("Frame", nil, UIParent)
 
 PlayerFrameSettings.accent_frames = {};
@@ -108,267 +51,118 @@ PlayerFrameSettings.accent_frames.minimap_border_texture = PlayerFrameSettings.a
 
 PlayerFrameSettings.Funcs.Display = {};
 
-
+-- Temporary function to fake if player is hardcore (for testing).
+-- @return Return true if player is HC according to addon.
 function PlayerIsHardcore()
 	return true;
 end
 
 
--- [ Player Loaded handler ] --
+-- [ Player Load functions ] --
+-- Load points and hook functions on player loaded.
 function PlayerFrameSettings.Funcs.PlayerLoaded(reload)
     PlayerFrameSettings.Vars.PlayerLoaded = false;
-    PlayerFrameSettings.Funcs.FillRestIconPointsTable(); -- Never reset manually, only when Blizzard updates the layout
+    TU.FillRestIconPointsTable(RestFrameData.PlayerRestIcon); -- Never reset manually, only when Blizzard updates the layout
 
-    for _, v in ipairs(FramesToUpdate) do
-	    PlayerFrameSettings.Funcs.FillTexturePointsTable(v.texture, v.name);
+    for _, v in pairs(FrameData) do
+	    TU.FillTexturePointsTable(v);
     end
 
-     for _, v in ipairs(LevelsToUpdate) do
-	    PlayerFrameSettings.Funcs.FillLevelTextPointsTable(v.texture, v.name);
+     for _, v in pairs(LevelFrameData) do
+	    TU.FillLevelTextPointsTable(v);
      end
 
     PlayerFrameSettings.Vars.PlayerLoaded = true;
 
-    hooksecurefunc("TargetFrame_CheckClassification",function(self,lock)
+     -- Todo  remove
+  if test_frame.tex == nil then
+    test_frame = CreateFrame("Frame", nil, UIParent);
+    test_frame:SetSize(200, 200)
+    test_frame:SetPoint("TOPLEFT")
+    test_frame.tex = test_frame:CreateTexture(nil, "ARTWORK")
+    test_frame.tex:SetTexture('Interface\\AddOns\\Hardcore\\Textures\\warlock_sprite.blp')
+    test_frame.tex:SetAllPoints(test_frame)
+    test_frame.tex:SetSize(200,200)
+    test_frame.tex:SetDrawLayer("Background", 0)
+    test_frame.tex:Show()
+    test_frame:Show()
+    TU.AddToAnimationFrames("TestFrame", test_frame.tex, TI.TestFrame.animated.AnimationInfo)
+  end
+
+
+    -- Hook TargetFrame classification. This is called after the target has been classified (elite, level colors, etc.)
+    hooksecurefunc("TargetFrame_CheckClassification",function(self, lock)
 	    if (Hardcore_Settings.target_frame == "hardcore" and PlayerIsHardcore()) then
-		   PlayerFrameSettings.Funcs.FillLevelTextPointsTable(TargetFrame.levelText, "TargetLevelText")
-		   PlayerFrameSettings.Funcs.Display.UpdateTexture(TargetFrame.borderTexture, PlayerFrameSettings.Tables.Points.TargetFrameTexture, HCTI.TargetFrame.hardcore)
-		   PlayerFrameSettings.Funcs.Display.UpdateLevelText(TargetFrame.levelText, PlayerFrameSettings.Tables.Points.TargetLevelText ,HCTI.TargetFrame.hardcore);
+		   TU.FillLevelTextPointsTable(LevelFrameData.TargetLevelText)
+		   TU.UpdateTexture(TargetFrame.borderTexture, FrameData.TargetFrameTexture.points, TI.TargetFrame.hardcore)
+		   TU.UpdateLevelText(TargetFrame.levelText, LevelFrameData.TargetLevelText.points ,TI.TargetFrame.hardcore);
 	    end
 end);
+    hooksecurefunc("PlayerFrame_UpdateLevelTextAnchor", ForceUpdateLevel);
 end
 
+-- Updates the player frame texture.
+-- @param arg1 This is arg1.
+-- @param arg2 This is arg2.
+-- @return Return something.
 
-function PlayerFrameSettings.Funcs.FillTexturePointsTable(texture, var_name)
-	if (UnitExists("player")) then
-	    PlayerFrameSettings.Tables.Points[var_name] = {};
-	    local points = texture:GetNumPoints();
-	    local i = 1;
-	    while (i <= points) do
-		local anchor, relativeFrame, relativeAnchor, x, y =
-		    texture:GetPoint(i);
-		tinsert(PlayerFrameSettings.Tables.Points[var_name], {
-		    ["Anchor"] = anchor,
-		    ["RelativeFrame"] = relativeFrame,
-		    ["RelativeAnchor"] = relativeAnchor,
-		    ["OffsetX"] = x,
-		    ["OffsetY"] = y
-		});
-		i = i + 1;
-	    end
-	end
-end
-function PlayerFrameSettings.Funcs.FillLevelTextPointsTable(level_text, var_name)
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (PlayerFrame_UpdateLevelTextAnchor)
-            PlayerFrameSettings.Tables.Points[var_name] = {};
-            TargetFrame.levelText:SetWordWrap(false); -- Fixes visual vertical misalignment discrepancy between login and UI reloads for 100+
-            local points = level_text:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    level_text:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points[var_name], {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-end
-function PlayerFrameSettings.Funcs.FillRestIconPointsTable()
-        -- Reset used if hooked to a dynamic layout update function from Blizzard (currently not used)
-        if (UnitExists("player")) then
-            PlayerFrameSettings.Tables.Points["PlayerRestIcon"] = {};
-            local points = PlayerRestIcon:GetNumPoints();
-            local i = 1;
-            while (i <= points) do
-                local anchor, relativeFrame, relativeAnchor, x, y =
-                    PlayerRestIcon:GetPoint(i);
-                tinsert(PlayerFrameSettings.Tables.Points.PlayerRestIcon, {
-                    ["Anchor"] = anchor,
-                    ["RelativeFrame"] = relativeFrame,
-                    ["RelativeAnchor"] = relativeAnchor,
-                    ["OffsetX"] = x,
-                    ["OffsetY"] = y
-                });
-                i = i + 1;
-            end
-        end
+-- Forces a level update for positioning.
+-- @param force Update positioning even if it has already been done.
+function ForceUpdateLevel(force)
+     for _, v in ipairs(LevelFrameData) do
+	    TU.FillLevelTextPointsTable(v);
+     end
+     PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame()
 end
 
--- [ Display Functions ] --
--- Update location of the level text
-function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame()
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PlayerFrameTexture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.player_frame])
-    --XPBarTexture0:Hide()
-
-    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.player_frame_texture, PlayerFrameSettings.Tables.Points.PlayerFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.player_frame], Hardcore_Settings.ui_color_scheme)
-
-    -- Without doing this, the pets face will be covered by player overlay
-    PetFrame:SetFrameStrata("High")
-
-    if PlayerFrameSettings.Vars.PlayerLoaded == true then
-        PlayerFrameSettings.Funcs.Display.UpdateLevelText(PlayerLevelText, PlayerFrameSettings.Tables.Points.PlayerLevelText ,HCTI.PlayerFrame[Hardcore_Settings.player_frame]);
-    end
-    PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon(HCTI.PlayerFrame[Hardcore_Settings.player_frame]);
-end
-
-function PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(TargetFrameToTTextureFrameTexture, PlayerFrameSettings.Tables.Points.TargetToTFrameTexture, HCTI.PlayerFrame[Hardcore_Settings.targetToT_frame])
-end
-
-function PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PetFrameTexture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.pet_frame])
-end
-
-function PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame1Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame2Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame3Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(PartyMemberFrame4Texture, PlayerFrameSettings.Tables.Points.PetFrameTexture, HCTI.PetFrame[Hardcore_Settings.party_frame])
-end
-
-function PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
-    PlayerFrameSettings.Funcs.Display.UpdateTexture(MinimapBorder, PlayerFrameSettings.Tables.Points.MinimapFrameTexture, HCTI.MinimapFrame[Hardcore_Settings.minimap_frame])
-    PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(PlayerFrameSettings.accent_frames.minimap_border_texture, PlayerFrameSettings.Tables.Points.MinimapFrameTexture, HCTI.MinimapFrame[Hardcore_Settings.minimap_frame], {1,1,1,1})
-end
-
--- [ Display Functions ] --
-function PlayerFrameSettings.Funcs.Display.UpdateTexture(texture, points, texture_info)
-    texture:SetTexture(texture_info.Str);
-    texture:ClearAllPoints();
-    for k, v in pairs(points) do
-        if (k == 1) then
-            texture:SetPoint(v.Anchor, v.RelativeFrame,
-                                        v.RelativeAnchor,
-                                        (v.OffsetX + texture_info.OffsetX_0),
-                                        (v.OffsetY + texture_info.OffsetY_0));
-        else
-            texture:SetPoint(v.Anchor, v.RelativeFrame,
-                                        v.RelativeAnchor,
-                                        (v.OffsetX + texture_info.OffsetX_1),
-                                        (v.OffsetY + texture_info.OffsetY_1));
-        end
-    end
-    texture:SetTexCoord(texture_info.TexCoords[1],
-                                   texture_info.TexCoords[2],
-                                   texture_info.TexCoords[3],
-                                   texture_info.TexCoords[4]);
-
-    if (PlayerFrame:IsClampedToScreen() == false or force) then
-        PlayerFrame:SetClampedToScreen(true);
-    end
-end
-
-function PlayerFrameSettings.Funcs.Display.UpdateAccentTexture(texture, points, texture_info, color)
-    texture:SetTexture(texture_info.AccentStr);
-    texture:ClearAllPoints();
-    for k, v in pairs(points) do
-        if (k == 1) then
-            texture:SetPoint(v.Anchor, v.RelativeFrame,
-                                        v.RelativeAnchor,
-                                        (v.OffsetX + texture_info.OffsetX_0),
-                                        (v.OffsetY + texture_info.OffsetY_0));
-        else
-            texture:SetPoint(v.Anchor, v.RelativeFrame,
-                                        v.RelativeAnchor,
-                                        (v.OffsetX + texture_info.OffsetX_1),
-                                        (v.OffsetY + texture_info.OffsetY_1));
-        end
-    end
-    texture:SetTexCoord(texture_info.TexCoords[1],
-                                   texture_info.TexCoords[2],
-                                   texture_info.TexCoords[3],
-                                   texture_info.TexCoords[4]);
-
-    if (PlayerFrame:IsClampedToScreen() == false or force) then
-        PlayerFrame:SetClampedToScreen(true);
-    end
-
-
-    texture:SetVertexColor(color[1], color[2], color[3], color[4])
-end
-
--- Update location of the level text PlayerLevelText, PlayerFrameSettings.Tables.Points.PlayerLevelText
-function PlayerFrameSettings.Funcs.Display.UpdateLevelText(display_text, text, texture_info)
-		if (#text >= 1) then
-		    display_text:ClearAllPoints();
-		    for k, v in pairs(text) do
-			display_text:SetPoint(v.Anchor, v.RelativeFrame,
-						 v.RelativeAnchor, (v.OffsetX +
-						     texture_info.LevelOffsetX),
-						 (v.OffsetY + texture_info.LevelOffsetY));
-		    end
-		end
-end
-
--- Update location of the rest icon
-function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrameRestIcon(
-    texture_info)
-    if (PlayerFrameSettings.Vars.PlayerLoaded) then
-        for k, v in pairs(PlayerFrameSettings.Tables.Points.PlayerRestIcon) do
-            if (k == 1) then
-                PlayerRestIcon:SetPoint(v.Anchor, v.RelativeFrame,
-                                        v.RelativeAnchor, (v.OffsetX +
-                                            texture_info.RestIconOffsetX),
-                                        v.OffsetY + texture_info.RestIconOffsetY);
-            end
-        end
-    end
-end
-
--- [ Animation functions ] --
---
--- Animate the texture by moving TexCoords.  Texture should be a sprite map.
-function PlayerFrameSettings.Funcs.AnimateTexCoords(texture, textureWidth,
-                                                    textureHeight, frameWidth,
-                                                    frameHeight, numFrames,
-                                                    elapsed, throttle)
-    if (not texture.frame) then
-        -- initialize everything
-        texture.frame = 1;
-        texture.throttle = throttle;
-        texture.numColumns = floor(textureWidth / frameWidth);
-        texture.numRows = floor(textureHeight / frameHeight);
-        texture.columnWidth = frameWidth / textureWidth;
-        texture.rowHeight = frameHeight / textureHeight;
-    end
-    local frame = texture.frame;
-    if (not texture.throttle or texture.throttle > throttle) then
-        local framesToAdvance = floor(texture.throttle / throttle);
-        while (frame + framesToAdvance > numFrames) do
-            frame = frame - numFrames;
-        end
-        frame = frame + framesToAdvance;
-        texture.throttle = 0;
-        local left = mod(frame - 1, texture.numColumns) * texture.columnWidth;
-        local right = left + texture.columnWidth;
-        local bottom = ceil(frame / texture.numColumns) * texture.rowHeight;
-        local top = bottom - texture.rowHeight;
-        texture:SetTexCoord(left, right, top, bottom);
-
-        texture.frame = frame;
-    else
-        texture.throttle = texture.throttle + elapsed;
-    end
-end
-function PlayerFrameSettings.Funcs.Animate_OnUpdate(elapsed)
-    if Hardcore_Settings.player_frame == "hardcore_animated" then
-        PlayerFrameSettings.Funcs.AnimateTexCoords(PlayerFrameTexture, 1028,
-                                                   256, 257, 128, 8, elapsed,
-                                                   0.1)
-    end
-end
-
+-- Hooks animation function.
 function PlayerFrameSettings.Funcs.StartAnimating()
     if PlayerFrameSettings.Vars.PlayerFrame.AnimationInit == false then
-	PlayerFrameSettings.animation_frame:HookScript("OnUpdate", function(self,
-									elapsed)
-	PlayerFrameSettings.Funcs.Animate_OnUpdate(elapsed)
+	PlayerFrameSettings.animation_frame:HookScript("OnUpdate", function(self, elapsed)
+    TU.Animate_OnUpdate(elapsed)
 	end)
 	PlayerFrameSettings.Vars.PlayerFrame.AnimationInit = true
     end
 end
 
+-- [ Update Functions ] --
+-- Updates the player frame texture.
+function PlayerFrameSettings.Funcs.Display.UpdatePlayerFrame()
+    TU.UpdateTexture(PlayerFrameTexture, FrameData.PlayerFrameTexture.points, TI.PlayerFrame[Hardcore_Settings.player_frame], nil)
+
+    TU.UpdateAccentTexture(PlayerFrameSettings.accent_frames.player_frame_texture, FrameData.PlayerFrameTexture.points, TI.PlayerFrame[Hardcore_Settings.player_frame], Hardcore_Settings.ui_color_scheme)
+
+    -- Without doing this, the pets face will be covered by player overlay
+    PetFrame:SetFrameStrata("High")
+
+    if PlayerFrameSettings.Vars.PlayerLoaded == true then
+        TU.UpdateLevelText(PlayerLevelText, LevelFrameData.PlayerLevelText.points ,TI.PlayerFrame[Hardcore_Settings.player_frame])
+    end
+    TU.UpdatePlayerFrameRestIcon(RestFrameData.PlayerRestIcon.points, TI.PlayerFrame[Hardcore_Settings.player_frame])
+
+    TU.AddToAnimationFrames("PlayerFrame", PlayerFrameTexture, TI.PlayerFrame[Hardcore_Settings.player_frame].AnimationInfo)
+end
+
+-- Updates the target of target frame.
+function PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
+    TU.UpdateTexture(TargetFrameToTTextureFrameTexture, FrameData.TargetToTFrameTexture.points, TI.PlayerFrame[Hardcore_Settings.targetToT_frame])
+end
+
+-- Updates the pet frame.
+function PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
+    TU.UpdateTexture(PetFrameTexture, FrameData.PetFrameTexture.points, TI.PetFrame[Hardcore_Settings.pet_frame])
+end
+
+-- Updates the pet frame.
+function PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
+    TU.UpdateTexture(PartyMemberFrame1Texture, FrameData.PetFrameTexture.points, TI.PetFrame[Hardcore_Settings.party_frame])
+    TU.UpdateTexture(PartyMemberFrame2Texture, FrameData.PetFrameTexture.points, TI.PetFrame[Hardcore_Settings.party_frame])
+    TU.UpdateTexture(PartyMemberFrame3Texture, FrameData.PetFrameTexture.points, TI.PetFrame[Hardcore_Settings.party_frame])
+    TU.UpdateTexture(PartyMemberFrame4Texture, FrameData.PetFrameTexture.points, TI.PetFrame[Hardcore_Settings.party_frame])
+end
+
+-- Updates the minimap frame
+function PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
+    TU.UpdateTexture(MinimapBorder, FrameData.MinimapFrameTexture.points, TI.MinimapFrame[Hardcore_Settings.minimap_frame])
+    TU.UpdateTexture(PlayerFrameSettings.accent_frames.minimap_border_texture, FrameData.MinimapFrameTexture.points, TI.MinimapFrame[Hardcore_Settings.minimap_frame], {1,1,1,1})
+end

@@ -41,7 +41,7 @@ Hardcore_Settings = {
 
 	show_hc_player_frame_animation = false,
 	notify = true,
-	level_list = {}
+	level_list = {},
 	death_list = {},
 	level_list = {},
 	bubble_hearth = false
@@ -264,6 +264,7 @@ function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
 			STARTED_BUBBLE_HEARTH_INFO = nil
 		end
 	end
+end
 
 function Hardcore:UNIT_EXITED_VEHICLE()
 	PFU.Funcs.PlayerLoaded()
@@ -281,9 +282,9 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	end
 
 	-- Send sync command to addon	
-	if CTL then
-		CTL:SendAddonMessage("NORMAL", COMM_NAME, COMM_COMMANDS[1]..COMM_COMMAND_DELIM, "GUILD")
-	end
+	-- if CTL then
+	-- 	CTL:SendAddonMessage("NORMAL", COMM_NAME, COMM_COMMANDS[1]..COMM_COMMAND_DELIM, "GUILD")
+	-- end
  
 	
 	PFU.Funcs.PlayerLoaded()
@@ -1033,217 +1034,6 @@ C_Timer.NewTicker(PLAY_TIME_UPDATE_INTERVAL, function()
 	Hardcore_Character.time_tracked = Hardcore_Character.time_tracked + PLAY_TIME_UPDATE_INTERVAL
 	Hardcore:RequestTimePlayed()
 end)
-
-function Hardcore:OptionCheckboxChecked(button, var)
-	if var == "hc_player_frame" then
-		if button:GetChecked() then
-			Hardcore_Settings.show_hc_player_frame = true
-		else
-			Hardcore_Settings.show_hc_player_frame = false
-		end
-		PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
-	elseif var == "hc_player_frame_animation" then
-		if button:GetChecked() then
-			Hardcore_Settings.show_hc_player_frame_animation = true
-			PFU.Funcs.StartAnimating()
-		else
-			Hardcore_Settings.show_hc_player_frame_animation = false
-		end
-
-		  PFU.Funcs.PlayerLoaded()
-		  PFU.Funcs.Display.UpdatePlayerFrame(Hardcore_Settings.show_hc_player_frame, Hardcore_Settings.show_hc_player_frame_animation)
-	elseif var == "hc_minimap_frame" then
-		if button:GetChecked() then
-			Hardcore_Settings.show_hc_minimap_frame = true
-		else
-			Hardcore_Settings.show_hc_minimap_frame = false
-		end
-		PFU.Funcs.Display.UpdateMinimapFrame(Hardcore_Settings.show_hc_minimap_frame)
-	end
-end
-
-function PLAYERFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetPlayerFrameDefault}, {'hardcore', SetPlayerFrameHardcore}, {'hardcore_animated', SetPlayerFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetPlayerFrameDefault()
-	Hardcore_Settings.player_frame = "blizzard"
-	_G["PLAYERFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
-	PFU.Funcs.StartAnimating()
-end
-function SetPlayerFrameHardcore()
-	Hardcore_Settings.player_frame = "hardcore"
-	_G["PLAYERFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
-	PFU.Funcs.StartAnimating()
-end
-function SetPlayerFrameHardcoreAnimated()
-	Hardcore_Settings.player_frame = "hardcore_animated"
-	_G["PLAYERFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
-	PFU.Funcs.StartAnimating()
-end
-
-function TARGETFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetTargetFrameDefault}, {'hardcore', SetTargetFrameHardcore}, {'hardcore_animated', SetTargetFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetTargetFrameDefault()
-	Hardcore_Settings.target_frame = "blizzard"
-	_G["TARGETFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-end
-function SetTargetFrameHardcore()
-	Hardcore_Settings.target_frame = "hardcore"
-	_G["TARGETFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-end
-function SetTargetFrameHardcoreAnimated()
-	Hardcore_Settings.target_frame = "hardcore_animated"
-	_G["TARGETFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-end
-
-function MINIMAPFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetMinimapFrameDefault}, {'hardcore', SetMinimapFrameHardcore}, {'hardcore_animated', SetMinimapFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetMinimapFrameDefault()
-	Hardcore_Settings.minimap_frame = "blizzard"
-	_G["MINIMAPFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
-end
-function SetMinimapFrameHardcore()
-	Hardcore_Settings.minimap_frame = "hardcore"
-	_G["MINIMAPFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
-end
-function SetMinimapFrameHardcoreAnimated()
-	_G["MINIMAPFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateMinimapFrame()
-end
-
-function PETFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetPetFrameDefault}, {'hardcore', SetPetFrameHardcore}, {'hardcore_animated', SetPetFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetPetFrameDefault()
-	Hardcore_Settings.pet_frame = "blizzard"
-	_G["PETFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
-end
-function SetPetFrameHardcore()
-	Hardcore_Settings.pet_frame = "hardcore"
-	_G["PETFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
-end
-function SetPetFrameHardcoreAnimated()
-	Hardcore_Settings.pet_frame = "hardcore_animated"
-	_G["PETFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePetFrame()
-end
-
-function TARGETTOTFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetTargetToTFrameDefault}, {'hardcore', SetTargetToTFrameHardcore}, {'hardcore_animated', SetTargetToTFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetTargetToTFrameDefault()
-	Hardcore_Settings.targetToT_frame = "blizzard"
-	_G["TARGETTOTFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
-end
-function SetTargetToTFrameHardcore()
-	Hardcore_Settings.targetToT_frame = "hardcore"
-	_G["TARGETTOTFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
-end
-function SetTargetToTFrameHardcoreAnimated()
-	Hardcore_Settings.targetToT_frame = "hardcore_animated"
-	_G["TARGETTOTFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdateTargetToTFrame()
-end
-
-
-function PARTYFRAMEFRAMEDROPDOWN_Init(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   local items = {{'blizzard', SetPartyFrameDefault}, {'hardcore', SetPartyFrameHardcore}, {'hardcore_animated', SetPartyFrameHardcoreAnimated}};
-   for k,v in pairs(items) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v[1]
-      info.value = v[1]
-      info.func = v[2]
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
-
-function SetPartyFrameDefault()
-	Hardcore_Settings.party_frame = "blizzard"
-	_G["PARTYFRAMEFRAMEDROPDOWN".."Text"]:SetText("blizzard")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
-end
-function SetPartyFrameHardcore()
-	Hardcore_Settings.party_frame = "hardcore"
-	_G["PARTYFRAMEFRAMEDROPDOWN".."Text"]:SetText("hardcore")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
-end
-function SetPartyFrameHardcoreAnimated()
-	Hardcore_Settings.party_frame = "hardcore_animated"
-	_G["PARTYFRAMEFRAMEDROPDOWN".."Text"]:SetText("hardcore animated")
-	PFU.Funcs.PlayerLoaded()
-	PlayerFrameSettings.Funcs.Display.UpdatePartyFrame()
-end
 
 --[[ Start Addon ]]--
 Hardcore:Startup()
