@@ -37,6 +37,31 @@ function HCTextureUtils.UpdateTexture(texture, points, texture_info)
     end
 end
 
+-- Only update texture points and texcoords.
+-- @param texture A texture object.
+-- @param points Points used to position texture.
+-- @param texture_info Additional loading, animation, and positioning metadata for specific texture.
+function HCTextureUtils.UpdateTexturePoints(texture, points, texture_info)
+    texture:ClearAllPoints();
+    for k, v in pairs(points) do
+        if (k == 1) then
+            texture:SetPoint(v.Anchor, v.RelativeFrame,
+                                        v.RelativeAnchor,
+                                        (v.OffsetX + texture_info.OffsetX_0),
+                                        (v.OffsetY + texture_info.OffsetY_0));
+        else
+            texture:SetPoint(v.Anchor, v.RelativeFrame,
+                                        v.RelativeAnchor,
+                                        (v.OffsetX + texture_info.OffsetX_1),
+                                        (v.OffsetY + texture_info.OffsetY_1));
+        end
+    end
+    texture:SetTexCoord(texture_info.TexCoords[1],
+                                   texture_info.TexCoords[2],
+                                   texture_info.TexCoords[3],
+                                   texture_info.TexCoords[4]);
+end
+
 -- Update general texture' accent.
 -- @param texture A texture object.
 -- @param points Points used to position texture.

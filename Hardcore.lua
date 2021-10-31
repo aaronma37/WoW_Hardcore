@@ -268,7 +268,9 @@ end
 
 function Hardcore:UNIT_EXITED_VEHICLE()
 	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
+  if Hardcore_Settings.player_frame ~= "blizzard" then
+    PFU.Funcs.Display.UpdatePlayerFrame()
+  end
 end
 
 function Hardcore:PLAYER_ENTERING_WORLD()
@@ -288,9 +290,15 @@ function Hardcore:PLAYER_ENTERING_WORLD()
  
 	
 	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
-	PFU.Funcs.Display.UpdateTargetToTFrame()
-	PFU.Funcs.Display.UpdateMinimapFrame()
+  if Hardcore_Settings.player_frame ~= "blizzard" then
+    PFU.Funcs.Display.UpdatePlayerFrame()
+  end
+  if Hardcore_Settings.targetToT_frame ~= "blizzard" then
+    PFU.Funcs.Display.UpdateTargetToTFrame()
+  end
+  if Hardcore_Settings.minimap_frame ~= "blizzard" then
+    PFU.Funcs.Display.UpdateMinimapFrame()
+  end
 	PFU.Funcs.StartAnimating()
 end
 
@@ -396,7 +404,9 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 	C_Timer.After(PICTURE_DELAY, Screenshot)
 
 	PFU.Funcs.PlayerLoaded()
-	PFU.Funcs.Display.UpdatePlayerFrame()
+  if Hardcore_Settings.player_frame ~= "blizzard" then
+    PFU.Funcs.Display.UpdatePlayerFrame()
+  end
 end
 
 function Hardcore:TIME_PLAYED_MSG(...)

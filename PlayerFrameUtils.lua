@@ -54,7 +54,10 @@ PlayerFrameSettings.Funcs.Display = {};
 -- Temporary function to fake if player is hardcore (for testing).
 -- @return Return true if player is HC according to addon.
 function PlayerIsHardcore()
-	return true;
+  if UnitGUID("target") == UnitGUID("player") then
+    return true
+  end
+  return false
 end
 
 
@@ -81,21 +84,26 @@ function PlayerFrameSettings.Funcs.PlayerLoaded(reload)
     test_frame:SetPoint("TOPLEFT")
     test_frame.tex = test_frame:CreateTexture(nil, "ARTWORK")
     test_frame.tex:SetTexture('Interface\\AddOns\\Hardcore\\Textures\\warlock_sprite.blp')
+    -- test_frame.tex:SetTexture('Interface\\AddOns\\Hardcore\\Textures\\test_sprite.blp')
+    -- test_frame.tex:SetTexture(TI.TestFrame.test_sprite.AnimationInfo.Str)
     test_frame.tex:SetAllPoints(test_frame)
     test_frame.tex:SetSize(200,200)
     test_frame.tex:SetDrawLayer("Background", 0)
     test_frame.tex:Show()
     test_frame:Show()
     TU.AddToAnimationFrames("TestFrame", test_frame.tex, TI.TestFrame.animated.AnimationInfo)
+    -- TU.AddToAnimationFrames("TestFrame", test_frame.tex, TI.TestFrame.test_sprite.AnimationInfo)
   end
 
 
     -- Hook TargetFrame classification. This is called after the target has been classified (elite, level colors, etc.)
     hooksecurefunc("TargetFrame_CheckClassification",function(self, lock)
-	    if (Hardcore_Settings.target_frame == "hardcore" and PlayerIsHardcore()) then
+      if (Hardcore_Settings.target_frame == "hardcore" and PlayerIsHardcore()) then
 		   TU.FillLevelTextPointsTable(LevelFrameData.TargetLevelText)
 		   TU.UpdateTexture(TargetFrame.borderTexture, FrameData.TargetFrameTexture.points, TI.TargetFrame.hardcore)
 		   TU.UpdateLevelText(TargetFrame.levelText, LevelFrameData.TargetLevelText.points ,TI.TargetFrame.hardcore);
+      else
+		   TU.UpdateTexturePoints(TargetFrame.borderTexture, FrameData.TargetFrameTexture.points, TI.TargetFrame.blizzard)
 	    end
 end);
     hooksecurefunc("PlayerFrame_UpdateLevelTextAnchor", ForceUpdateLevel);

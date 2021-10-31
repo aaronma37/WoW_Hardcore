@@ -95,6 +95,19 @@ HCTextureInfo.PetFrame.hardcore = {
 
 -- Target frames --
 HCTextureInfo.TargetFrame = {}
+HCTextureInfo.TargetFrame.blizzard = {
+    Str = nil,
+    AccentStr = nil,
+    OffsetX_0 = -25,
+    OffsetX_1 = 0,
+    OffsetY_0 = 0,
+    OffsetY_1 = -30,
+    LevelOffsetX = nil,
+    LevelOffsetY = nil,
+    RestIconOffsetX = nil,
+    RestIconOffsetY = nil,
+    TexCoords = {0, 1, 0, 1},
+}
 HCTextureInfo.TargetFrame.hardcore = {
     Str = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder.blp",
     AccentStr = "Interface\\AddOns\\Hardcore\\Textures\\hardcore_frame_placeholder_accent.blp",
@@ -157,5 +170,26 @@ HCTextureInfo.TestFrame.animated = {
 		    SpriteHeight = 113.777,
 		    NumFrames = 56,
 		    Throttle = .05,
+	    }
+}
+HCTextureInfo.TestFrame.test_sprite = {
+    Str = "Interface\\AddOns\\Hardcore\\Textures\\test_sprite.blp",
+    OffsetX_0 = 16,
+    OffsetX_1 = 50,
+    OffsetY_0 = 30,
+    OffsetY_1 = -4,
+    LevelOffsetX = -31,
+    LevelOffsetY = -11,
+    RestIconOffsetX = 1.5,
+    RestIconOffsetY = 3,
+    TexCoords = {0, 1, 0, 1},
+    AnimationInfo =
+	    {
+		    TextureWidth = 1024,
+		    TextureHeight = 1024,
+		    SpriteWidth = 1024/3.0,
+		    SpriteHeight = 1024/3.0,
+		    NumFrames = 9,
+		    Throttle = .5,
 	    }
 }
