@@ -50,6 +50,8 @@ Hardcore_Character = {
 	guid = "",
 	time_tracked = 0, -- seconds
 	time_played = 0, -- seconds
+	last_segment_start_time = 0, -- start of session's recorded os time
+	last_segment_end_time = 0, -- last recorded os time
 	accumulated_time_diff = 0, -- seconds
 	tracked_played_percentage = 0,
 	deaths = {},
@@ -72,12 +74,15 @@ local monitor_msg_throttle = {
 	ADD = {},
 	DEAD = {},
 }
+local guild_player_first_ping_time = {}
 local online_pulsing = {}
 local guild_versions = {}
 local guild_versions_status = {}
 local guild_online = {}
 local guild_highest_version = '0.0.0'
 local guild_roster_loading = false
+local recovery_info = nil
+local received_recover_time_ack = nil
 
 local bubble_hearth_vars = {
 	spell_id = 8690,
@@ -99,12 +104,17 @@ local COMM_RECORD_DELIM = "^"
 local COMM_COMMANDS = {
 	"PULSE",
 	"ADD", -- depreciated, we can only handle receiving
-	"DEAD" -- new death command
+	"DEAD", -- new death command
+	"REQUEST_RECOVERY_TIME",
+	"REQUEST_RECOVERY_TIME_ACK",
+
 }
 local COMM_SPAM_THRESHOLD = { -- msgs received within durations (s) are flagged as spam
 	PULSE = 3,
 	ADD = 180,
 	DEAD = 180,
+	REQUEST_RECOVERY_TIME = 180,
+	REQUEST_RECOVERY_TIME_ACK = 180,
 }
 local DEPRECATED_COMMANDS = {
 	UPDATE = 1,
@@ -650,18 +660,38 @@ function Hardcore:TIME_PLAYED_MSG(...)
 		local debug_message = "Playtime gap percentage: " .. Hardcore_Character.tracked_played_percentage .. "%."
 		Hardcore:Debug(debug_message)
 
-		-- Only warn user about playtime percentage if percentage is low enough and enough playtime is logged.
+		-- Only warn user about playtime percentage if percentage is low enough and enough playtime is logged. First attempt to recover time from guildmates.
 		if Hardcore_Character.tracked_played_percentage < PLAYED_TIME_PERC_THRESH and Hardcore_Character.time_played >
 			PLAYED_TIME_MIN_PLAYED_THRESH then
-			local message =
-				"\124cffFF0000Detected that the player's addon active time is much lower than played time. Please record the rest of your run."
-			Hardcore:Print(message)
+			local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. "" -- Request recover time information from guildmates
+			received_recover_time_ack = false
+			recovery_info = {}
+			recovery_info.recorded_last_segment_start_time = Hardcore_Character.last_segment_start_time
+			recovery_info.recorded_last_segment_end_time = Hardcore_Character.last_segment_end_time
+			CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "GUILD")
+			C_Timer.After(10, function()
+				-- Valid recovery detected
+				if recovery_info.last_segment_start_time ~= nil and recovery_info.last_segment_start_time > recovery_info.recorded_last_segment_start_time then
+					local recovered_time = recovery_info.last_segment_end_time - recovery_info.last_segment_start_time
+					Hardcore_Character.played_tracked = Hardcore_Character.played_tracked + recovered_time
+					local message =
+						"\124cffFF0000Successfully recovered " .. tostring(recovered_time) .. "s!"
+					Hardcore:Print(message)
+					Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked /
+																 Hardcore_Character.time_played * 100.0
+				else
+					local message =
+						"\124cffFF0000Detected that the player's addon active time is much lower than played time. Please record the rest of your run."
+					Hardcore:Print(message)
+				end
+			end)
 		end
 
 		-- Check playtime gap since last session
 		local duration_since_last_recording = Hardcore_Character.time_played - Hardcore_Character.time_tracked -
 													Hardcore_Character.accumulated_time_diff
 		debug_message = "Playtime gap duration: " .. duration_since_last_recording .. " seconds."
+		Hardcore_Character.last_segment_start_time = time()
 		Hardcore:Debug(debug_message)
 
 		if duration_since_last_recording > PLAYED_TIME_GAP_THRESH then
@@ -757,7 +787,6 @@ end
 function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 	-- Ignore messages that are not ours
 	if COMM_NAME == prefix then
-		-- Get the command
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if DEPRECATED_COMMANDS[command] or alert_msg_time[command] == nil then return end
 		if alert_msg_time[command][sender] and (time() - alert_msg_time[command][sender] < COMM_SPAM_THRESHOLD[command]) then
@@ -779,6 +808,29 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			Hardcore:Add(sender)
 		elseif command == COMM_COMMANDS[1] then
 			Hardcore:ReceivePulse(data, sender)
+		elseif command == COMM_COMMANDS[3] then -- send recover time ack
+			if CTL and isInGuild and guild_player_first_ping_time[sender] ~= nil and pulses[sender] ~= nil then
+				local commMessage = COMM_COMMANDS[4] .. COMM_COMMAND_DELIM .. tostring(guild_player_first_ping_time[sender]) .. COMM_COMMAND_DELIM .. tostring(pulses[sender])
+				CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", sender)
+			end
+		elseif command == COMM_COMMANDS[4] then -- receive recover time ack
+			local _, last_segment_start_time, last_segment_end_time = string.split(COMM_COMMAND_DELIM, datastr)
+			if CTL and isInGuild then
+				-- First ack message
+				if received_recover_time_ack == false then
+					recovery_info.last_segment_start_time = last_segment_start_time
+					recovery_info.last_segment_end_time = last_segment_end_time
+					received_recover_time_ack = true
+				-- Other player's might have better recover time data
+				else
+					if last_segment_start_time < recovery_info.last_segment_start_time then
+						recovery_info.last_segment_start_time = last_segment_start_time
+					end
+					if last_segment_end_time > recovery_info.last_segment_end_time then
+						recovery_info.last_segment_end_time = last_segment_end_time
+					end
+				end
+			end
 		else
 			-- Hardcore:Debug("Unknown command :"..command)
 		end
@@ -1404,6 +1456,9 @@ function Hardcore:ReceivePulse(data, sender)
 		guild_versions_status[FULL_PLAYER_NAME] = 'outdated'
 	end
 
+	if guild_player_first_ping_time[sender] == nil then
+		guild_player_first_ping_time[sender] = time()
+	end
 	pulses[sender] = time()
 end
 
