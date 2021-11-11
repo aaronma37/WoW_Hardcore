@@ -651,8 +651,7 @@ function Hardcore:TIME_PLAYED_MSG(...)
 
 		-- Check playtime gap percentage
 		if Hardcore_Character.time_played ~= 0 then
-			Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked /
-																 Hardcore_Character.time_played * 100.0
+			Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked / Hardcore_Character.time_played * 100.0
 		else
 			Hardcore_Character.tracked_played_percentage = 100.0
 		end
@@ -677,8 +676,7 @@ function Hardcore:TIME_PLAYED_MSG(...)
 					local message =
 						"\124cffFF0000Successfully recovered " .. tostring(recovered_time) .. "s!"
 					Hardcore:Print(message)
-					Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked /
-																 Hardcore_Character.time_played * 100.0
+					Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked / Hardcore_Character.time_played * 100.0
 				else
 					local message =
 						"\124cffFF0000Detected that the player's addon active time is much lower than played time. Please record the rest of your run."
