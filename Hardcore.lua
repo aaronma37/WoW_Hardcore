@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with the Hardcore AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+math.randomseed(os.clock())
+
 --[[ Const variables ]]--
 local GRIEF_WARNING_OFF = 0
 local GRIEF_WARNING_SAME_FACTION = 1
@@ -662,7 +664,20 @@ function Hardcore:TIME_PLAYED_MSG(...)
 		-- Only warn user about playtime percentage if percentage is low enough and enough playtime is logged. First attempt to recover time from guildmates.
 		if Hardcore_Character.tracked_played_percentage < PLAYED_TIME_PERC_THRESH and Hardcore_Character.time_played >
 			PLAYED_TIME_MIN_PLAYED_THRESH then
-			local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. "" -- Request recover time information from guildmates
+			local message =
+				"\124cffFF0000Detected that the player's addon active time is much lower than played time. Please record the rest of your run."
+			Hardcore:Print(message)
+		end
+
+		-- Check playtime gap since last session
+		local duration_since_last_recording = Hardcore_Character.time_played - Hardcore_Character.time_tracked -
+													Hardcore_Character.accumulated_time_diff
+		debug_message = "Playtime gap duration: " .. duration_since_last_recording .. " seconds."
+		Hardcore_Character.last_segment_start_time = time()
+		Hardcore:Debug(debug_message)
+
+		if duration_since_last_recording > PLAYED_TIME_GAP_THRESH then
+			local commMessage = COMM_COMMANDS[4] .. COMM_COMMAND_DELIM .. "" -- Request recover time information from guildmates
 			received_recover_time_ack = false
 			recovery_info = {}
 			recovery_info.recorded_last_segment_start_time = Hardcore_Character.last_segment_start_time
@@ -678,36 +693,25 @@ function Hardcore:TIME_PLAYED_MSG(...)
 					Hardcore:Print(message)
 					Hardcore_Character.tracked_played_percentage = Hardcore_Character.time_tracked / Hardcore_Character.time_played * 100.0
 				else
-					local message =
-						"\124cffFF0000Detected that the player's addon active time is much lower than played time. Please record the rest of your run."
+					local played_time_gap_info = {}
+					played_time_gap_info.duration_since_last_recording = duration_since_last_recording
+					played_time_gap_info.date = date("%m/%d/%y %H:%M:%S")
+					if Hardcore_Character.played_time_gap_warnings == nil then
+						Hardcore_Character.played_time_gap_warnings = {}
+						Hardcore_Character.played_time_gap_warnings[1] = played_time_gap_info
+					else
+						table.insert(Hardcore_Character.played_time_gap_warnings, played_time_gap_info)
+					end
+					local message = "\124cffFF0000Addon/Playtime gap detected at date" ..
+										Hardcore_Character.played_time_gap_warnings[#Hardcore_Character.played_time_gap_warnings]
+											.date .. " with a duration: " ..
+										Hardcore_Character.played_time_gap_warnings[#Hardcore_Character.played_time_gap_warnings]
+											.duration_since_last_recording .. " seconds."
 					Hardcore:Print(message)
-				end
+
+						end
 			end)
-		end
 
-		-- Check playtime gap since last session
-		local duration_since_last_recording = Hardcore_Character.time_played - Hardcore_Character.time_tracked -
-													Hardcore_Character.accumulated_time_diff
-		debug_message = "Playtime gap duration: " .. duration_since_last_recording .. " seconds."
-		Hardcore_Character.last_segment_start_time = time()
-		Hardcore:Debug(debug_message)
-
-		if duration_since_last_recording > PLAYED_TIME_GAP_THRESH then
-			local played_time_gap_info = {}
-			played_time_gap_info.duration_since_last_recording = duration_since_last_recording
-			played_time_gap_info.date = date("%m/%d/%y %H:%M:%S")
-			if Hardcore_Character.played_time_gap_warnings == nil then
-				Hardcore_Character.played_time_gap_warnings = {}
-				Hardcore_Character.played_time_gap_warnings[1] = played_time_gap_info
-			else
-				table.insert(Hardcore_Character.played_time_gap_warnings, played_time_gap_info)
-			end
-			local message = "\124cffFF0000Addon/Playtime gap detected at date" ..
-								Hardcore_Character.played_time_gap_warnings[#Hardcore_Character.played_time_gap_warnings]
-									.date .. " with a duration: " ..
-								Hardcore_Character.played_time_gap_warnings[#Hardcore_Character.played_time_gap_warnings]
-									.duration_since_last_recording .. " seconds."
-			Hardcore:Print(message)
 		end
 	end
 
@@ -808,8 +812,10 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			Hardcore:ReceivePulse(data, sender)
 		elseif command == COMM_COMMANDS[3] then -- send recover time ack
 			if CTL and isInGuild and guild_player_first_ping_time[sender] ~= nil and pulses[sender] ~= nil then
-				local commMessage = COMM_COMMANDS[4] .. COMM_COMMAND_DELIM .. tostring(guild_player_first_ping_time[sender]) .. COMM_COMMAND_DELIM .. tostring(pulses[sender])
-				CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", sender)
+				C_Timer.After(math.random(0, 8), function()
+					local commMessage = COMM_COMMANDS[5] .. COMM_COMMAND_DELIM .. tostring(guild_player_first_ping_time[sender]) .. COMM_COMMAND_DELIM .. tostring(pulses[sender])
+					CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", sender)
+				end)
 			end
 		elseif command == COMM_COMMANDS[4] then -- receive recover time ack
 			local _, last_segment_start_time, last_segment_end_time = string.split(COMM_COMMAND_DELIM, datastr)
