@@ -43,6 +43,9 @@ Hardcore_Settings = {
 	monitor = false,
 	filter_f_in_chat = false,
 	show_version_in_chat = false,
+	alert_frame_x_offset = 0,
+	alert_frame_y_offset = -150,
+	alert_frame_scale = 0.7,
 }
 
 --[[ Character saved variables ]]--
@@ -217,8 +220,15 @@ local ALERT_STYLES = {
 		delay = 10,
 		alertSound = 8959
 	},
+	hc_sample = {
+		frame = Hardcore_Alert_Frame,
+		text = Hardcore_Alert_Text,
+		icon = Hardcore_Alert_Icon,
+		file = "alert-hc-red.blp",
+		delay = 30,
+		alertSound = 8959
+	},
 }
-Hardcore_Alert_Frame:SetScale(0.7)
 
 -- the big frame object for our addon
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
@@ -232,83 +242,164 @@ local options = {
 	type = "group",
 	args = {
 		alert_options_header = {
-			type = "header",
-			name = "Alert options",
+			type = "group",
+			name = "Alerts",
 			order = 1,
-		},
-		death_alerts = {
-			type = "toggle",
-			name = "Death alerts",
-			desc = "Toggle on/off death alerts.",
-			get = (function()return Hardcore_Settings.notify end),
-			set = (function()
-				Hardcore_Toggle_Alerts()
-				if Hardcore_Settings.notify then
-					Hardcore:Print("Alerts enabled.")
-				else
-					Hardcore:Print("Alerts disabled.")
-				end
-			end),
-			order = 2,
-		},
-		grief_alerts = {
-			type = "select",
-			name = "Grief alerts",
-			desc = "Type of grief alerts.",
-			values = {
-				off = "off",
-				alliance = "alliance",
-				horde = "horde",
-				both = "both",
+			inline = true,
+			args = {
+				death_alerts = {
+					type = "select",
+					name = "Death alerts",
+					desc = "Type of death alerts.",
+					values = {
+						off = "off",
+						on = "on",
+					},
+					get = function()
+						if Hardcore_Settings.notify then return "on" end
+						return "off"
+					end,
+					set = function(info, value)
+						Hardcore_Settings.notify = (value == "on")
+					end,
+					order = 2,
+				},
+				grief_alerts = {
+					type = "select",
+					name = "Grief alerts",
+					desc = "Type of grief alerts.",
+					values = {
+						off = "off",
+						alliance = "alliance",
+						horde = "horde",
+						both = "both",
+					},
+					get = function(info)
+						if Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_OFF then
+							return "off"
+						elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_SAME_FACTION then
+							if PLAYER_FACTION == "Alliance" then
+								return "alliance"
+							else
+								return "horde"
+							end
+						elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_ENEMY_FACTION then
+							if PLAYER_FACTION == "Horde" then
+								return "alliance"
+							else
+								return "horde"
+							end
+						else
+							return "both"
+						end
+					end,
+					set = function(info, value)
+						Hardcore:SetGriefAlertCondition(value)
+					end,
+					order = 3,
+				},
 			},
-			get = function(info)
-				if Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_OFF then
-					return "off"
-				elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_SAME_FACTION then
-					if PLAYER_FACTION == "Alliance" then
-						return "alliance"
-					else
-						return "horde"
-					end
-				elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_ENEMY_FACTION then
-					if PLAYER_FACTION == "Horde" then
-						return "alliance"
-					else
-						return "horde"
-					end
-				else
-					return "both"
-				end
-			end,
-			set = function(info, value)
-				Hardcore:SetGriefAlertCondition(value)
-			end,
-			order = 3,
+		},
+		alert_pos_group = {
+			type = "group",
+			name = "Alert position and scale",
+			inline = true,
+			order = 4,
+			args = {
+				alerts_x_pos = {
+					type = "range",
+					name = "X-offset",
+					desc = "Modify alert frame's x-offset.",
+					min = -100,
+					max = 100,
+					get = (function()return Hardcore_Settings.alert_frame_x_offset / 10 end),
+					set = (function(info, value)
+						Hardcore_Settings.alert_frame_x_offset = value * 10
+						Hardcore:ApplyAlertFrameSettings()
+					end),
+					order = 4,
+				},
+				alerts_y_pos = {
+					type = "range",
+					name = "Y-offset",
+					desc = "Modify alert frame's y-offset.",
+					min = -100,
+					max = 100,
+					get = (function()return Hardcore_Settings.alert_frame_y_offset / 10 end),
+					set = (function(info, value)
+						Hardcore_Settings.alert_frame_y_offset = value * 10
+						Hardcore:ApplyAlertFrameSettings()
+					end),
+					order = 4,
+				},
+				alerts_scale = {
+					type = "range",
+					name = "Scale",
+					desc = "Modify alert frame's scale.",
+					min = 0,
+					max = 2,
+					get = (function()return Hardcore_Settings.alert_frame_scale end),
+					set = (function(info, value)
+						Hardcore_Settings.alert_frame_scale = value
+						Hardcore:ApplyAlertFrameSettings()
+					end),
+					order = 4,
+				},
+				alert_sample = {
+					type = "execute",
+					name = "show",
+					desc = "Show sample alert.",
+					func = (function(info, value)
+						Hardcore:ShowAlertFrame(ALERT_STYLES.hc_sample, "Sample alert frame text.")
+						Hardcore:ApplyAlertFrameSettings()
+					end),
+					order = 5,
+				},
+			},
 		},
 		chat_filter_header = {
-			type = "header",
+			type = "group",
 			name = "Chat filters",
-			order = 4,
-		},
-		f_in_chat_filter = {
-			type = "toggle",
-			name = "Filter F in chat",
-			desc = "Remove Fs in chat.",
-			get = (function()return Hardcore_Settings.filter_f_in_chat end),
-			set = function()
-				Hardcore_Settings.filter_f_in_chat = not Hardcore_Settings.filter_f_in_chat
-			end,
-			order = 5,
-		},
-		version_in_chat_filter = {
-			type = "toggle",
-			name = "HC versions in chat",
-			desc = "Show player versions in chat.",
-			get = (function()return Hardcore_Settings.show_version_in_chat end),
-			set = function()
-				Hardcore_Settings.show_version_in_chat = not Hardcore_Settings.show_version_in_chat
-			end,
 			order = 6,
+			inline = true,
+			args = {
+				f_in_chat_filter = {
+					type = "toggle",
+					name = "Filter F in chat",
+					desc = "Remove Fs in chat.",
+					get = (function()return Hardcore_Settings.filter_f_in_chat end),
+					set = function()
+						Hardcore_Settings.filter_f_in_chat = not Hardcore_Settings.filter_f_in_chat
+					end,
+					order = 7,
+				},
+				version_in_chat_filter = {
+					type = "toggle",
+					name = "HC versions in chat",
+					desc = "Show player versions in chat.",
+					get = (function()return Hardcore_Settings.show_version_in_chat end),
+					set = function()
+						Hardcore_Settings.show_version_in_chat = not Hardcore_Settings.show_version_in_chat
+					end,
+					order = 8,
+				},
+			},
+		},
+		apply_defaults = {
+			type = "execute",
+			name = "Defaults",
+			desc = "Change back to default configuration.",
+			func = function()
+				Hardcore_Settings.show_version_in_chat = false
+				Hardcore_Settings.filter_f_in_chat = false
+				Hardcore_Settings.notify = true
+				Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_BOTH_FACTIONS 
+				Hardcore_Settings.alert_frame_x_offset = 0
+				Hardcore_Settings.alert_frame_y_offset = -150
+				Hardcore_Settings.alert_frame_scale = .7
+				Hardcore:ApplyAlertFrameSettings()
+			end,
+			order = 9,
 		},
 	},
 }
@@ -448,6 +539,7 @@ function Hardcore:PLAYER_LOGIN()
 	PLAYER_GUID = UnitGUID("player")
 	PLAYER_FACTION, _ = UnitFactionGroup("player")
 	local PLAYER_LEVEL = UnitLevel("player")
+	Hardcore:ApplyAlertFrameSettings()
 
 	-- fires on first loading
 	self:RegisterEvent("PLAYER_UNGHOST")
@@ -1699,6 +1791,11 @@ function Hardcore:SetGriefAlertCondition(grief_alert_option)
 		Hardcore:Print("Grief alert is currently set to: " .. grief_alert_setting_msg)
 		Hardcore:Print("|cff00ff00Grief alert options:|r off horde alliance both")
 	end
+end
+
+function Hardcore:ApplyAlertFrameSettings()
+	Hardcore_Alert_Frame:SetScale(Hardcore_Settings.alert_frame_scale)
+	Hardcore_Alert_Frame:SetPoint("TOP", "UIParent", "TOP", Hardcore_Settings.alert_frame_x_offset / Hardcore_Settings.alert_frame_scale, Hardcore_Settings.alert_frame_y_offset / Hardcore_Settings.alert_frame_scale)
 end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
