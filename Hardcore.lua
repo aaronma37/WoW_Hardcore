@@ -41,6 +41,8 @@ Hardcore_Settings = {
 	notify = true,
 	debug_log = {},
 	monitor = false,
+	filter_f_in_chat = false,
+	show_version_in_chat = false,
 }
 
 --[[ Character saved variables ]]--
@@ -224,6 +226,92 @@ Hardcore.ALERT_STYLES = ALERT_STYLES
 
 Hardcore_Frame:ApplyBackdrop()
 
+local options = {
+	name = "Hardcore",
+	handler = Hardcore,
+	type = "group",
+	args = {
+		alert_options_header = {
+			type = "header",
+			name = "Alert options",
+			order = 1,
+		},
+		death_alerts = {
+			type = "toggle",
+			name = "Death alerts",
+			desc = "Toggle on/off death alerts.",
+			get = (function()return Hardcore_Settings.notify end),
+			set = (function()
+				Hardcore_Toggle_Alerts()
+				if Hardcore_Settings.notify then
+					Hardcore:Print("Alerts enabled.")
+				else
+					Hardcore:Print("Alerts disabled.")
+				end
+			end),
+			order = 2,
+		},
+		grief_alerts = {
+			type = "select",
+			name = "Grief alerts",
+			desc = "Type of grief alerts.",
+			values = {
+				off = "off",
+				alliance = "alliance",
+				horde = "horde",
+				both = "both",
+			},
+			get = function(info)
+				if Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_OFF then
+					return "off"
+				elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_SAME_FACTION then
+					if PLAYER_FACTION == "Alliance" then
+						return "alliance"
+					else
+						return "horde"
+					end
+				elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_ENEMY_FACTION then
+					if PLAYER_FACTION == "Horde" then
+						return "alliance"
+					else
+						return "horde"
+					end
+				else
+					return "both"
+				end
+			end,
+			set = function(info, value)
+				Hardcore:SetGriefAlertCondition(value)
+			end,
+			order = 3,
+		},
+		chat_filter_header = {
+			type = "header",
+			name = "Chat filters",
+			order = 4,
+		},
+		f_in_chat_filter = {
+			type = "toggle",
+			name = "Filter F in chat",
+			desc = "Remove Fs in chat.",
+			get = (function()return Hardcore_Settings.filter_f_in_chat end),
+			set = function()
+				Hardcore_Settings.filter_f_in_chat = not Hardcore_Settings.filter_f_in_chat
+			end,
+			order = 5,
+		},
+		version_in_chat_filter = {
+			type = "toggle",
+			name = "HC versions in chat",
+			desc = "Show player versions in chat.",
+			get = (function()return Hardcore_Settings.show_version_in_chat end),
+			set = function()
+				Hardcore_Settings.show_version_in_chat = not Hardcore_Settings.show_version_in_chat
+			end,
+			order = 6,
+		},
+	},
+}
 --[[ Command line handler ]]--
 
 local function SlashHandler(msg, editbox)
@@ -260,50 +348,7 @@ local function SlashHandler(msg, editbox)
 		for substring in args:gmatch("%S+") do
 			grief_alert_option = substring
 		end
-		if grief_alert_option == "off" then
-			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_OFF
-			Hardcore:Print("Grief alert set to off.")
-		elseif grief_alert_option == "horde" then
-			if PLAYER_FACTION == "Horde" then
-				Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_SAME_FACTION
-				Hardcore:Print("Grief alert set to same faction.")
-			else
-				Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_ENEMY_FACTION
-				Hardcore:Print("Grief alert set to enemy faction.")
-			end
-		elseif grief_alert_option == "alliance" then
-			if PLAYER_FACTION == "Alliance" then
-				Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_SAME_FACTION
-				Hardcore:Print("Grief alert set to same faction.")
-			else
-				Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_ENEMY_FACTION
-				Hardcore:Print("Grief alert set to enemy faction.")
-			end
-		elseif grief_alert_option == "both" then
-			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_BOTH_FACTIONS
-			Hardcore:Print("Grief alert set to both factions.")
-		else
-			local grief_alert_setting_msg = ""
-			if Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_OFF then
-				grief_alert_setting_msg = "off"
-			elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_SAME_FACTION then
-				if PLAYER_FACTION == "Alliance" then
-					grief_alert_setting_msg = "same faction (alliance)"
-				else
-					grief_alert_setting_msg = "same faction (horde)"
-				end
-			elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_ENEMY_FACTION then
-				if PLAYER_FACTION == "Alliance" then
-					grief_alert_setting_msg = "enemy faction (horde)"
-				else
-					grief_alert_setting_msg = "enemy faction (alliance)"
-				end
-			elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_BOTH_FACTIONS then
-				grief_alert_setting_msg = "both factions"
-			end
-			Hardcore:Print("Grief alert is currently set to: " .. grief_alert_setting_msg)
-			Hardcore:Print("|cff00ff00Grief alert options:|r off horde alliance both")
-		end
+		Hardcore:SetGriefAlertCondition(grief_alert_option)
 	-- Alert debug code
 	elseif cmd == "alert" and debug == true then
 		local head, tail = "", {}
@@ -388,6 +433,8 @@ function Hardcore:Startup()
 	-- actually start loading the addon once player ui is loading
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_LOGIN")
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Hardcore", options)
+	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Hardcore", "Hardcore")
 end
 
 --[[ Events ]]--
@@ -1607,5 +1654,66 @@ function Hardcore:HandleLegacyDeaths()
 	end
 end
 
+function Hardcore:SetGriefAlertCondition(grief_alert_option)
+	if grief_alert_option == "off" then
+		Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_OFF
+		Hardcore:Print("Grief alert set to off.")
+	elseif grief_alert_option == "horde" then
+		if PLAYER_FACTION == "Horde" then
+			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_SAME_FACTION
+			Hardcore:Print("Grief alert set to same faction.")
+		else
+			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_ENEMY_FACTION
+			Hardcore:Print("Grief alert set to enemy faction.")
+		end
+	elseif grief_alert_option == "alliance" then
+		if PLAYER_FACTION == "Alliance" then
+			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_SAME_FACTION
+			Hardcore:Print("Grief alert set to same faction.")
+		else
+			Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_ENEMY_FACTION
+			Hardcore:Print("Grief alert set to enemy faction.")
+		end
+	elseif grief_alert_option == "both" then
+		Hardcore_Character.grief_warning_conditions = GRIEF_WARNING_BOTH_FACTIONS
+		Hardcore:Print("Grief alert set to both factions.")
+	else
+		local grief_alert_setting_msg = ""
+		if Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_OFF then
+			grief_alert_setting_msg = "off"
+		elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_SAME_FACTION then
+			if PLAYER_FACTION == "Alliance" then
+				grief_alert_setting_msg = "same faction (alliance)"
+			else
+				grief_alert_setting_msg = "same faction (horde)"
+			end
+		elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_ENEMY_FACTION then
+			if PLAYER_FACTION == "Alliance" then
+				grief_alert_setting_msg = "enemy faction (horde)"
+			else
+				grief_alert_setting_msg = "enemy faction (alliance)"
+			end
+		elseif Hardcore_Character.grief_warning_conditions == GRIEF_WARNING_BOTH_FACTIONS then
+			grief_alert_setting_msg = "both factions"
+		end
+		Hardcore:Print("Grief alert is currently set to: " .. grief_alert_setting_msg)
+		Hardcore:Print("|cff00ff00Grief alert options:|r off horde alliance both")
+	end
+end
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
+	if Hardcore_Settings.filter_f_in_chat then
+		if message == "f" or message == "F" then
+			return true, message, sender, ...
+		end
+	end
+	if Hardcore_Settings.show_version_in_chat then
+		if guild_versions[sender] then
+			message = "|cfffd9122[" .. guild_versions[sender] .. "]|r " .. message
+		end
+	end
+	return false, message, sender, ... -- don't hide this message
+    -- note that you must return *all* of the values that were passed to your filter, even ones you didn't change
+end)
 --[[ Start Addon ]]--
 Hardcore:Startup()
