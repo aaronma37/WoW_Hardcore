@@ -55,6 +55,7 @@ Hardcore_Character = {
 	played_time_gap_warnings = {},
 	trade_partners = {},
 	grief_warning_conditions = GRIEF_WARNING_BOTH_FACTIONS,
+	first_level_found = {}, -- Records the lowest level with addon enabled
 }
 
 --[[ Local variables ]]--
@@ -346,7 +347,8 @@ local saved_variable_meta = {
 	{ key = "bubble_hearth_incidents", initial_data = {} },
 	{ key = "played_time_gap_warnings", initial_data = {} },
 	{ key = "trade_partners", initial_data = {} },
-	{ key = "grief_warning_conditions", initial_data = GRIEF_WARNING_BOTH_FACTIONS }
+	{ key = "grief_warning_conditions", initial_data = GRIEF_WARNING_BOTH_FACTIONS },
+	{ key = "first_level_found", initial_data = UnitLevel("player") }
 }
 
 function Hardcore:InitializeSavedVariables()
