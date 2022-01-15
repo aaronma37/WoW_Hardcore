@@ -46,6 +46,7 @@ Hardcore_Settings = {
 	alert_frame_x_offset = 0,
 	alert_frame_y_offset = -150,
 	alert_frame_scale = 0.7,
+	show_minimap_mailbox_icon = false,
 }
 
 --[[ Character saved variables ]]--
@@ -385,6 +386,31 @@ local options = {
 				},
 			},
 		},
+		miscellaneous_header = {
+			type = "group",
+			name = "Miscellaneous",
+			order = 9,
+			inline = true,
+			args = {
+				show_minimap_icon = {
+					type = "toggle",
+					name = "Show minimap mail icon",
+					desc = "Show minimap mail icon",
+					get = (function()return Hardcore_Settings.show_minimap_mailbox_icon end),
+					set = function()
+						Hardcore_Settings.show_minimap_mailbox_icon = not Hardcore_Settings.show_minimap_mailbox_icon
+						if Hardcore_Settings.show_minimap_mailbox_icon == true then
+							MiniMapMailIcon:Show()
+							MiniMapMailBorder:Show()
+						else
+							MiniMapMailIcon:Hide()
+							MiniMapMailBorder:Hide()
+						end
+					end,
+					order = 10,
+				},
+			},
+		},
 		apply_defaults = {
 			type = "execute",
 			name = "Defaults",
@@ -397,9 +423,10 @@ local options = {
 				Hardcore_Settings.alert_frame_x_offset = 0
 				Hardcore_Settings.alert_frame_y_offset = -150
 				Hardcore_Settings.alert_frame_scale = .7
+				Hardcore_Settings.show_minimap_mailbox_icon = false
 				Hardcore:ApplyAlertFrameSettings()
 			end,
-			order = 9,
+			order = 11,
 		},
 	},
 }
@@ -686,6 +713,11 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	PLAYER_NAME, _ = UnitName("player")
 	Hardcore:PrintBubbleHearthInfractions()
 	Hardcore:Monitor("Monitoring malicious users enabled.")
+
+	if Hardcore_Settings.show_minimap_mailbox_icon == false then
+		MiniMapMailIcon:Hide()
+		MiniMapMailBorder:Hide()
+	end
 
 	-- initialize addon communication
 	if (not C_ChatInfo.IsAddonMessagePrefixRegistered(COMM_NAME)) then
