@@ -312,6 +312,26 @@ local function SlashHandler(msg, editbox)
 		    end
 		  end
 		end
+	elseif cmd == "renamepartypartner1" then
+		if Hardcore_Character.party_mode == nil or (Hardcore_Character.party_mode == "Duo" or Hardcore_Character.party_mode == "Trio") == false then
+		  Hardcore:Print("Cannot rename party partner 1; Not in valid duo or trio group.")
+		else
+		  for substring in args:gmatch("%S+") do
+			  local new_member_name = string.lower(substring)
+			  new_member_name = new_member_name:gsub("^%l", string.upper)
+			  Hardcore_Character.team[1] = new_member_name
+		  end
+		end
+	elseif cmd == "renamepartypartner2" then
+		if Hardcore_Character.party_mode == nil or Hardcore_Character.party_mode ~= "Trio" then
+		  Hardcore:Print("Cannot rename party partner 1; Not in valid trio group.")
+		else
+		  for substring in args:gmatch("%S+") do
+			  local new_member_name = string.lower(substring)
+			  new_member_name = new_member_name:gsub("^%l", string.upper)
+			  Hardcore_Character.team[2] = new_member_name
+		  end
+		end
 	elseif cmd == "dk" then
 		-- sacrifice your current lvl 55 char to allow for making DK
 		local dk_convert_option = ""
