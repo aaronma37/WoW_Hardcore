@@ -525,11 +525,11 @@ function Hardcore:PLAYER_LOGIN()
 	-- Show the first menu screen.  Requires short delay
 	if (UnitLevel("player") < 2) then
 	  C_Timer.After(1.0, function()
-	    ShowFirstMenu(Hardcore_Character, failure_function_executor)
+	    print(Hardcore_Settings["leaderboard"])
+	    ShowFirstMenu(Hardcore_Character, failure_function_executor, Hardcore_Settings.leaderboard)
 	    Hardcore_Character.first_recorded = GetServerTime()
 	  end)
 	end
-
 	-- cache player data
 	_, class, _ = UnitClass("player")
 	PLAYER_NAME, _ = UnitName("player")
