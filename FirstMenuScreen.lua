@@ -1,4 +1,4 @@
-
+local name_to_idx = {}
 local AceGUI = LibStub("AceGUI-3.0")
 
 local function errorhandler(err)
@@ -109,7 +109,12 @@ AceGUI:RegisterLayout("FlowTight",
 					end
 					--anchor the previous row, we will now know its height and offset
 					rowstart:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -(height + (rowoffset - rowstartoffset) + 3))
-					height = height + rowheight - 10
+					if rowheight == 35 then
+					  height = height + rowheight - 10
+					else
+					  height = height + rowheight - 10
+					end
+					print("A", i, height, rowheight)
 					--save this as the rowstart so we can anchor it after the row is complete and we have the max height and offset of controls in it
 					rowstart = frame
 					rowstartoffset = frameoffset
@@ -492,6 +497,7 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 	local function DrawLeaderboardPlayerRow(player_data, _scroll_frame, rank)
 		-- local btn_container = AceGUI:Create("SimpleGroup")
 		local btn_container = AceGUI:Create("HardcoreLeaderboardRowInlineGroup")
+		btn_container:ClearAllPoints()
 		btn_container:SetWidth(600)
 		btn_container:SetHeight(10)
 		btn_container:SetLayout("Flow")
@@ -523,10 +529,20 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 		btn_container:AddChild(title)
 
 		local achievements_container = AceGUI:Create("SimpleGroup")
+		achievements_container:ClearAllPoints()
 		achievements_container:SetWidth(150)
 		achievements_container:SetHeight(10)
 		achievements_container:SetLayout("FlowTight")
 		btn_container:AddChild(achievements_container)
+
+		local classes_container = AceGUI:Create("SimpleGroup")
+		classes_container:ClearAllPoints()
+		classes_container:SetWidth(160)
+		classes_container:SetHeight(10)
+		classes_container:SetLayout("FlowTight")
+		btn_container:AddChild(classes_container)
+
+
 		local classes = {
 		  ["Druid"] = "Interface\\Addons\\Hardcore\\Media\\icon_druid.blp",
 		  ["Hunter"] = "Interface\\Addons\\Hardcore\\Media\\icon_hunter.blp",
@@ -541,7 +557,6 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 		-- "Death Knight" = "Interface\\Addons\\Hardcore\\Media\\icon_death_knight.blp",
 		for k,v in pairs(classes) do
 		  if player_data[k] ~= nil and player_data[k] ~= "" then
-		    print(v)
 		    for n=1,player_data[k] do
 		      local achievement_icon = AceGUI:Create("Icon")
 		      achievement_icon:SetWidth(20)
@@ -554,19 +569,14 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 		  end
 		end
 
-		local classes_container = AceGUI:Create("SimpleGroup")
-		classes_container:SetWidth(150)
-		classes_container:SetHeight(10)
-		classes_container:SetLayout("Flow")
-		btn_container:AddChild(classes_container)
-
 		for i,k in ipairs(player_data["achievements"]) do
 		  if _G.achievements[k] ~= nil then
 		    local achievement_icon = AceGUI:Create("Icon")
-		    achievement_icon:SetWidth(25)
-		    achievement_icon:SetHeight(25)
+		    achievement_icon:SetPoint("TOP", 0, 10)
+		    achievement_icon:SetWidth(24)
+		    achievement_icon:SetHeight(24)
 		    achievement_icon:SetImage(_G.achievements[k].icon_path)
-		    achievement_icon:SetImageSize(25, 25)
+		    achievement_icon:SetImageSize(24, 24)
 		    achievement_icon.image:SetVertexColor(1,1,1)
 		    classes_container:AddChild(achievement_icon)
 		  end
@@ -576,12 +586,25 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 
 
 	end
+	
+	local function processLeaderboard()
+	    for k, achievement in pairs(leaderboard) do
+	      name_to_idx[achievement["name"]:lower()] = k
+	    end
+	end
 
-	local function DrawLeaderboardTab(container, _scroll_frame)
+	local function DrawLeaderboardTab(container, _scroll_frame, filter)
+		processLeaderboard()
+		_scroll_frame:ReleaseChildren()
 		local num = 0
-		for k, achievement in pairs(leaderboard) do
-		      num = num + 1
-		      DrawLeaderboardPlayerRow(achievement, _scroll_frame, num)
+		if filter == nil then
+		  for k, achievement in pairs(leaderboard) do
+			if num > 49 then break end
+			num = num + 1
+			DrawLeaderboardPlayerRow(achievement, _scroll_frame, num)
+		  end
+		elseif filter["player"] ~=nil and name_to_idx[filter["player"]] ~= nil then
+		  DrawLeaderboardPlayerRow(leaderboard[name_to_idx[filter["player"]]], _scroll_frame, name_to_idx[filter["player"]])
 		end
 
 		local bottom_buffer = AceGUI:Create("SimpleGroup")
@@ -602,6 +625,9 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 	tabcontainer:SetFullWidth(true)
 	tabcontainer:SetFullHeight(true) -- probably?
 	tabcontainer:SetLayout("Fill") -- important!
+	tabcontainer:SetCallback("OnClose", function(widget)
+	  AceGUI:Release(widget)
+	end)
 
 	-- Callback function for OnGroupSelected
 	local function SelectGroup(container, event, group)
@@ -634,6 +660,7 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 		elseif group == "Player Leaderboard" then
 			local leaderboard_container = AceGUI:Create("SimpleGroup")
 			leaderboard_container:SetFullWidth(true)
+			leaderboard_container:ClearAllPoints()
 			leaderboard_container:SetHeight(600)
 			leaderboard_container:SetLayout("List")
 			tabcontainer:AddChild(leaderboard_container)
@@ -644,6 +671,25 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 			leaderboard_container_header_options:SetLayout("Flow")
 			leaderboard_container_header_options:SetPoint("BOTTOM", 0, -100)
 			leaderboard_container:AddChild(leaderboard_container_header_options)
+
+			local leaderboard_container_header = AceGUI:Create("SimpleGroup")
+			leaderboard_container_header:SetFullWidth(true)
+			leaderboard_container_header:SetHeight(200)
+			leaderboard_container_header:SetLayout("Flow")
+			leaderboard_container_header:SetPoint("BOTTOM", 0, -100)
+			leaderboard_container:AddChild(leaderboard_container_header)
+
+			local scroll_container = AceGUI:Create("SimpleGroup")
+			scroll_container:SetFullWidth(true)
+			scroll_container:SetHeight(300)
+			scroll_container:SetLayout("Flow")
+			leaderboard_container:AddChild(scroll_container)
+
+			local scroll_frame = AceGUI:Create("ScrollFrame")
+			scroll_frame:SetHeight(300)
+			scroll_frame:SetLayout("ListTight")
+			scroll_container:AddChild(scroll_frame)
+			DrawLeaderboardTab(container, scroll_frame)
 
 			local dropdown = AceGUI:Create("Dropdown")
 			dropdown:SetWidth(120)
@@ -665,17 +711,21 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 			tm1:DisableButton(true)
 			leaderboard_container_header_options:AddChild(tm1)
 
+			tm1:SetCallback("OnTextChanged", function()
+			  print(name_to_idx["Cheezey"])
+			  print(name_to_idx[tm1:GetText()])
+			  local filter
+			  if tm1:GetText() ~= "" then
+			    filter = {["player"] = tm1:GetText():lower()} 
+			  end
+			  DrawLeaderboardTab(container, scroll_frame, filter)
+			end)
+
 			local tm1 = AceGUI:Create("Button")
 			tm1:SetText("Achievement Filter")
 			tm1:SetPoint("TOP", 20, 5)
 			leaderboard_container_header_options:AddChild(tm1)
 
-			local leaderboard_container_header = AceGUI:Create("SimpleGroup")
-			leaderboard_container_header:SetFullWidth(true)
-			leaderboard_container_header:SetHeight(200)
-			leaderboard_container_header:SetLayout("Flow")
-			leaderboard_container_header:SetPoint("BOTTOM", 0, -100)
-			leaderboard_container:AddChild(leaderboard_container_header)
 
 			local description = AceGUI:Create("Label")
 			description:SetWidth(35)
@@ -718,16 +768,6 @@ function ShowFirstMenu(_hardcore_character, _failure_function_executor, leaderbo
 			description:SetPoint("BOTTOM", 0, 0)
 			leaderboard_container_header:AddChild(description)
 
-			local scroll_container = AceGUI:Create("SimpleGroup")
-			scroll_container:SetFullWidth(true)
-			scroll_container:SetHeight(300)
-			scroll_container:SetLayout("Flow")
-			leaderboard_container:AddChild(scroll_container)
-			local scroll_frame = AceGUI:Create("ScrollFrame")
-			scroll_frame:SetHeight(300)
-			scroll_frame:SetLayout("ListTight")
-			scroll_container:AddChild(scroll_frame)
-			DrawLeaderboardTab(container, scroll_frame)
 		end
 	end
 
