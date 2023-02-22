@@ -2036,6 +2036,95 @@ local function DrawOfficerToolsTab(container)
 
 end
 
+local function DrawEventsTab(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("List")
+	tabcontainer:AddChild(scroll_container)
+
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("List")
+	scroll_container:AddChild(scroll_frame)
+
+	local function addEvent(_scroll_frame, event_data)
+		local event_group_container = AceGUI:Create("InlineGroup")
+		event_group_container:SetWidth(800)
+		event_group_container:SetHeight(200)
+		event_group_container:SetLayout("Flow")
+		scroll_frame:AddChild(event_group_container)
+
+		local calendar_day_container = AceGUI:Create("InlineGroup")
+		calendar_day_container:SetWidth(150)
+		calendar_day_container:SetHeight(200)
+		calendar_day_container:SetLayout("List")
+		event_group_container:AddChild(calendar_day_container)
+
+		local temp_logo_msg = AceGUI:Create("Label")
+		temp_logo_msg:SetText("<LOGO goes here>")
+		temp_logo_msg:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		calendar_day_container:AddChild(temp_logo_msg)
+
+
+		local month_text = AceGUI:Create("Label")
+		month_text:SetText("\n" .. event_data["month"] .. " " .. event_data["day"])
+		month_text:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 18, "")
+		calendar_day_container:AddChild(month_text)
+
+		local time_text = AceGUI:Create("Label")
+		local time_msg = ""
+		if event_data["server_time_hr"] > 12 then
+		      time_msg = tostring(event_data["server_time_hr"] - 12) .. tostring(event_data["server_time_min"])  .. "pm"
+		else
+		      time_msg = tostring(event_data["server_time_hr"]) .. tostring(event_data["server_time_min"])  .. "pm"
+		end
+		time_text:SetText("Realm time: " .. time_msg)
+		time_text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		calendar_day_container:AddChild(time_text)
+
+		local time_text = AceGUI:Create("Label")
+		local time_msg = ""
+		if event_data["server_time_hr"] > 12 then
+		      time_msg = tostring(event_data["server_time_hr"] - 12) .. tostring(event_data["server_time_min"])  .. "pm"
+		else
+		      time_msg = tostring(event_data["server_time_hr"]) .. tostring(event_data["server_time_min"])  .. "pm"
+		end
+		time_text:SetText("Local time: " .. time_msg)
+		time_text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		calendar_day_container:AddChild(time_text)
+
+		local buffer_container = AceGUI:Create("SimpleGroup")
+		buffer_container:SetWidth(10)
+		buffer_container:SetLayout("Flow")
+		event_group_container:AddChild(buffer_container)
+
+		local text_container = AceGUI:Create("SimpleGroup")
+		text_container:SetWidth(580)
+		text_container:SetHeight(200)
+		text_container:SetLayout("List")
+		event_group_container:AddChild(text_container)
+
+		local event_title = AceGUI:Create("Label")
+		event_title:SetText(event_data["title"])
+		event_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 18, "")
+		text_container:AddChild(event_title)
+
+		local event_text = AceGUI:Create("Label")
+		event_text:SetText(event_data["body"])
+		event_text:SetWidth(600)
+		event_text:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		text_container:AddChild(event_text)
+	end
+
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+	addEvent(scroll_frame, {["title"] = "F's and Chat", ["body"] = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ["month"] = "November", ["day"] = "16", ["server_time_hr"] = 21, ["server_time_min"] = 30})
+end
+
 function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_function)
 	hardcore_modern_menu = AceGUI:Create("HardcoreFrameModernMenu")
 	hardcore_modern_menu:SetCallback("OnClose", function(widget)
@@ -2073,6 +2162,7 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		{ value = "DungeonsTab", text = "Dungeons" },
 		{ value = "AccountabilityTab", text = "Accountability" },
 		{ value = "AchievementsTab", text = "Achievements" },
+		{ value = "EventsTab", text = "Events" },
 	}
 	if hc_guild_rank_index and hc_guild_rank_index < 2 then -- 0 is GM, 1 is generally officer
 	  table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
@@ -2119,6 +2209,8 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 			achievement_tab_handler:DrawAchievementTab(tabcontainer, _hardcore_character, false)
 		elseif group == "OfficerToolsTab" then
 			DrawOfficerToolsTab(container)
+		elseif group == "EventsTab" then
+			DrawEventsTab(container)
 		end
 	end
 
