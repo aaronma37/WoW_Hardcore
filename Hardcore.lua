@@ -20,6 +20,7 @@ along with the Hardcore AddOn. If not, see <http://www.gnu.org/licenses/>.
 --[[ Const variables ]]
 --
 StaticPopupDialogs["CHAT_CHANNEL_PASSWORD"] = nil
+ERR_CHAT_PLAYER_NOT_FOUND_S = nil
 --CHAT_WRONG_PASSWORD_NOTICE = nil
 local DEATH_ALERT_COOLDOWN = 1800
 local GRIEF_WARNING_OFF = 0
