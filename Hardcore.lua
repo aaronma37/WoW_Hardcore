@@ -1897,6 +1897,8 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 	-- get time played, see TIME_PLAYED_MSG
 	RequestTimePlayed()
 
+	Hardcore:Print("Recovery code: " .. Hardcore_GenerateRecoveryCode(Hardcore_Character))
+
 	-- take screenshot (got this idea from DingPics addon)
 	-- wait a bit so the yellow animation appears
 	C_Timer.After(PICTURE_DELAY, function()

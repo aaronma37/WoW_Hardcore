@@ -170,3 +170,104 @@ function Hardcore_FilterUnique(tbl)
 
 	return res
 end
+
+function Hardcore_fletcher16(data)
+	local sum1 = 0
+	local sum2 = 0
+	for index=1,#data do
+		sum1 = (sum1 + string.byte(string.sub(data,index,index))) % 255;
+		sum2 = (sum2 + sum1) % 255;
+	end
+	return bit.bor(bit.lshift(sum2,8), sum1)
+end
+
+local function encodeDataRecovery(_hardcore_character)
+  local code = ""
+  local str = tostring(_hardcore_character.time_tracked)
+  for i = 1, #str do
+      local c = str:sub(i,i)
+      code = code .. string.char(tonumber(c+65))
+  end
+  code = code .. "@"
+  if _hardcore_character.first_recorded ~= -1 then
+    str = tostring(_hardcore_character.first_recorded)
+    for i = 1, #str do
+	local c = str:sub(i,i)
+	code = code .. string.char(tonumber(c+65))
+    end
+  end
+
+  code = code .. "@"
+  for idx, k in ipairs(_hardcore_character.achievements) do
+      code = code .. tostring(_G.a_id[k]) .. "&"
+  end
+
+  code = code .. "@"
+  for idx, k in ipairs(_hardcore_character.passive_achievements) do
+      code = code .. tostring(_G.pa_id[k]) .. "&"
+  end
+
+  return code
+end
+
+function Hardcore_GenerateRecoveryCode(_hardcore_character)
+	  local player_name = UnitGUID("player")
+	  local encoded = encodeDataRecovery(_hardcore_character)
+	  return Hardcore_fletcher16(player_name .. encoded) .. "-" ..  encoded
+end
+
+function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
+  Hardcore_GenerateRecoveryCode(_hardcore_character)
+  local player_name = UnitGUID("player")
+  local checksum, data = strsplit("-", text, 2)
+  if checksum == nil or data == nil then return end
+  local received_checksum = tonumber(Hardcore_fletcher16(player_name .. data))
+  if received_checksum == tonumber(checksum) then 
+    local time_tracked_str, time_started_str, achievement_str, passive_achievements_str = strsplit("@", data)
+
+    local time_tracked = ""
+    for i = 1, #time_tracked_str do
+	local c = time_tracked_str:sub(i,i)
+	time_tracked = time_tracked .. tonumber(string.byte(c) - 65)
+    end
+    time_tracked = tonumber(time_tracked)
+
+    local first_recorded = ""
+    for i = 1, #time_started_str do
+	local c = time_started_str:sub(i,i)
+	first_recorded = first_recorded .. tonumber(string.byte(c) - 65)
+    end
+
+    local achievements = {}
+    local achievements = {strsplit("&", tostring(achievement_str))}
+    local achievement_list = {}
+    for k,v in ipairs(achievements) do
+      if v ~= nil and _G.id_a[v] then 
+	table.insert(achievement_list, _G.id_a[v])
+      end
+    end
+
+    local passive_achievements = {}
+    local passive_achievements = {strsplit("&", tostring(passive_achievements_str))}
+    local passive_achievement_list = {}
+    for k,v in ipairs(passive_achievements) do
+      if v ~= nil and _G.id_pa[v] then 
+	table.insert(passive_achievement_list, _G.id_pa[v])
+      end
+    end
+    return time_tracked, first_recorded, achievement_list, passive_achievement_list
+  end
+  return nil, nil, nil
+end
+
+function Hardcore_DecodeRecoveryCode(_hardcore_character)
+  Hardcore_GenerateRecoveryCode(_hardcore_character)
+  local player_name = UnitGUID("player")
+  local checksum, data = strsplit("-", recovery_box:GetText(), 2)
+  if checksum == nil or data == nil then return end
+  local received_checksum = tonumber(Hardcore_fletcher16(player_name .. data))
+  if received_checksum == tonumber(checksum) then 
+    return true
+  end
+  return false
+end
