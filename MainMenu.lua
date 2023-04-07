@@ -2145,7 +2145,7 @@ local function DrawDataRecoveryTab(container, _hardcore_character)
 
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetWidth(700)
-	first_menu_description:SetText("\nYou can attempt to recover your saved data by entering a code here.  Data recovery will not remove death infractions or starting achievements.  Data recover will recover your start date, tracked time, and earned achievements.  You can use this mechanism for multiple computer setups.  Every time you level up, a recovery code is printed to your chat.  You may go to your screenshots and look for recovery codes there if you lose your data.  Use the most recent screenshot and recover code that you can find.")
+	first_menu_description:SetText("\nYou can attempt to recover your saved data by entering a code here.  Data recovery will not remove death infractions or starting achievements.  Data recover will recover your start date, tracked time, and earned achievements.  You can use this mechanism for multiple computer setups.  Every time you level up, a recovery code is printed to your chat.  You may go to your screenshots and look for recovery codes there if you lose your data.  Use the most recent screenshot and recover code that you can find.  A message in chat will notify that you have successfully recovered data after you enter it into the box below. Make sure to reload after a succesful recovery.")
 	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	scroll_frame:AddChild(first_menu_description)
 
@@ -2256,13 +2256,13 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		{ value = "WelcomeTab", text = "General" },
 		{ value = "RulesTab", text = "Rules" },
 		{ value = "VerifyTab", text = "Verify" },
+		{ value = "DataRecoveryTab", text = "Data Recovery" },
 		{ value = "DKTab", text = "Death Knight" },
 		{ value = "LevelsTab", text = "Levels" },
 		{ value = "DungeonsTab", text = "Dungeons" },
 		{ value = "AccountabilityTab", text = "Accountability" },
 		{ value = "AchievementsTab", text = "Achievements" },
 		{ value = "DeathStatisticsTab", text = "Death Statistics" },
-		{ value = "DataRecoveryTab", text = "Data Recovery" },
 	}
 	if hc_guild_rank_index and hc_guild_rank_index < 2 then -- 0 is GM, 1 is generally officer
 	  table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
