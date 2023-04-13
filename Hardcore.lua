@@ -1898,8 +1898,6 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 
 	-- get time played, see TIME_PLAYED_MSG
 	RequestTimePlayed()
-
-	Hardcore:Print("Recovery code: " .. Hardcore_GenerateRecoveryCode(Hardcore_Character))
 	Hardcore_SendAutomaticBackupUpdate(Hardcore_Character)
 
 	-- take screenshot (got this idea from DingPics addon)
