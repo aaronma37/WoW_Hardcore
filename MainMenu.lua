@@ -2125,105 +2125,6 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 
 end
 
-local function DrawDataRecoveryTab(container, _hardcore_character)
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
-	tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("List")
-	scroll_container:AddChild(scroll_frame)
-
-	local first_menu_description_title = AceGUI:Create("Label")
-	first_menu_description_title:SetWidth(500)
-	first_menu_description_title:SetText("Data Recovery\n")
-	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
-	-- first_menu_description_title:SetPoint("TOP", 2,5)
-	scroll_frame:AddChild(first_menu_description_title)
-
-	local first_menu_description = AceGUI:Create("Label")
-	first_menu_description:SetWidth(700)
-	first_menu_description:SetText("\nYou can attempt to recover your saved data by entering a code here.  Data recovery will not remove death infractions or starting achievements.  Data recover will recover your start date, tracked time, and earned achievements.  You can use this mechanism for multiple computer setups.  Every time you level up, a recovery code is printed to your chat.  You may go to your screenshots and look for recovery codes there if you lose your data.  Use the most recent screenshot and recover code that you can find.  A message in chat will notify that you have successfully recovered data after you enter it into the box below. Make sure to reload after a succesful recovery.")
-	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(first_menu_description)
-
-	local recovery_box = AceGUI:Create("EditBox")
-	recovery_box:SetWidth(700)
-	recovery_box:SetHeight(200)
-	recovery_box:SetDisabled(false)
-	recovery_box:SetLabel("Enter Recovery Code")
-	scroll_frame:AddChild(recovery_box)
-
-	recovery_box:SetCallback("OnEnterPressed", function()
-	  local tracked_time, first_recorded, achievements_list, passive_achievements_list = Hardcore_VerifyRecoveryCode(_hardcore_character, recovery_box:GetText())
-	  if tracked_time and _hardcore_character.time_tracked and tracked_time > _hardcore_character.time_tracked then
-	    _hardcore_character.time_tracked = tracked_time
-	     Hardcore:Print("Recovered tracked time.")
-	  end
-
-	  if first_recorded and _hardcore_character.first_recorded == -1 then
-	    _hardcore_character.first_recorded = first_recorded
-	     Hardcore:Print("Recovered start date.")
-	  end
-
-	  if achievements_list then
-	    for _,v in ipairs(achievements_list) do
-	      local found = false
-	      for _,v2 in ipairs(_hardcore_character.achievements) do
-		if v == v2 then found = true end
-	      end
-	      if found == false then 
-		table.insert(_hardcore_character.achievements, v)
-	        Hardcore:Print("Recovered achievement: " .. v)
-	      end
-	    end
-	  end
-
-	  if passive_achievements_list then
-	    for _,v in ipairs(passive_achievements_list) do
-	      local found = false
-	      for _,v2 in ipairs(_hardcore_character.passive_achievements) do
-		if v == v2 then found = true end
-	      end
-	      if found == false then 
-		table.insert(_hardcore_character.passive_achievements, v)
-	        Hardcore:Print("Recovered achievement: " .. v)
-	      end
-	    end
-	  end
-	end)
-
-	local first_menu_description_title = AceGUI:Create("Label")
-	first_menu_description_title:SetWidth(500)
-	first_menu_description_title:SetText("\n\n\n\n\n\nGenerate Recovery Code\n")
-	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
-	scroll_frame:AddChild(first_menu_description_title)
-
-	local first_menu_description = AceGUI:Create("Label")
-	first_menu_description:SetWidth(700)
-	first_menu_description:SetText("\nWrite down, screenshot, or copy-paste and store the following code to backup verification data.  You can use this code to support multi-computer setups.")
-	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(first_menu_description)
-
-	local first_menu_description = AceGUI:Create("MultiLineEditBox")
-	first_menu_description:SetMaxLetters(0)
-	first_menu_description:SetNumLines(2)
-	first_menu_description:SetWidth(700)
-	first_menu_description:SetLabel("Recovery Code")
-	first_menu_description:DisableButton(true)
-	first_menu_description:SetText(Hardcore_GenerateRecoveryCode(_hardcore_character))
-	scroll_frame:AddChild(first_menu_description)
-
-	local copy_tip_label = AceGUI:Create("Label")
-	local text = "Select All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
-	copy_tip_label:SetText(text)
-	copy_tip_label:SetWidth(700)
-	copy_tip_label:SetFontObject(GameFontHighlightSmall)
-	scroll_frame:AddChild(copy_tip_label)
-end
-
 function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_function)
 	hardcore_modern_menu = AceGUI:Create("HardcoreFrameModernMenu")
 	hardcore_modern_menu:SetCallback("OnClose", function(widget)
@@ -2256,7 +2157,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		{ value = "WelcomeTab", text = "General" },
 		{ value = "RulesTab", text = "Rules" },
 		{ value = "VerifyTab", text = "Verify" },
-		{ value = "DataRecoveryTab", text = "Data Recovery" },
 		{ value = "DKTab", text = "Death Knight" },
 		{ value = "LevelsTab", text = "Levels" },
 		{ value = "DungeonsTab", text = "Dungeons" },
@@ -2309,8 +2209,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 			achievement_tab_handler:DrawAchievementTab(tabcontainer, _hardcore_character, false)
 		elseif group == "DeathStatisticsTab" then
 			DrawDeathStatisticsTab(tabcontainer, _hardcore_settings)
-		elseif group == "DataRecoveryTab" then
-			DrawDataRecoveryTab(tabcontainer, _hardcore_character)
 		elseif group == "OfficerToolsTab" then
 			DrawOfficerToolsTab(container)
 		end
