@@ -210,16 +210,18 @@ local function encodeDataRecovery(_hardcore_character)
   return code
 end
 
+
 function Hardcore_GenerateRecoveryCode(_hardcore_character)
 	  local player_name = UnitGUID("player")
+	  local last_four_guid = string.sub(UnitGUID("player"), -4)
 	  local encoded = encodeDataRecovery(_hardcore_character)
-	  return Hardcore_fletcher16(player_name .. encoded) .. "-" ..  encoded
+	  return Hardcore_fletcher16(player_name .. encoded) .. "-" .. last_four_guid .. "-" ..  encoded
 end
 
 function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
   Hardcore_GenerateRecoveryCode(_hardcore_character)
   local player_name = UnitGUID("player")
-  local checksum, data = strsplit("-", text, 2)
+  local checksum, last_four_guid, data = strsplit("-", text, 3)
   if checksum == nil or data == nil then return end
   local received_checksum = tonumber(Hardcore_fletcher16(player_name .. data))
   if received_checksum == tonumber(checksum) then 
