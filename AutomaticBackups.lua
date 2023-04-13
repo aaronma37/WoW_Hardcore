@@ -63,7 +63,7 @@ function Hardcore_SendAutomaticBackupUpdate(_hardcore_character)
   CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "GUILD")
 end
 
-function Hardcore_SendRequest()
+function Hardcore_SendAutomaticBackupDataRequest()
   found_invalid = false
   local last_four_guid = string.sub(UnitGUID("player"), -4)
   local commMessage = COMM_COMMANDS["REQUEST"] .. COMM_COMMAND_DELIM .. last_four_guid
