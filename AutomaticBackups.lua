@@ -5,7 +5,7 @@ local COMM_NAME = "HCAB"
 -- CHECKSUM: GUID .. DATA
 local COMM_COMMANDS = {
   ["UPDATE"] = "1", -- 1$<Last4GUID>~<DATA>
-  ["REQUEST"] = "2", -- 2$
+  ["REQUEST"] = "2", -- 2$<Last4GUID>
   ["REQUEST_ACK"] = "3", -- 3$<VALID>~<DATA>
   ["POST_HC_FAILURE"] = "4", -- 4$<Last4GUID>
 }
@@ -15,11 +15,11 @@ local COMM_FIELD_DELIM = "~"
 local found_invalid = false
 local received_acks = {}
 
-local function recoverData()
+local function recoverData(_hardcore_character)
   for _,v in ipairs(received_acks) do
     local tracked_time, first_recorded, achievements_list, passive_achievements_list = Hardcore_VerifyRecoveryCode(Hardcore_Character, v)
     if tracked_time and _hardcore_character.time_tracked and tracked_time > _hardcore_character.time_tracked then
-      _hardcore_character.time_tracked = tracked_time
+      _hardcore_character.time_tracked = tonumber(tracked_time)
        Hardcore:Print("Recovered tracked time.")
     end
 
@@ -63,22 +63,21 @@ function Hardcore_SendAutomaticBackupUpdate(_hardcore_character)
   CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "GUILD")
 end
 
-function Hardcore_SendAutomaticBackupDataRequest()
+function Hardcore_SendAutomaticBackupDataRequest(_hardcore_character)
   found_invalid = false
   local last_four_guid = string.sub(UnitGUID("player"), -4)
   local commMessage = COMM_COMMANDS["REQUEST"] .. COMM_COMMAND_DELIM .. last_four_guid
   CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "GUILD")
 
   C_Timer.After(5, function()
-    if found_invalid == false then recoverData() end
+    if found_invalid == false then recoverData(_hardcore_character) end
   end)
 end
 
-function Hardcore_SendRequestAck(request_name, request_last_four_guid, _hardcore_automatic_backup_data)
+function Hardcore_SendRequestAck(_hardcore_automatic_backup_data, request_name, request_last_four_guid)
   if _hardcore_automatic_backup_data[request_name .. request_last_four_guid] == nil then return end
-  if _hardcore_automatic_backup_data[request_name .. request_last_four_guid]["checksum"] == nil then return end
   if _hardcore_automatic_backup_data[request_name .. request_last_four_guid]["valid"] == nil then return end 
-  local commMessage = COMM_COMMANDS["REQUEST_ACK"] .. COMM_COMMAND_DELIM .. _hardcore_automatic_backup_data[request_name .. request_last_four_guid]["valid"] .. COMM_FIELD_DELIM .. _hardcore_automatic_backup_data[request_name .. request_last_four_guid]["data"]
+  local commMessage = COMM_COMMANDS["REQUEST_ACK"] .. COMM_COMMAND_DELIM .. tostring(_hardcore_automatic_backup_data[request_name .. request_last_four_guid]["valid"]) .. COMM_FIELD_DELIM .. _hardcore_automatic_backup_data[request_name .. request_last_four_guid]["data"]
   CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "GUILD")
 end
 
@@ -90,27 +89,27 @@ end
 
 local automatic_backup_event_handler = CreateFrame("Frame")
 automatic_backup_event_handler:RegisterEvent("CHAT_MSG_ADDON")
-automatic_backup_event_handler:SetScript("OnEvent", handleEvent)
 
-
-function automatic_backup_event_handler:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
-	-- Ignore messages that are not ours
+local function handleAutomaticBackupEvent(self, event, prefix, datastr, scope, sender)
 	if COMM_NAME == prefix then
 		local command, comm_postfix = string.split(COMM_COMMAND_DELIM, datastr)
+		local sender_short, _ = string.split("-", sender)
+		if debug then print(command, comm_postfix, sender_short) end
 		if command == COMM_COMMANDS["UPDATE"] then
 		  if comm_postfix == nil then return end
 		  local last_four_guid, data = strsplit(COMM_FIELD_DELIM, comm_postfix, 2)
 		  if last_four_guid == nil then return end
 		  if data == nil then return end
 		  if Hardcore_Automatic_Backup_Data == nil then Hardcore_Automatic_Backup_Data = {} end
-		  if Hardcore_Automatic_Backup_Data[sender .. last_four_guid] == nil then
-		    Hardcore_Automatic_Backup_Data[sender .. last_four_guid] = {
+		  if Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid] == nil then
+		    Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid] = {
 		      ["valid"] = true,
 		    }
 		  end
-		  Hardcore_Automatic_Backup_Data[sender .. last_four_guid]["data"] = data
+		  Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid]["data"] = data
 		elseif command == COMM_COMMANDS["REQUEST"] then
-		  Hardcore_SendRequestAck(Hardcore_Automatic_Backup_Data)
+		  local last_four_guid = strsplit(COMM_FIELD_DELIM, comm_postfix, 1)
+		  Hardcore_SendRequestAck(Hardcore_Automatic_Backup_Data, sender_short, comm_postfix) 
 		elseif command == COMM_COMMANDS["REQUEST_ACK"] then
 		  if comm_postfix == nil then return end
 		  local valid, data = strsplit(COMM_FIELD_DELIM, comm_postfix, 2)
@@ -125,8 +124,54 @@ function automatic_backup_event_handler:CHAT_MSG_ADDON(prefix, datastr, scope, s
 		  local last_four_guid = strsplit(COMM_FIELD_DELIM, comm_postfix, 1)
 		  if last_four_guid == nil then return end
 		  if Hardcore_Automatic_Backup_Data == nil then Hardcore_Automatic_Backup_Data = {} end
-		  if Hardcore_Automatic_Backup_Data[sender .. last_four_guid] == nil then Hardcore_Automatic_Backup_Data[sender .. last_four_guid] = {} end
-		  Hardcore_Automatic_Backup_Data[sender .. last_four_guid]["valid"] = false
+		  if Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid] == nil then Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid] = {} end
+		  Hardcore_Automatic_Backup_Data[sender_short .. last_four_guid]["valid"] = false
 		end
 	end
 end
+automatic_backup_event_handler:SetScript("OnEvent", handleAutomaticBackupEvent)
+
+-- Unit tests -- Warning!! If this goes wrong, you will lose input data
+
+function Hardcore_TestAutomaticBackupUpdate(_hardcore_character)
+	_hardcore_character.time_tracked = _hardcore_character.time_played 
+	local first_recorded = _hardcore_character.first_recorded
+	table.insert(_hardcore_character.achievements, "Hammertime")
+	table.insert(_hardcore_character.passive_achievements, "Vagash")
+	print("Testing Automatic backup. Test takes 12 seconds ...")
+	Hardcore_SendAutomaticBackupUpdate(_hardcore_character)
+	_hardcore_character.time_tracked = -1
+	_hardcore_character.first_recorded = -1
+	_hardcore_character.achievements = {}
+	_hardcore_character.passive_achievements = {}
+	local last_four_guid = string.sub(UnitGUID("player"), -4)
+
+	if Hardcore_Automatic_Backup_Data == nil then Hardcore_Automatic_Backup_Data = {} end
+	Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid] = nil
+	C_Timer.After(5.0, function()
+	  assert(Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid])
+	  Hardcore_SendAutomaticBackupDataRequest(_hardcore_character)
+	end)
+
+	C_Timer.After(12.0, function()
+	  assert(abs(_hardcore_character.time_tracked - _hardcore_character.time_played) < 50)
+	  print("Test time tracked recovery: Passed")
+
+	  assert(abs(first_recorded - _hardcore_character.first_recorded) < 5)
+	  print("Test first recorded recovery: Passed")
+
+	  local found = false
+	  for _,v in ipairs(_hardcore_character.achievements) do
+	    if v == "Hammertime" then found = true end
+	  end
+	  assert(found)
+	  print("Test achievement recovery: Passed")
+
+	  for _,v in ipairs(_hardcore_character.passive_achievements) do
+	    if v == "Vagash" then found = true end
+	  end
+	  assert(found)
+	  print("Test passive achievement recovery: Passed")
+	end)
+end
+
