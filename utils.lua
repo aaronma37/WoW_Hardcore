@@ -269,19 +269,10 @@ local function encodeHex(binary_str)
 end
 
 local function encodeDataRecovery(_hardcore_character)
-  local code = ""
-  local str = tostring(_hardcore_character.time_tracked)
-  for i = 1, #str do
-      local c = str:sub(i,i)
-      code = code .. string.char(tonumber(c+65))
-  end
+  local code = string.format("%x", _hardcore_character.time_tracked) 
   code = code .. "@"
   if _hardcore_character.first_recorded ~= -1 then
-    str = tostring(_hardcore_character.first_recorded)
-    for i = 1, #str do
-	local c = str:sub(i,i)
-	code = code .. string.char(tonumber(c+65))
-    end
+    code = code .. string.format("%x", _hardcore_character.first_recorded)
   end
 
   local function encodeAchievements(character_achievements, achievement_id_tbl)
@@ -332,7 +323,6 @@ local function encodeDataRecovery(_hardcore_character)
   code = code .. encodeAchievements(_hardcore_character.achievements, _G.a_id)
   code = code .. "@"
   code = code .. encodeAchievements(_hardcore_character.passive_achievements, _G.pa_id)
-  print(code)
   return code
 end
 
@@ -351,18 +341,8 @@ function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
   if received_checksum == tonumber(checksum) then 
     local time_tracked_str, time_started_str, achievement_str, passive_achievements_str = strsplit("@", data)
 
-    local time_tracked = ""
-    for i = 1, #time_tracked_str do
-	local c = time_tracked_str:sub(i,i)
-	time_tracked = time_tracked .. tonumber(string.byte(c) - 65)
-    end
-    time_tracked = tonumber(time_tracked)
-
-    local first_recorded = ""
-    for i = 1, #time_started_str do
-	local c = time_started_str:sub(i,i)
-	first_recorded = first_recorded .. tonumber(string.byte(c) - 65)
-    end
+    local time_tracked = tonumber(time_tracked_str, 16)
+    local first_recorded = tonumber(time_started_str, 16)
 
     local function decodeAchievements(ach_str, ach_tbl)
       local ach_list = {}
@@ -372,7 +352,6 @@ function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
 	  if bit.band(bit.rshift(dec, j), 1) == 1 then
 	    local ach_idx = tostring((i-1)*32 + 32-j)
 	    if ach_tbl[ach_idx] then
-	      print("Found " .. ach_tbl[ach_idx])
 	      table.insert(ach_list, ach_tbl[ach_idx])
 	    end
 	  end
