@@ -257,6 +257,17 @@ function Hardcore_fletcher16(data)
 	return bit.bor(bit.lshift(sum2,8), sum1)
 end
 
+-- Expect 32 bit binary, output 8 char hex
+local function encodeHex(binary_str)
+    local short_hex_str = string.format("%x", tonumber(table.concat(binary_str),2))
+    local  pre_hex_str_tbl = {}
+    for i=1,8-#short_hex_str do
+      pre_hex_str_tbl[#pre_hex_str_tbl + 1] = 0
+    end
+    local hex_str = table.concat(pre_hex_str_tbl) .. short_hex_str
+    return hex_str
+end
+
 local function encodeDataRecovery(_hardcore_character)
   local code = ""
   local str = tostring(_hardcore_character.time_tracked)
@@ -273,42 +284,68 @@ local function encodeDataRecovery(_hardcore_character)
     end
   end
 
-  code = code .. "@"
-  for idx, k in ipairs(_hardcore_character.achievements) do
-      code = code .. tostring(_G.a_id[k]) .. "&"
+  local function encodeAchievements(character_achievements, achievement_id_tbl)
+    local code = ""
+    local achievement_ids = {}
+    for idx, k in ipairs(character_achievements) do
+      achievement_ids[achievement_id_tbl[k]] = 1
+    end
+
+    local num = 0
+    for _,_ in pairs(achievement_id_tbl) do num = num + 1 end
+
+    counter = 0
+    local str = {}
+    for i=1,num do
+      counter = counter + 1
+      if achievement_ids[i] then
+	str[#str+1] = 1
+      else
+	str[#str+1] = 0
+      end
+      if counter >= 32 then
+	local val = tonumber(table.concat(str),2)
+	if val == 0 then
+	  code = code .. "00000000" 
+	else
+	  code = code .. encodeHex(str)
+	end
+	str = {}
+	counter = 0
+      end
+    end
+
+    for i=1,32-#str do
+      str[#str + 1] = 0
+    end
+
+    local val = tonumber(table.concat(str),2)
+    if val == 0 then
+      code = code .. "00000000"
+    else
+      code = code .. encodeHex(str)
+    end
+    return code
   end
 
   code = code .. "@"
-  for idx, k in ipairs(_hardcore_character.passive_achievements) do
-      code = code .. tostring(_G.pa_id[k]) .. "&"
-  end
-
+  code = code .. encodeAchievements(_hardcore_character.achievements, _G.a_id)
+  code = code .. "@"
+  code = code .. encodeAchievements(_hardcore_character.passive_achievements, _G.pa_id)
+  print(code)
   return code
 end
 
-<<<<<<< HEAD
-
 function Hardcore_GenerateRecoveryCode(_hardcore_character)
-	  local player_name = UnitGUID("player")
-	  local last_four_guid = string.sub(UnitGUID("player"), -4)
-	  local encoded = encodeDataRecovery(_hardcore_character)
-	  return Hardcore_fletcher16(player_name .. encoded) .. "-" .. last_four_guid .. "-" ..  encoded
-=======
-function Hardcore_GenerateRecoveryCode(_hardcore_character)
-	  local player_name = UnitGUID("player")
-	  local encoded = encodeDataRecovery(_hardcore_character)
-	  return Hardcore_fletcher16(player_name .. encoded) .. "-" ..  encoded
->>>>>>> added recovery codes
+    local player_name = UnitGUID("player")
+    local last_four_guid = string.sub(UnitGUID("player"), -4)
+    local encoded = encodeDataRecovery(_hardcore_character)
+    return Hardcore_fletcher16(player_name .. encoded) .. "-" .. last_four_guid .. "-" ..  encoded
 end
 
 function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
-  Hardcore_GenerateRecoveryCode(_hardcore_character)
   local player_name = UnitGUID("player")
-<<<<<<< HEAD
   local checksum, last_four_guid, data = strsplit("-", text, 3)
-=======
-  local checksum, data = strsplit("-", text, 2)
->>>>>>> added recovery codes
   if checksum == nil or data == nil then return end
   local received_checksum = tonumber(Hardcore_fletcher16(player_name .. data))
   if received_checksum == tonumber(checksum) then 
@@ -327,23 +364,25 @@ function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
 	first_recorded = first_recorded .. tonumber(string.byte(c) - 65)
     end
 
-    local achievements = {}
-    local achievements = {strsplit("&", tostring(achievement_str))}
-    local achievement_list = {}
-    for k,v in ipairs(achievements) do
-      if v ~= nil and _G.id_a[v] then 
-	table.insert(achievement_list, _G.id_a[v])
+    local function decodeAchievements(ach_str, ach_tbl)
+      local ach_list = {}
+      for i=1,math.ceil(#ach_str/8) do
+	local dec = tonumber(string.sub(ach_str,(i - 1) * 8 + 1, i * 8), 16)
+	for j=1,32 do
+	  if bit.band(bit.rshift(dec, j), 1) == 1 then
+	    local ach_idx = tostring((i-1)*32 + 32-j)
+	    if ach_tbl[ach_idx] then
+	      print("Found " .. ach_tbl[ach_idx])
+	      table.insert(ach_list, ach_tbl[ach_idx])
+	    end
+	  end
+	end
       end
+      return ach_list
     end
 
-    local passive_achievements = {}
-    local passive_achievements = {strsplit("&", tostring(passive_achievements_str))}
-    local passive_achievement_list = {}
-    for k,v in ipairs(passive_achievements) do
-      if v ~= nil and _G.id_pa[v] then 
-	table.insert(passive_achievement_list, _G.id_pa[v])
-      end
-    end
+    local achievement_list = decodeAchievements(achievement_str, _G.id_a)
+    local passive_achievement_list = decodeAchievements(passive_achievements_str, _G.id_pa)
     return time_tracked, first_recorded, achievement_list, passive_achievement_list
   end
   return nil, nil, nil
