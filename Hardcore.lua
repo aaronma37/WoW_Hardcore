@@ -1027,6 +1027,7 @@ function Hardcore:DKConvert(dk_convert_option)
 		local percentage = Hardcore_Character.tracked_played_percentage
 
 		if Hardcore:ShouldShowPlaytimeWarning(level, percentage) then
+			Hardcore_SendAutomaticBackupDataRequest()
 			Hardcore:DisplayPlaytimeWarning(level)
 			return
 		end
@@ -1799,6 +1800,7 @@ function Hardcore:PLAYER_DEAD()
 	-- Send broadcast text messages to guild and greenwall
 	selfDeathAlert(DeathLog_Last_Attack_Source)
 	selfDeathAlertLastWords(recent_msg["text"])
+	Hardcore_SendPostFailure()
 
 	SendChatMessage(messageString, "GUILD")
 	startXGuildChatMsgRelay(messageString)
@@ -1896,6 +1898,7 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 
 	-- get time played, see TIME_PLAYED_MSG
 	RequestTimePlayed()
+	Hardcore_SendAutomaticBackupUpdate(Hardcore_Character)
 
 	-- take screenshot (got this idea from DingPics addon)
 	-- wait a bit so the yellow animation appears
