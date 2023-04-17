@@ -1,4 +1,8 @@
 _G["HardcoreBuildLabel"] = nil
+
+local MAJOR_DELIMITER = "~"
+local MINOR_DELIMITER = "|"
+
 local build_num = select(4, GetBuildInfo())
 if build_num > 29999 then
 	_G["HardcoreBuildLabel"] = "WotLK"
@@ -269,10 +273,10 @@ local function encodeHex(binary_str)
 end
 
 local function encodeDataRecovery(_hardcore_character)
-  local code = string.format("%x", _hardcore_character.time_tracked) 
-  code = code .. "@"
+  local code = decimalToAscii85(_hardcore_character.time_tracked) 
+  code = code .. MINOR_DELIMITER
   if _hardcore_character.first_recorded ~= -1 then
-    code = code .. string.format("%x", _hardcore_character.first_recorded)
+    code = code .. decimalToAscii85(_hardcore_character.first_recorded) 
   end
 
   local function encodeAchievements(character_achievements, achievement_id_tbl)
@@ -296,11 +300,7 @@ local function encodeDataRecovery(_hardcore_character)
       end
       if counter >= 32 then
 	local val = tonumber(table.concat(str),2)
-	if val == 0 then
-	  code = code .. "00000000" 
-	else
-	  code = code .. encodeHex(str)
-	end
+	code = code .. decimalToAscii85(val)
 	str = {}
 	counter = 0
       end
@@ -311,17 +311,13 @@ local function encodeDataRecovery(_hardcore_character)
     end
 
     local val = tonumber(table.concat(str),2)
-    if val == 0 then
-      code = code .. "00000000"
-    else
-      code = code .. encodeHex(str)
-    end
+    code = code .. decimalToAscii85(val)
     return code
   end
 
-  code = code .. "@"
+  code = code .. MINOR_DELIMITER
   code = code .. encodeAchievements(_hardcore_character.achievements, _G.a_id)
-  code = code .. "@"
+  code = code .. MINOR_DELIMITER
   code = code .. encodeAchievements(_hardcore_character.passive_achievements, _G.pa_id)
   return code
 end
@@ -330,36 +326,31 @@ function Hardcore_GenerateRecoveryCode(_hardcore_character)
     local player_name = UnitGUID("player")
     local last_four_guid = string.sub(UnitGUID("player"), -4)
     local encoded = encodeDataRecovery(_hardcore_character)
-    return Hardcore_fletcher16(player_name .. encoded) .. "-" .. last_four_guid .. "-" ..  encoded
+    return Hardcore_fletcher16(player_name .. encoded) .. MAJOR_DELIMITER .. last_four_guid .. MAJOR_DELIMITER ..  encoded
 end
 
 function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
   local player_name = UnitGUID("player")
-  local checksum, last_four_guid, data = strsplit("-", text, 3)
+  local checksum, last_four_guid, data = strsplit(MAJOR_DELIMITER, text, 3)
   if checksum == nil or data == nil then return end
   local received_checksum = tonumber(Hardcore_fletcher16(player_name .. data))
   if received_checksum == tonumber(checksum) then 
-    local time_tracked_str, time_started_str, achievement_str, passive_achievements_str = strsplit("@", data)
+    local time_tracked_str, time_started_str, achievement_str, passive_achievements_str = strsplit(MINOR_DELIMITER, data)
 
-    local time_tracked = tonumber(time_tracked_str, 16)
-    local first_recorded = tonumber(time_started_str, 16)
+    local time_tracked = tonumber(ascii85ToBinary(time_tracked_str),2) 
+    local first_recorded = tonumber(ascii85ToBinary(time_started_str),2)
+
 
     local function decodeAchievements(ach_str, ach_tbl)
       local ach_list = {}
-      for i=1,math.ceil(#ach_str/8) do
-	local dec = tonumber(string.sub(ach_str,(i - 1) * 8 + 1, i * 8), 16)
-	for j=1,32 do
-	  if bit.band(bit.rshift(dec, j), 1) == 1 then
-	    local ach_idx = tostring((i-1)*32 + 32-j)
-	    if ach_tbl[ach_idx] then
-	      table.insert(ach_list, ach_tbl[ach_idx])
-	    end
-	  end
+      local bin = ascii85ToBinary(ach_str)
+      for i=1,#bin do
+	if bin:sub(i,i) == "1" and ach_tbl[tostring(i)] then
+	      table.insert(ach_list, ach_tbl[tostring(i)])
 	end
       end
       return ach_list
     end
-
     local achievement_list = decodeAchievements(achievement_str, _G.id_a)
     local passive_achievement_list = decodeAchievements(passive_achievements_str, _G.id_pa)
     return time_tracked, first_recorded, achievement_list, passive_achievement_list
@@ -368,7 +359,6 @@ function Hardcore_VerifyRecoveryCode(_hardcore_character, text)
 end
 
 function Hardcore_DecodeRecoveryCode(_hardcore_character)
-  Hardcore_GenerateRecoveryCode(_hardcore_character)
   local player_name = UnitGUID("player")
   local checksum, data = strsplit("-", recovery_box:GetText(), 2)
   if checksum == nil or data == nil then return end
