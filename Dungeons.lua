@@ -355,6 +355,25 @@ local function DungeonTrackerHasRun( name )
 end
 
 
+-- DungeonTrackerQuestCompletedForRun( v )
+--
+-- Checks if any of the dungeon quests have been completed
+
+local function DungeonTrackerQuestCompletedForRun( run )
+
+	-- Check for funny dungeon names
+	local index = dt_name_to_index[ run.name ] 
+	if index ~= nil then 
+		-- Go through the associated quests
+		local quests = dt_db[index][8]
+		for j = 1, #quests do
+			if C_QuestLog.IsQuestFlaggedCompleted(quests[j]) then
+				return true
+			end
+		end
+	end	
+	return false
+end
 
 -- DungeonTrackerFindMissingRunsFromQuests()
 --
@@ -1995,58 +2014,62 @@ end
 -- DungeonTrackerGenerateRecoveryString()
 --
 -- Generates a recovery string encoding the essential data about runs, which looks like this
+-- All integer values are in base64 (the examples given below are in base-10 for understanding)
 -- <version>[&<run1>[&<run2>]]
 -- Where for version 1 (Era+WOTLK), each run is "<index><type><level>[,IID/repeat][start][,kills]", 
---   e.g. "2t18" for a "first tracked run of WC at level 18"
---        "2T18,3" for a "third (repeated) run of WC at level 18"
---        "11p57,1234,1621312312,500,5" for a pending run in SM GY at level 57, IID 1234, start time 16...12, lsat seen 500s after start, 5 kills
---        "11P57,1234,1621312312,500,5,2" for a pending run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
---        "11c57,1234,1621312312,500,5" for a current run in SM GY at level 57, IID 1234, start time 16...12, 5 kills
---        "11C57,1234,1621312312,500,5,2" for a current run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
--- Legacy runs are skipped, they will be recovered through quests
+--   e.g. "t2,18" for a "first tracked run (without legacy quests) of WC at level 18"
+--        "T3,2,18" for a "third (repeated) run of WC at level 18"
+--        "p11,57,1234,1621312312,500,5" for a pending run in SM GY at level 57, IID 1234, start time 16...12, lsat seen 500s after start, 5 kills
+--        "P2,11,57,1234,1621312312,500,5" for a pending run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
+--        "c11,57,1234,1621312312,500,5" for a current run in SM GY at level 57, IID 1234, start time 16...12, 5 kills
+--        "C2,11,57,1234,1621312312,500,5" for a current run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
+-- Legacy runs and first runs of dungeons which have a legacy run are skipped; they will be recovered through quests
+
+local Jan2023 = 1672574400			-- Used to decrease .start size, dungeon tracker only introduced on 5 January 2023
 
 function DungeonTrackerGenerateRecoveryString()
 
-	local function EncodeAll( v, type )
+	local function EncodeAll( v, etype )
 		local code = "&"
+		code = code .. etype
 		if dt_db_name_to_index[ v.name ] ~= nil then
-			code = code .. tostring(dt_db_name_to_index[ v.name ])
+			code = code .. Hardcore_EncodePosIntegerBase64(dt_db_name_to_index[ v.name ])
 		else
 			code = code .. "0"
 		end
-		code = code .. type
+		code = code .. ","
 		if v.level ~= nil then
-			code = code .. tostring( v.level )
+			code = code .. Hardcore_EncodePosIntegerBase64( v.level )
 		else
 			code = code .. "0"
 		end
 		return code
 	end
 
-	local function EncodePendingCurrent( v, type )
-		local code = EncodeAll( v, type )
+	local function EncodePendingCurrent( v, etype )
+		local code = EncodeAll( v, etype )
 		code = code .. ","
 		if v.iid ~= nil then
-			code = code .. tostring( v.iid )
+			code = code .. Hardcore_EncodePosIntegerBase64( v.iid )
 		else
 			code = code .. "0"
 		end
 		code = code .. ","
 		if v.start ~= nil then
-			code = code .. tostring( v.start )
+			code = code .. Hardcore_EncodePosIntegerBase64( v.start - Jan2023 )
 		else
 			code = code .. "0"
 			v.start = 0			-- We need something 4 lines down
 		end
 		code = code .. ","
 		if v.last_seen ~= nil then
-			code = code .. tostring( v.last_seen - v.start )
+			code = code .. Hardcore_EncodePosIntegerBase64( v.last_seen - v.start )
 		else
 			code = code .. "0"
 		end
 		code = code .. ","
 		if v.num_kills ~= nil then
-			code = code .. tostring( v.num_kills )
+			code = code .. Hardcore_EncodePosIntegerBase64( v.num_kills )
 		else
 			code = code .. "0"
 		end
@@ -2056,7 +2079,6 @@ function DungeonTrackerGenerateRecoveryString()
 	local code = "0"	-- version 1
 	local already_seen = {}
 	local rtype
-	local repnum
 
 	-- First go through the legacy quests and count what we already have
 	for i, v in ipairs( Hardcore_Character.dt.runs ) do
@@ -2073,14 +2095,15 @@ function DungeonTrackerGenerateRecoveryString()
 			if already_seen[ v.name ] == nil then
 				already_seen[ v.name ] = 1
 				rtype = "t"
-				repnum = ""
 			else
 				already_seen[ v.name ] = already_seen[ v.name ] + 1
-				rtype = "T"
-				repnum = "," .. already_seen[ v.name ]
+				rtype = "T" .. already_seen[ v.name ] .. ","
 			end
-			code = code .. EncodeAll( v, rtype )
-			code = code .. repnum
+			
+			-- Encode all repeated runs, but only encode a first run if it wouldn't be recoverable based on a quest
+			if rtype == "T" or DungeonTrackerQuestCompletedForRun( v ) == false then
+				code = code .. EncodeAll( v, rtype )
+			end
 		end
 	end
 
@@ -2089,14 +2112,11 @@ function DungeonTrackerGenerateRecoveryString()
 		if already_seen[ v.name ] == nil then
 			already_seen[ v.name ] = 1
 			rtype = "p"
-			repnum = ""
 		else
 			already_seen[ v.name ] = already_seen[ v.name ] + 1
-			rtype = "P"
-			repnum = "," .. already_seen[ v.name ]
+			rtype = "P" .. already_seen[ v.name ] .. ","
 		end
 		code = code .. EncodePendingCurrent( v, rtype )
-		code = code .. repnum
 	end
 
 	-- Go through the current run and encode it
@@ -2105,17 +2125,14 @@ function DungeonTrackerGenerateRecoveryString()
 		if already_seen[ v.name ] == nil then
 			already_seen[ v.name ] = 1
 			rtype = "c"
-			repnum = ""
 		else
 			already_seen[ v.name ] = already_seen[ v.name ] + 1
-			rtype = "C"
-			repnum = "," .. already_seen[ v.name ]
+			rtype = "C" .. already_seen[ v.name ] .. ","
 		end
 		code = code .. EncodePendingCurrent( v, rtype )
-		code = code .. repnum
 	end
 
-	Hardcore:Print( "Returning recovery code: " .. code )
+	Hardcore:Debug( "Returning recovery code: " .. code )
 	return code
 end
 
@@ -2142,15 +2159,32 @@ function DungeonTrackerReceiveRecoveryString( code )
 		end
 	end
 
-	local index, type, level, repnum, name, id, rest
+	local index, rtype, level, repnum, name, id, rest
 	for i=2,#records do
-		index, type, level, rest = string.match( records[i], "(%d)([tTpPcC])(%d)(.*)")
-		if type == "T" or type == "P" or type == "C" then
-			repnum, rest = string.match( rest, "(.*),(%d)$")
+	
+		-- Decode the common header (<type>[repnum,]<index><level>"
+		rtype, rest = string.match( records[i], "([tTpPcC])(.*)$")
+		if rtype == "T" or rtype == "P" or rtype == "C" then
+			repnum, rest = string.match( rest, "(%S-),(.*)$")
 		else
-			repnum = 1
-			type = string.upper( type )
+			repnum = "1"		-- this is a base-64 string
+			rtype = string.upper( rtype )
 		end
+		index, rest = string.match( rest, "(%S-),(.*)$")
+		if string.find( rest, "," ) then
+			level, rest = string.match( rest, "(%S-),(.*)$")
+		else
+			level = rest
+		end		
+		
+		-- Convert back from base-64
+		repnum = Hardcore_DecodePosIntegerBase64( repnum )
+		index = Hardcore_DecodePosIntegerBase64( index )
+		level = Hardcore_DecodePosIntegerBase64( level )
+
+		Hardcore:Debug( "Decoded base: " .. rtype .. "," .. repnum .. "," .. level .. "," .. index)
+		
+		-- Make sure that we can increase already_seen later on
 		name = dt_db[index][3]
 		if already_seen[ name ] == nil then
 			already_seen[ name ] = 0
@@ -2165,15 +2199,25 @@ function DungeonTrackerReceiveRecoveryString( code )
 			DUNGEON_RUN.time_inside = 0
 			DUNGEON_RUN.level = level
 
-			if type == "T" then
+			if rtype == "T" then
 				DUNGEON_RUN.date = "(recovered)"
 				Hardcore:Debug("Logging recovered run in " .. DUNGEON_RUN.name)
 				table.insert(Hardcore_Character.dt.runs, DUNGEON_RUN)
-			elseif type == "P" or type == "C" then
+			elseif rtype == "P" or rtype == "C" then
 				-- Get the other data
 				local iid, start,last_seen,num_kills,found
-				iid, start, last_seen, num_kills = string.match( rest, ",(%d),(%d),(%d),(%d)")
+				iid, start, last_seen, num_kills = string.match( rest, "(%S+),(%S+),(%S+),(%S+)")
+
+				-- Convert back from base-64
+				iid = Hardcore_DecodePosIntegerBase64( iid )
+				start = Hardcore_DecodePosIntegerBase64( start )
+				last_seen = Hardcore_DecodePosIntegerBase64( last_seen )
+				num_kills = Hardcore_DecodePosIntegerBase64( num_kills )
+
+				start = start + Jan2023				-- Undo the space optimization
 				last_seen = last_seen + start		-- Undo space optimization
+
+				Hardcore:Debug( "Decoded extra: " .. iid .. "," .. start .. "," .. last_seen .. "," .. num_kills )
 
 				-- Check if this run is already pending, finalized or current (by instance ID and name)
 				found = false
