@@ -4,7 +4,8 @@
 
 -- Definitions
 local DT_WARN_INTERVAL = 10 					-- Warn every 10 seconds about repeated run (while in dungeon)
-local DT_INSIDE_MAX_TIME = 60 					-- Maximum time inside a dungeon without it being logged (61 looks nicer than 60 in-game)
+local DT_INSIDE_MAX_TIME = 60 					-- Maximum time inside a dungeon without it being logged
+local DT_INSIDE_MAX_TIME_NO_KILLS = 450			-- Maximum time inside a dungeon without it being logged if there are no kills
 local DT_OUTSIDE_MAX_REAL_TIME = 1800 			-- If seen outside, how many seconds since last seen inside before finalization (1800 = 30m)
 local DT_OUTSIDE_MAX_RUN_TIME = 21600 			-- If seen outside, how many seconds since start of run before finalization (21600 = 6 hrs)
 local DT_TIME_STEP = 1 							-- Dungeon code called every 1 second
@@ -354,6 +355,25 @@ local function DungeonTrackerHasRun( name )
 end
 
 
+-- DungeonTrackerQuestCompletedForRun( v )
+--
+-- Checks if any of the dungeon quests have been completed
+
+local function DungeonTrackerQuestCompletedForRun( run )
+
+	-- Check for funny dungeon names
+	local index = dt_name_to_index[ run.name ] 
+	if index ~= nil then 
+		-- Go through the associated quests
+		local quests = dt_db[index][8]
+		for j = 1, #quests do
+			if C_QuestLog.IsQuestFlaggedCompleted(quests[j]) then
+				return true
+			end
+		end
+	end	
+	return false
+end
 
 -- DungeonTrackerFindMissingRunsFromQuests()
 --
@@ -596,7 +616,7 @@ local function DungeonTrackerLogRun(run)
 	end
 
 	-- We don't log this run if it's relatively short, there is an instance ID (checked above), but no kills
-	if run.num_kills ~= nil and run.num_kills == 0 and run.time_inside < (5*DT_INSIDE_MAX_TIME) then
+	if run.num_kills ~= nil and run.num_kills == 0 and run.time_inside < (DT_INSIDE_MAX_TIME_NO_KILLS) then
 		Hardcore:Debug("Not logging short run without kills in " .. run.name)
 		return
 	end
@@ -1495,6 +1515,23 @@ local function DungeonTrackerClearOutsideQuestLegacyRuns()
 	Hardcore:Debug( "Removed " .. legacy_runs_removed .. " legacy runs possibly linked to outside quests")
 end
 
+-- DungeonTrackerClearShortNoKillRuns()
+--
+-- Finds short runs with 0 kills logged and removes them
+
+local function DungeonTrackerClearShortNoKillRuns()
+
+	for i = #Hardcore_Character.dt.runs, 1, -1 do
+		local v = Hardcore_Character.dt.runs[i]
+		if v.num_kills ~= nil and v.num_kills == 0 and v.time_inside < DT_INSIDE_MAX_TIME_NO_KILLS then
+			table.remove( Hardcore_Character.dt.runs, i )
+			Hardcore:Debug( "Removed run with 0 kills in " .. v.name )
+		end
+	end
+
+end
+
+
 
 --  DungeonTrackerFindMergeableRuns()
 --
@@ -1599,6 +1636,7 @@ local function DungeonTracker()
 		C_Timer.After(5, function()
 			Hardcore:Debug("Looking for erroneous, missing and mergeable runs...")
 			DungeonTrackerClearOutsideQuestLegacyRuns()
+			DungeonTrackerClearShortNoKillRuns()
 			DungeonTrackerFindMissingRunsFromQuests()
 			DungeonTrackerFindMergeableRuns()
 		end)
@@ -1972,3 +2010,249 @@ function DungeonTrackerHandleAppealCode(args)
 		return
 	end
 end
+
+-- DungeonTrackerGenerateRecoveryString()
+--
+-- Generates a recovery string encoding the essential data about runs, which looks like this
+-- All integer values are in base64 (the examples given below are in base-10 for understanding)
+-- <version>[&<run1>[&<run2>]]
+-- Where for version 1 (Era+WOTLK), each run is "<index><type><level>[,IID/repeat][start][,kills]", 
+--   e.g. "t2,18" for a "first tracked run (without legacy quests) of WC at level 18"
+--        "T3,2,18" for a "third (repeated) run of WC at level 18"
+--        "p11,57,1234,1621312312,500,5" for a pending run in SM GY at level 57, IID 1234, start time 16...12, lsat seen 500s after start, 5 kills
+--        "P2,11,57,1234,1621312312,500,5" for a pending run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
+--        "c11,57,1234,1621312312,500,5" for a current run in SM GY at level 57, IID 1234, start time 16...12, 5 kills
+--        "C2,11,57,1234,1621312312,500,5" for a current run in SM GY at level 57, with IID 1234, start time 16...12, 5 kills (second run)
+-- Legacy runs and first runs of dungeons which have a legacy run are skipped; they will be recovered through quests
+
+local Jan2023 = 1672574400			-- Used to decrease .start size, dungeon tracker only introduced on 5 January 2023
+
+function DungeonTrackerGenerateRecoveryString()
+
+	local function EncodeAll( v, etype )
+		local code = "&"
+		code = code .. etype
+		if dt_db_name_to_index[ v.name ] ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64(dt_db_name_to_index[ v.name ])
+		else
+			code = code .. "0"
+		end
+		code = code .. ","
+		if v.level ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64( v.level )
+		else
+			code = code .. "0"
+		end
+		return code
+	end
+
+	local function EncodePendingCurrent( v, etype )
+		local code = EncodeAll( v, etype )
+		code = code .. ","
+		if v.iid ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64( v.iid )
+		else
+			code = code .. "0"
+		end
+		code = code .. ","
+		if v.start ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64( v.start - Jan2023 )
+		else
+			code = code .. "0"
+			v.start = 0			-- We need something 4 lines down
+		end
+		code = code .. ","
+		if v.last_seen ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64( v.last_seen - v.start )
+		else
+			code = code .. "0"
+		end
+		code = code .. ","
+		if v.num_kills ~= nil then
+			code = code .. Hardcore_EncodePosIntegerBase64( v.num_kills )
+		else
+			code = code .. "0"
+		end
+		return code
+	end
+
+	local code = "0"	-- version 1
+	local already_seen = {}
+	local rtype
+
+	-- First go through the legacy quests and count what we already have
+	for i, v in ipairs( Hardcore_Character.dt.runs ) do
+		if v.date ~= nil and v.date == "(legacy)" then
+			if already_seen[ v.name ] == nil then
+				already_seen[ v.name ] = 1
+			end
+		end
+	end
+
+	-- Go through the non-legacy runs and encode them
+	for i, v in ipairs( Hardcore_Character.dt.runs ) do
+		if v.date ~= nil and v.date ~= "(legacy)" then
+			if already_seen[ v.name ] == nil then
+				already_seen[ v.name ] = 1
+				rtype = "t"
+			else
+				already_seen[ v.name ] = already_seen[ v.name ] + 1
+				rtype = "T" .. already_seen[ v.name ] .. ","
+			end
+			
+			-- Encode all repeated runs, but only encode a first run if it wouldn't be recoverable based on a quest
+			if rtype == "T" or DungeonTrackerQuestCompletedForRun( v ) == false then
+				code = code .. EncodeAll( v, rtype )
+			end
+		end
+	end
+
+	-- Go through the pending runs and encode them
+	for i, v in ipairs( Hardcore_Character.dt.pending ) do
+		if already_seen[ v.name ] == nil then
+			already_seen[ v.name ] = 1
+			rtype = "p"
+		else
+			already_seen[ v.name ] = already_seen[ v.name ] + 1
+			rtype = "P" .. already_seen[ v.name ] .. ","
+		end
+		code = code .. EncodePendingCurrent( v, rtype )
+	end
+
+	-- Go through the current run and encode it
+	if next( Hardcore_Character.dt.current ) then
+		local v = Hardcore_Character.dt.current
+		if already_seen[ v.name ] == nil then
+			already_seen[ v.name ] = 1
+			rtype = "c"
+		else
+			already_seen[ v.name ] = already_seen[ v.name ] + 1
+			rtype = "C" .. already_seen[ v.name ] .. ","
+		end
+		code = code .. EncodePendingCurrent( v, rtype )
+	end
+
+	Hardcore:Debug( "Returning recovery code: " .. code )
+	return code
+end
+
+-- DungeonTrackerReceiveRecoveryString()
+--
+-- Accepts a recovery string and tries to rebuild the dungeon log
+-- At this point, the legacy quests should already have been triggered
+-- The runs 
+
+function DungeonTrackerReceiveRecoveryString( code )
+
+	local records = { string.split( "&", code ) }
+	if #records < 2 then
+		return
+	end
+
+	-- Let's count what runs we already have
+	local already_seen = {}
+	for i, v in ipairs( Hardcore_Character.dt.runs ) do
+		if already_seen[ v.name ] == nil then
+			already_seen[ v.name ] = 1
+		else
+			already_seen[ v.name ] = already_seen[ v.name ] + 1
+		end
+	end
+
+	local index, rtype, level, repnum, name, id, rest
+	for i=2,#records do
+	
+		-- Decode the common header (<type>[repnum,]<index><level>"
+		rtype, rest = string.match( records[i], "([tTpPcC])(.*)$")
+		if rtype == "T" or rtype == "P" or rtype == "C" then
+			repnum, rest = string.match( rest, "(%S-),(.*)$")
+		else
+			repnum = "1"		-- this is a base-64 string
+			rtype = string.upper( rtype )
+		end
+		index, rest = string.match( rest, "(%S-),(.*)$")
+		if string.find( rest, "," ) then
+			level, rest = string.match( rest, "(%S-),(.*)$")
+		else
+			level = rest
+		end		
+		
+		-- Convert back from base-64
+		repnum = Hardcore_DecodePosIntegerBase64( repnum )
+		index = Hardcore_DecodePosIntegerBase64( index )
+		level = Hardcore_DecodePosIntegerBase64( level )
+
+		Hardcore:Debug( "Decoded base: " .. rtype .. "," .. repnum .. "," .. level .. "," .. index)
+		
+		-- Make sure that we can increase already_seen later on
+		name = dt_db[index][3]
+		if already_seen[ name ] == nil then
+			already_seen[ name ] = 0
+		end
+
+		if repnum > already_seen[ name ] then
+			-- Make a new run with what we know already
+			id = dt_db[index][1]
+			DUNGEON_RUN = {}
+			DUNGEON_RUN.name = name
+			DUNGEON_RUN.id = id
+			DUNGEON_RUN.time_inside = 0
+			DUNGEON_RUN.level = level
+
+			if rtype == "T" then
+				DUNGEON_RUN.date = "(recovered)"
+				Hardcore:Debug("Logging recovered run in " .. DUNGEON_RUN.name)
+				table.insert(Hardcore_Character.dt.runs, DUNGEON_RUN)
+			elseif rtype == "P" or rtype == "C" then
+				-- Get the other data
+				local iid, start,last_seen,num_kills,found
+				iid, start, last_seen, num_kills = string.match( rest, "(%S+),(%S+),(%S+),(%S+)")
+
+				-- Convert back from base-64
+				iid = Hardcore_DecodePosIntegerBase64( iid )
+				start = Hardcore_DecodePosIntegerBase64( start )
+				last_seen = Hardcore_DecodePosIntegerBase64( last_seen )
+				num_kills = Hardcore_DecodePosIntegerBase64( num_kills )
+
+				start = start + Jan2023				-- Undo the space optimization
+				last_seen = last_seen + start		-- Undo space optimization
+
+				Hardcore:Debug( "Decoded extra: " .. iid .. "," .. start .. "," .. last_seen .. "," .. num_kills )
+
+				-- Check if this run is already pending, finalized or current (by instance ID and name)
+				found = false
+				for _, v in ipairs( Hardcore_Character.dt.runs) do
+					if v.iid ~= nil and v.name ~= nil and v.name == name and v.iid == iid then
+						found = true
+					end
+				end
+				for _, v in ipairs( Hardcore_Character.dt.pending) do
+					if v.iid ~= nil and v.name ~= nil and v.name == name and v.iid == iid then
+						found = true
+					end
+				end
+				if next( Hardcore_Character.dt.current ) then
+					local v = Hardcore_Character.dt.current
+					if v.iid ~= nil and v.name ~= nil and v.name == name and v.iid == iid then
+						found = true
+					end
+				end
+
+				-- If we don't have this run somewhere already, insert a new pending run (any current will connect, hopefully)
+				if found == false then
+					DUNGEON_RUN.iid = iid
+					DUNGEON_RUN.start = start
+					DUNGEON_RUN.last_seen = last_seen
+					DUNGEON_RUN.time_inside = last_seen - start
+					DUNGEON_RUN.date = date( "%m/%d/%y %H:%M:%S", start )
+					DUNGEON_RUN.num_kills = num_kills
+
+					Hardcore:Debug("Logging recovered pending run in " .. DUNGEON_RUN.name)
+					table.insert(Hardcore_Character.dt.pending, DUNGEON_RUN)
+				end
+			end
+		end
+	end
+end
+
+
