@@ -1,4 +1,4 @@
-local debug = false
+local debug = true
 local CTL = _G.ChatThrottleLib
 local COMM_NAME = "HCAB"
 
@@ -9,8 +9,8 @@ local COMM_COMMANDS = {
   ["REQUEST_ACK"] = "3", -- 3$<VALID>~<DATA>
   ["POST_HC_FAILURE"] = "4", -- 4$<Last4GUID>
 }
-local COMM_COMMAND_DELIM = "$"
-local COMM_FIELD_DELIM = "~"
+local COMM_COMMAND_DELIM = "{"
+local COMM_FIELD_DELIM = "}"
 
 local found_invalid = false
 local received_acks = {}
@@ -94,7 +94,7 @@ local function handleAutomaticBackupEvent(self, event, prefix, datastr, scope, s
 	if COMM_NAME == prefix then
 		local command, comm_postfix = string.split(COMM_COMMAND_DELIM, datastr)
 		local sender_short, _ = string.split("-", sender)
-		if debug then print(command, comm_postfix, sender_short) end
+		if debug then print("Debug:", command, data_str, comm_postfix, sender_short) end
 		if command == COMM_COMMANDS["UPDATE"] then
 		  if comm_postfix == nil then return end
 		  local last_four_guid, data = strsplit(COMM_FIELD_DELIM, comm_postfix, 2)
@@ -135,7 +135,8 @@ automatic_backup_event_handler:SetScript("OnEvent", handleAutomaticBackupEvent)
 
 function Hardcore_TestAutomaticBackupUpdate(_hardcore_character)
 	_hardcore_character.time_tracked = _hardcore_character.time_played 
-	local first_recorded = _hardcore_character.first_recorded
+	_hardcore_character.first_recorded = GetServerTime()  
+	local first_recorded = GetServerTime() 
 	table.insert(_hardcore_character.achievements, "Hammertime")
 	table.insert(_hardcore_character.passive_achievements, "Vagash")
 	print("Testing Automatic backup. Test takes 12 seconds ...")
@@ -154,7 +155,7 @@ function Hardcore_TestAutomaticBackupUpdate(_hardcore_character)
 	end)
 
 	C_Timer.After(12.0, function()
-	  assert(abs(_hardcore_character.time_tracked - _hardcore_character.time_played) < 50)
+	  assert(abs(_hardcore_character.time_tracked - _hardcore_character.time_played) < 50, "Test time tracked recovery failed. " .. _hardcore_character.time_tracked .. " " .. _hardcore_character.time_played)
 	  print("Test time tracked recovery: Passed")
 
 	  assert(abs(first_recorded - _hardcore_character.first_recorded) < 5)
