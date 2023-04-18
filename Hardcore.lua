@@ -1027,7 +1027,6 @@ function Hardcore:DKConvert(dk_convert_option)
 		local percentage = Hardcore_Character.tracked_played_percentage
 
 		if Hardcore:ShouldShowPlaytimeWarning(level, percentage) then
-			Hardcore_SendAutomaticBackupDataRequest()
 			Hardcore:DisplayPlaytimeWarning(level)
 			return
 		end
@@ -1183,6 +1182,12 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios.")
 	end
 end)
+
+local function startAutomaticBackupUpdateTimer()
+    C_Timer.NewTicker(60*15, function(self) -- Once every 15 minutes
+      Hardcore_SendAutomaticBackupUpdate(Hardcore_Character)
+    end)
+end
 
 --[[ Startup ]]
 --
@@ -2136,6 +2141,8 @@ function Hardcore:TIME_PLAYED_MSG(...)
 				.. Hardcore_Character.played_time_gap_warnings[#Hardcore_Character.played_time_gap_warnings].duration_since_last_recording
 				.. " seconds."
 			Hardcore:Print(message)
+
+			Hardcore_SendAutomaticBackupDataRequest(Hardcore_Character)
 		else
 			-- Backup character data grooming and maintainence
 

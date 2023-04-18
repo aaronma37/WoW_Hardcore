@@ -55,8 +55,9 @@ local function testTamperedRecoveryCode(hardcore_character, player_name, last_fo
 	return true
 end
 
-local function testAutomaticBackupFull(_hardcore_character)
-	local time_tracked = _hardcore_character.time_tracked
+local function testAutomaticBackupFull(_hardcore_character, force_send_request)
+	local time_tracked = _hardcore_character.time_played
+	_hardcore_character.time_tracked = _hardcore_character.time_played
 	_hardcore_character.first_recorded = GetServerTime()  
 	local first_recorded = GetServerTime() 
 	table.insert(_hardcore_character.achievements, "Hammertime")
@@ -71,10 +72,12 @@ local function testAutomaticBackupFull(_hardcore_character)
 
 	if Hardcore_Automatic_Backup_Data == nil then Hardcore_Automatic_Backup_Data = {} end
 	Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid] = nil
-	C_Timer.After(5.0, function()
-	  assert(Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid])
-	  Hardcore_SendAutomaticBackupDataRequest(_hardcore_character)
-	end)
+	if force_send_request then
+	  C_Timer.After(5.0, function()
+	    assert(Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid])
+	    Hardcore_SendAutomaticBackupDataRequest(_hardcore_character)
+	  end)
+	end
 
 	C_Timer.After(12.0, function()
 	  assert(abs(_hardcore_character.time_tracked - time_tracked) < 50, "Test time tracked recovery failed. " .. _hardcore_character.time_tracked .. " " .. time_tracked)
@@ -104,6 +107,8 @@ local function testRecoveryCodeSuite()
   -- Self
   local player_name = UnitGUID("player")
   local last_four_guid = string.sub(UnitGUID("player"), -4)
+  if Hardcore_Character.time_tracked == nil then Hardcore_Character.time_tracked = Hardcore_Character.time_played end
+  if Hardcore_Character.first_recorded == nil or Hardcore_Character.first_recorded == -1 then Hardcore_Character.first_recorded = GetServerTime() end
   assert(testRecoveryCode(Hardcore_Character, player_name, last_four_guid), "Failed self recovery code test.")
   Hardcore:Print("Test self recovery code test: |cFF00FF00Passed|r")
 
@@ -120,7 +125,7 @@ local function testRecoveryCodeSuite()
   assert(testTamperedRecoveryCode(hardcore_character, "some_name", "9988"), "Failed tampered recovery code test.")
   Hardcore:Print("Test tampered recovery code test: |cFF00FF00Passed|r")
 
-  testAutomaticBackupFull(Hardcore_Character)
+  testAutomaticBackupFull(Hardcore_Character, true)
 end
 
 

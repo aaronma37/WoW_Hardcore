@@ -18,9 +18,10 @@ local received_acks = {}
 local function recoverData(_hardcore_character)
   for _,v in ipairs(received_acks) do
     local tracked_time, first_recorded, achievements_list, passive_achievements_list = Hardcore_VerifyRecoveryCode(Hardcore_Character, v)
-    if tracked_time and _hardcore_character.time_tracked and tracked_time > _hardcore_character.time_tracked then
+    if tracked_time and _hardcore_character.time_tracked and tracked_time > _hardcore_character.time_tracked and tracked_time <= _hardcore_character.time_played then
       _hardcore_character.time_tracked = tonumber(tracked_time)
-       Hardcore:Print("Recovered tracked time.")
+      _hardcore_character.tracked_played_percentage = _hardcore_character.time_tracked / _hardcore_character.time_played * 100.0
+       Hardcore:Print("Recovered tracked time: " .. string.format("%.1f", _hardcore_character.tracked_played_percentage) .. "%")
     end
 
     if first_recorded and _hardcore_character.first_recorded == -1 then
