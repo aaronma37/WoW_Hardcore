@@ -322,7 +322,7 @@ local function encodeDataRecovery(_hardcore_character)
   return code
 end
 
-function Hardcore_GenerateRecoveryCode(_hardcore_character)
+function Hardcore_GenerateRecoveryCode(_hardcore_character, player_name, last_four_guid)
     local player_name = UnitGUID("player")
     local last_four_guid = string.sub(UnitGUID("player"), -4)
     local encoded = encodeDataRecovery(_hardcore_character)

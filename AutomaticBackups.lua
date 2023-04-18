@@ -1,4 +1,4 @@
-local debug = true
+local debug = false
 local CTL = _G.ChatThrottleLib
 local COMM_NAME = "HCAB"
 
@@ -130,49 +130,3 @@ local function handleAutomaticBackupEvent(self, event, prefix, datastr, scope, s
 	end
 end
 automatic_backup_event_handler:SetScript("OnEvent", handleAutomaticBackupEvent)
-
--- Unit tests -- Warning!! If this goes wrong, you will lose input data
-
-function Hardcore_TestAutomaticBackupUpdate(_hardcore_character)
-	_hardcore_character.time_tracked = _hardcore_character.time_played 
-	_hardcore_character.first_recorded = GetServerTime()  
-	local first_recorded = GetServerTime() 
-	table.insert(_hardcore_character.achievements, "Hammertime")
-	table.insert(_hardcore_character.passive_achievements, "Vagash")
-	print("Testing Automatic backup. Test takes 12 seconds ...")
-	Hardcore_SendAutomaticBackupUpdate(_hardcore_character)
-	_hardcore_character.time_tracked = -1
-	_hardcore_character.first_recorded = -1
-	_hardcore_character.achievements = {}
-	_hardcore_character.passive_achievements = {}
-	local last_four_guid = string.sub(UnitGUID("player"), -4)
-
-	if Hardcore_Automatic_Backup_Data == nil then Hardcore_Automatic_Backup_Data = {} end
-	Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid] = nil
-	C_Timer.After(5.0, function()
-	  assert(Hardcore_Automatic_Backup_Data[UnitName("player") .. last_four_guid])
-	  Hardcore_SendAutomaticBackupDataRequest(_hardcore_character)
-	end)
-
-	C_Timer.After(12.0, function()
-	  assert(abs(_hardcore_character.time_tracked - _hardcore_character.time_played) < 50, "Test time tracked recovery failed. " .. _hardcore_character.time_tracked .. " " .. _hardcore_character.time_played)
-	  print("Test time tracked recovery: Passed")
-
-	  assert(abs(first_recorded - _hardcore_character.first_recorded) < 5)
-	  print("Test first recorded recovery: Passed")
-
-	  local found = false
-	  for _,v in ipairs(_hardcore_character.achievements) do
-	    if v == "Hammertime" then found = true end
-	  end
-	  assert(found)
-	  print("Test achievement recovery: Passed")
-
-	  for _,v in ipairs(_hardcore_character.passive_achievements) do
-	    if v == "Vagash" then found = true end
-	  end
-	  assert(found)
-	  print("Test passive achievement recovery: Passed")
-	end)
-end
-
