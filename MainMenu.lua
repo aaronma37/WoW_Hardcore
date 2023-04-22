@@ -607,7 +607,6 @@ local function DrawRulesTab(container)
 end
 
 local function DrawVerifyTab(container, _hardcore_character)
-_hardcore_character.passive_achievements[#_hardcore_character.passive_achievements+1] = "Vagash"
 	local ATTRIBUTE_SEPARATOR = "_"
 	local function GenerateVerificationString()
 		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
