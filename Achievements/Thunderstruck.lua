@@ -8,11 +8,9 @@ local blacklist = {
 	["Flame Shock"] = 1,
 	["Flametongue Totem"] = 1,
 	["Flametongue Weapon"] = 1,
-	["Frost Resistance Totem"] = 1,
 	["Magma Totem"] = 1,
 	["Searing Totem"] = 1,
 	-- Forbidden frost spells
-	["Fire Resistance Totem"] = 1,
 	["Frost Shock"] = 1,
 	["Frostbrand Weapon"] = 1,
 
@@ -22,11 +20,9 @@ local blacklist = {
 	["Horion de flammes"] = 1,
 	["Totem Langue de feu"] = 1,
 	["Arme Langue de feu"] = 1,
-	["Totem de résistance au Givre"] = 1,
 	["Totem de Magma"] = 1,
 	["Totem incendiaire"] = 1,
 	-- Forbidden frost spells
-	["Totem de résistance au Feu"] = 1,
 	["Horion de givre"] = 1,
 	["Arme de givre"] = 1,
 
@@ -36,11 +32,9 @@ local blacklist = {
 	["Flammenschock"] = 1,
 	["Totem der Flammenzunge"] = 1,
 	["Waffe der Flammenzunge"] = 1,
-	["Totem des Frostwiderstands"] = 1,
 	["Totem der glühenden Magma"] = 1,
 	["Totem der Verbrennung"] = 1,
 	-- Forbidden frost spells
-	["Totem des Feuerwiderstands"] = 1,
 	["Frostschock"] = 1,
 	["Waffe des Frostbrands"] = 1,
 
@@ -50,11 +44,9 @@ local blacklist = {
 	["Choque de llamas"] = 1,
 	["Tótem lengua de Fuego"] = 1,
 	["Arma lengua de Fuego"] = 1,
-	["Tótem de resistencia a la Escarcha"] = 1,
 	["Tótem de magma"] = 1,
 	["Tótem abrasador"] = 1,
 	-- Forbidden frost spells
-	["Tótem de Resistencia al Fuego"] = 1,
 	["Choque de Escarcha"] = 1,
 	["Arma Estigma de Escarcha"] = 1,
 
@@ -65,11 +57,9 @@ local blacklist = {
 	["Folgore del Fuoco"] = 1,
 	["Totem della Lingua di Fuoco"] = 1,
 	["Arma della Lingua di Fuoco"] = 1,
---	["Frost Resistance Totem"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
 	["Totem del Magma"] = 1,
 	["Totem delle Fiamme"] = 1,
 	-- Forbidden frost spells
---	["Fire Resistance Totem"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
 	["Folgore del Gelo"] = 1,
 --	["Frostbrand Weapon"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
 
@@ -79,11 +69,9 @@ local blacklist = {
 	["Choque Flamejante"] = 1,
 	["Totem de Labaredas"] = 1,
 	["Arma de Labaredas"] = 1,
-	["Totem de Resistência ao Gelo"] = 1,
 --	["Totem de Magma"] = 1, -- Same as French
 	["Totem Calcinante"] = 1,
 	-- Forbidden frost spells
-	["Totem de Resistência ao Fogo"] = 1,
 	["Choque Gélido"] = 1,
 	["Arma da Marca Gélida"] = 1,
 
@@ -93,11 +81,9 @@ local blacklist = {
 	["Огненный шок"] = 1,
 	["Тотем языка пламени"] = 1,
 	["Оружие языка пламени"] = 1,
-	["Тотем сопротивления льду"] = 1,
 	["Тотем магмы"] = 1,
 	["Опаляющий тотем"] = 1,
 	-- Forbidden frost spells
-	["Тотем сопротивления огню"] = 1,
 	["Ледяной шок"] = 1,
 	["Оружие ледяного клейма"] = 1,
 
@@ -107,11 +93,9 @@ local blacklist = {
 	["화염 충격"] = 1,
 	["불꽃의 토템"] = 1,
 	["불꽃의 무기"] = 1,
-	["냉기 저항 토템"] = 1,
 	["용암 토템"] = 1,
 	["불타는 토템"] = 1,
 	-- Forbidden frost spells
-	["화염 저항 토템"] = 1,
 	["냉기 충격"] = 1,
 	["냉기의 무기"] = 1,
 
@@ -121,11 +105,9 @@ local blacklist = {
 	["烈焰震击"] = 1,
 	["火舌图腾"] = 1,
 	["火舌武器"] = 1,
-	["抗寒图腾"] = 1,
 	["熔岩图腾"] = 1,
 	["灼热图腾"] = 1,
 	-- Forbidden frost spells
-	["抗火图腾"] = 1,
 	["冰霜震击"] = 1,
 	["冰封武器"] = 1,
 }
