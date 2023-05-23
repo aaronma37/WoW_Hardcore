@@ -2,7 +2,19 @@ local _G = _G
 local thunderstruck_achievement = CreateFrame("Frame")
 _G.achievements.Thunderstruck = thunderstruck_achievement
 
+--[[
+	The list below can be obtained by entering the following lines in the chat, for each language.
+/run LocaleMap = { ["enUS"]="English", ["koKR"]="Korean", ["frFR"]="French", ["deDE"]="German", ["zhCN"]="Chinese (Simplified)", ["esES"]="Spanish", ["zhTW"]="Chinese (Traditional)", ["esMX"]="Spanish", ["ruRU"]="Russian", ["ptBR"]="Portuguese" }
+/run f=CreateFrame("Frame") f:SetPoint("TOPLEFT",200,-200) f:SetWidth(256) f:SetHeight(128) f.t=f:CreateTexture() f.t:SetColorTexture(0,0,0.5); f.t:SetAllPoints()
+/run CBT = function(b,icon) b[icon]=b:CreateTexture() b[icon]:SetTexture("Interface/Buttons/UI-Panel-MinimizeButton-"..icon) b[icon]:SetAllPoints() b[icon]:SetTexCoord(0.08,0.9,0.1,0.9) return b[icon] end
+/run b=CreateFrame("Button",nil,f) b:SetPoint("TOPRIGHT",0,0) b:SetWidth(14) b:SetHeight(14) b:SetScript("OnClick", function() f:Hide() end) b:SetNormalTexture(CBT(b,"Up")) b:SetPushedTexture(CBT(b,"Down")) b:SetHighlightTexture(CBT(b,"Highlight"))
+/run s="\t-- Spell names, in "..LocaleMap[GetLocale()].."\n" AddText = function(x) if type(x) == "string" then s=s.."\t-- Forbidden "..x.." spells\n" else n=GetSpellInfo(x) if n then s=s.."\t[\""..n.."\"] = 1,\n" end end end
+/run g=CreateFrame("EditBox", nil, f) g:SetMultiLine(true) g:SetAutoFocus(false) g:SetAllPoints() g:SetFontObject(GameTooltipTextSmall) for _,x in ipairs({"fire",1535,8050,8227,8024,8190,3599,2894,51505,"frost",8056,8033}) do AddText(x) end g:SetText(s)
+
+	It opens an edit box with preformatted code. Simply copy/paste the contents of the edit box to the source code below.
+]]
 local blacklist = {
+	-- Spell names, in English
 	-- Forbidden fire spells
 	["Fire Nova Totem"] = 1,
 	["Flame Shock"] = 1,
@@ -14,7 +26,7 @@ local blacklist = {
 	["Frost Shock"] = 1,
 	["Frostbrand Weapon"] = 1,
 
-	-- Same list, now in French
+	-- Spell names, in French
 	-- Forbidden fire spells
 	["Totem Nova de feu"] = 1,
 	["Horion de flammes"] = 1,
@@ -26,7 +38,7 @@ local blacklist = {
 	["Horion de givre"] = 1,
 	["Arme de givre"] = 1,
 
-	-- Same list, now in German
+	-- Spell names, in German
 	-- Forbidden fire spells
 	["Totem der Feuernova"] = 1,
 	["Flammenschock"] = 1,
@@ -38,7 +50,7 @@ local blacklist = {
 	["Frostschock"] = 1,
 	["Waffe des Frostbrands"] = 1,
 
-	-- Same list, now in Spanish
+	-- Spell names, in Spanish
 	-- Forbidden fire spells
 	["Tótem Nova de Fuego"] = 1,
 	["Choque de llamas"] = 1,
@@ -50,7 +62,7 @@ local blacklist = {
 	["Choque de Escarcha"] = 1,
 	["Arma Estigma de Escarcha"] = 1,
 
-	-- Same list, now in Portuguese
+	-- Spell names, in Portuguese
 	-- Forbidden fire spells
 	["Totem de Nova de Fogo"] = 1,
 	["Choque Flamejante"] = 1,
@@ -62,7 +74,7 @@ local blacklist = {
 	["Choque Gélido"] = 1,
 	["Arma da Marca Gélida"] = 1,
 
-	-- Same list, now in Russian
+	-- Spell names, in Russian
 	-- Forbidden fire spells
 	["Тотем кольца огня"] = 1,
 	["Огненный шок"] = 1,
@@ -74,7 +86,7 @@ local blacklist = {
 	["Ледяной шок"] = 1,
 	["Оружие ледяного клейма"] = 1,
 
-	-- Same list, now in Korean
+	-- Spell names, in Korean (untested)
 	-- Forbidden fire spells
 	["불꽃 회오리 토템"] = 1,
 	["화염 충격"] = 1,
@@ -86,7 +98,7 @@ local blacklist = {
 	["냉기 충격"] = 1,
 	["냉기의 무기"] = 1,
 
-	-- Same list, now in Chinese
+	-- Spell names, in Chinese (untested)
 	-- Forbidden fire spells
 	["火焰新星图腾"] = 1,
 	["烈焰震击"] = 1,
