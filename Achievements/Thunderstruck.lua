@@ -59,18 +59,19 @@ local blacklist = {
 	["Arma Estigma de Escarcha"] = 1,
 
 	-- Same list, now in Italian
+	-- Unlike other languages, these translations come from Wowhead Retail instead of Wowhead Classic, therefore there is a (small) risk that translations are wrong
 	-- Forbidden fire spells
---	["Fire Nova Totem"] = 1,
---	["Flame Shock"] = 1,
---	["Flametongue Totem"] = 1,
---	["Flametongue Weapon"] = 1,
---	["Frost Resistance Totem"] = 1,
---	["Magma Totem"] = 1,
---	["Searing Totem"] = 1,
+	["Totem dell'Esplosione di Fuoco"] = 1,
+	["Folgore del Fuoco"] = 1,
+	["Totem della Lingua di Fuoco"] = 1,
+	["Arma della Lingua di Fuoco"] = 1,
+--	["Frost Resistance Totem"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
+	["Totem del Magma"] = 1,
+	["Totem delle Fiamme"] = 1,
 	-- Forbidden frost spells
---	["Fire Resistance Totem"] = 1,
---	["Frost Shock"] = 1,
---	["Frostbrand Weapon"] = 1,
+--	["Fire Resistance Totem"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
+	["Folgore del Gelo"] = 1,
+--	["Frostbrand Weapon"] = 1, -- Unkown Italian translation in both Wowhead Classic and Wowhead Retail
 
 	-- Same list, now in Portuguese
 	-- Forbidden fire spells
