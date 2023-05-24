@@ -156,6 +156,7 @@ AchievementTab.lua
 FirstMenuScreen.lua
 Dungeons.lua
 Survey.lua
+ReloadReminder.lua
 MainMenu.lua
 TextureUtils.lua
 TextureInfo.lua
