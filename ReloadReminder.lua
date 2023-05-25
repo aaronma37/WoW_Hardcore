@@ -26,7 +26,7 @@ local RR_LOST_VS_AUTO_INTERVAL = {
 }
 
 -- debug values
-if true then
+if false then
     RR_WARN_SUPPRESS = 3
     RR_LOST_VS_AUTO_INTERVAL = {
         {  60,  20 },         -- With less than 1 hour of lost time, warn every hour
