@@ -4,9 +4,12 @@
 
 ----- LOCAL VARIABLES ----------
 
+local AceGUI = LibStub("AceGUI-3.0")
+
 local rr_last_reload = 0                -- Last time of a reload (basically, last time since ReloadReminderInitiate())
 local rr_last_warning = 0               -- Last time of an actually output warning
 local rr_last_played_msg = 0            -- Last time of a PLAYED_TIME_MSG in Hardcore.lua
+local rr_frame
 
 -- These variables correspond to the HC options
 local rr_show_warning = true
@@ -15,8 +18,6 @@ local rr_set_interval = 0               -- 0 indicates automatic
 -- Definitions
 local RR_TIME_STEP = 1                  -- How often our timer is called
 local RR_WARN_SUPPRESS = 60             -- How long to wait before another warning is output, to prevent spamming the user
-
-
 
 local RR_LOST_VS_AUTO_INTERVAL = {
     { 3600, 3600 },         -- With less than 1 hour of lost time, warn every hour
@@ -27,12 +28,12 @@ local RR_LOST_VS_AUTO_INTERVAL = {
 
 -- debug values
 if false then
-    RR_WARN_SUPPRESS = 3
+    RR_WARN_SUPPRESS = 10
     RR_LOST_VS_AUTO_INTERVAL = {
-        {  60,  20 },         -- With less than 1 hour of lost time, warn every hour
-        { 120,  10 },         -- With 1-2 hours of lost time, warn every 45m
-        { 1800, 5 },         -- With 2-3 hours of lost time, warn every 30m
-        {   -1, 2 }          -- All other cases: warn every 15m; this is crazy, really... You're reloading mroe than playing. But okay, this is just a warning
+        { 3600, 30 },         -- With less than 1 hour of lost time, warn every hour
+        { 7200, 20 },         -- With 1-2 hours of lost time, warn every 45m
+        { 1800, 10 },         -- With 2-3 hours of lost time, warn every 30m
+        {   -1, 5 }           -- All other cases: warn every 15m; this is crazy, really... You're reloading mroe than playing. But okay, this is just a warning
     }
 end
 
@@ -58,6 +59,46 @@ local function ReloadReminderGetInterval( rr_lost_time )
     return rr_set_interval
 
 end
+
+local function ReloadReminderDoReload()
+
+    Hardcore:Print("Attempting reload")    
+    ReloadUI()
+    Hardcore:Print("Reload failed")
+
+end
+
+local function ReloadReminderCleanup(widget)
+
+    AceGUI:Release(widget) 
+    rr_frame = nil
+    rr_last_warning = GetServerTime()           -- Suppress warnings for maximum time from now
+
+end
+
+local function ReloadReminderCreateWindow()
+
+    -- Create the window if it isn't simply hidden
+    if rr_frame == nil then
+        rr_frame = AceGUI:Create("Frame")
+        rr_frame:SetTitle("Reload Reminder")
+        rr_frame:SetStatusText("Reload when safe!")
+        rr_frame:SetCallback("OnClose", function(widget) ReloadReminderCleanup(widget) end )
+        rr_frame:SetLayout("Flow")
+        rr_frame:SetWidth(300)
+        rr_frame:SetHeight(125)
+
+        local button = AceGUI:Create("Button")
+        button:SetText("Reload now")
+        button:SetWidth(250)
+        button:SetCallback("OnClick", function() ReloadReminderDoReload() end)
+        rr_frame:AddChild(button)
+    end
+
+    rr_frame:Show()
+
+end
+
 
 
 ----- GLOBAL FUNCTIONS ----------
@@ -121,18 +162,10 @@ function ReloadReminderCheck()
         return
     end
 
-    print( "5: " .. now .. "/" .. rr_last_played_msg )
-    -- Okay, so it's time to output a warning
-    -- But we don't advise the warning if the /played msg was received too long ago;
-    -- we want to do the advice right after the /played msg was received, so that most
-    -- data is up-to-date
-    if now - rr_last_played_msg > 10 then
-        return
-    end
-
     -- Okay, let's output the warning
     Hardcore:Print( "Time for a /reload, interval = " .. rr_warn_interval)
     rr_last_warning = now
+    ReloadReminderCreateWindow()
 
 end
 
@@ -181,6 +214,9 @@ function ReloadReminderInitiate()
 	C_Timer.NewTicker(RR_TIME_STEP, function()
 		ReloadReminderCheck()
 	end)
+
+    -- Show the window when needed
+    --ReloadReminderCreateWindow()
 
 end
 
