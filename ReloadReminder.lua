@@ -9,6 +9,8 @@ local AceGUI = LibStub("AceGUI-3.0")
 local rr_last_reload = 0                -- Last time of a reload (basically, last time since ReloadReminderInitiate())
 local rr_last_warning = 0               -- Last time of an actually output warning
 local rr_last_played_msg = 0            -- Last time of a PLAYED_TIME_MSG in Hardcore.lua
+local rr_last_track_msg = 0             -- Last time of a tracked time ticker in Hardcore.lua
+local rr_last_dung_msg = 0              -- Last time of a dungeon ticker in Hardcore.lua
 local rr_frame
 
 -- These variables correspond to the HC options
@@ -105,15 +107,22 @@ end
 
 
 -- ReloadReminderPlayedTimeUpdate()
+-- ReloadReminderTrackedTimeUpdate()
+-- ReloadReminderDungeonTrackerUpdate()
 --
--- Called from Hardcore:TIME_PLAYED_MSG(...) right after the /played time is updated
--- This triggers the "best time to reload" message. We put as little as possible
--- code here to prevent breaking the main tracked time timer
+-- Watchdog functions that track if the three vital tickers for tracked, played and dungeon tracking
+-- are still operational
 
 function ReloadReminderPlayedTimeUpdate()
-
     rr_last_played_msg = GetServerTime()
+end
 
+function ReloadReminderTrackedTimeUpdate()
+    rr_last_track_msg = GetServerTime()
+end
+
+function ReloadReminderDungeonTrackerUpdate()
+    rr_last_dung_msg = GetServerTime()
 end
 
 
@@ -141,6 +150,24 @@ function ReloadReminderCheck()
         return
     end
 
+    -- Find out current time, so we can compare against the stored times
+    local now = GetServerTime()
+
+    -- Don't warn more often than once per minute
+    if now - rr_last_warning < RR_WARN_SUPPRESS then
+        return
+    end
+
+    -- Check if any of the tickers are falling behind; if so, warn immediately
+    if (now - rr_last_played_msg > 180) or
+       (now - rr_last_track_msg > 180) or
+       (now - rr_last_dung_msg > 180) then
+        Hardcore:Print( "Detected a missing heartbeat -- a /reload is advised!")
+        rr_last_warning = now
+        ReloadReminderCreateWindow()
+        return
+    end
+
     -- Determine what is a good time to advise a reload;
     -- First determine how much tracked time was lost already
     local rr_lost_time = _G.Hardcore_Character.time_played - _G.Hardcore_Character.time_tracked
@@ -152,20 +179,12 @@ function ReloadReminderCheck()
     rr_warn_interval = ReloadReminderGetInterval(rr_lost_time)
 
     -- Now see if the interval has passed already
-    local now = GetServerTime()
-    if now - rr_last_reload < rr_warn_interval then
-        return
+    if now - rr_last_reload > rr_warn_interval then
+        -- Okay, let's output the warning
+        Hardcore:Print( "Time for a /reload, interval = " .. rr_warn_interval)
+        rr_last_warning = now
+        ReloadReminderCreateWindow()
     end
-
-    -- Don't warn more often than once per minute
-    if now - rr_last_warning < RR_WARN_SUPPRESS then
-        return
-    end
-
-    -- Okay, let's output the warning
-    Hardcore:Print( "Time for a /reload, interval = " .. rr_warn_interval)
-    rr_last_warning = now
-    ReloadReminderCreateWindow()
 
 end
 

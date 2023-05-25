@@ -154,9 +154,9 @@ CharacterStatusScreen.lua
 InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
+ReloadReminder.lua
 Dungeons.lua
 Survey.lua
-ReloadReminder.lua
 MainMenu.lua
 TextureUtils.lua
 TextureInfo.lua

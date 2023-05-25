@@ -1632,6 +1632,7 @@ function Hardcore:TIME_PLAYED_MSG(...)
 
 	Hardcore:Debug(Hardcore_Character.tracked_played_percentage)
 
+	-- Tell the watchdog we are still alive
 	ReloadReminderPlayedTimeUpdate()
 
 	-- Check to see if the gap since the last recording is too long.  When receiving played time for the first time.
@@ -3328,6 +3329,8 @@ function Hardcore:InitiatePulsePlayed()
 		if RECEIVED_FIRST_PLAYED_TIME_MSG == true then
 			Hardcore_Character.accumulated_time_diff = Hardcore_Character.time_played - Hardcore_Character.time_tracked
 		end
+		-- Tell the watchdog we are still alive
+		ReloadReminderTrackedTimeUpdate()
 	end)
 
 	--played time tracking
