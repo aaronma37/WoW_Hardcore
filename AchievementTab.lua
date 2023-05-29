@@ -58,7 +58,7 @@ local function DrawPassiveAchievementRow(achievement, _scroll_frame)
 	title:SetWidth(550)
 	title:SetText(achievement.title)
 	title:SetPoint("TOP", 2, 5)
-	title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 	btn_container_frame:AddChild(title)
 
 	local description = AceGUI:Create("InteractiveLabel")
@@ -147,7 +147,7 @@ local function DrawClassTitleRowOffset(_scroll_frame, _title)
 		["Alliance Only"] = "004A93",
 	}
 	title:SetText("|c00" .. CLASS_COLOR_BY_NAME[_title] .. _title .. "|r Achievements")
-	title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 	row_container:AddChild(title)
 end
 
@@ -178,7 +178,7 @@ local function DrawClassTitleRow(_scroll_frame, _title)
 		["Alliance Only"] = "004A93",
 	}
 	title:SetText("|c00" .. CLASS_COLOR_BY_NAME[_title] .. _title .. "|r Achievements")
-	title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 	row_container:AddChild(title)
 end
 
@@ -335,7 +335,7 @@ local function DrawAchievementRow(achievement, _scroll_frame, _hardcore_characte
 	title:SetWidth(550)
 	title:SetText(achievement.title)
 	title:SetPoint("TOP", 2, 5)
-	title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 	btn_container_frame:AddChild(title)
 
 	local description = AceGUI:Create("InteractiveLabel")
@@ -381,7 +381,7 @@ local function DrawAchievementIntroductionPage(scroll_frame)
 	local first_menu_description_title = AceGUI:Create("Label")
 	first_menu_description_title:SetWidth(500)
 	first_menu_description_title:SetText("Achievements")
-	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	first_menu_description_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 	-- first_menu_description_title:SetPoint("TOP", 2,5)
 	scroll_frame:AddChild(first_menu_description_title)
 
@@ -570,7 +570,7 @@ local function DrawStartingAchievementsPageIconForm(
 	achievements_title:SetRelativeWidth(1.0)
 	achievements_title:SetHeight(40)
 	achievements_title:SetText("General Achievements")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+	achievements_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 16, "")
 	achievements_container:AddChild(achievements_title)
 	DrawClassContainer(achievements_container, "All", 50)
 
@@ -585,7 +585,7 @@ local function DrawStartingAchievementsPageIconForm(
 		achievements_title:SetRelativeWidth(1.0)
 		achievements_title:SetHeight(40)
 		achievements_title:SetText(class)
-		achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+		achievements_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 16, "")
 		class_contianer:AddChild(achievements_title)
 		DrawClassContainer(class_contianer, class, size)
 	end
@@ -599,7 +599,7 @@ local function DrawStartingAchievementsPageIconForm(
 	achievements_title:SetRelativeWidth(1.0)
 	achievements_title:SetHeight(40)
 	achievements_title:SetText("\n\n\n\n")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+	achievements_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 16, "")
 	scroll_container:AddChild(achievements_title)
 
 	local achievements_container = AceGUI:Create("SimpleGroup")

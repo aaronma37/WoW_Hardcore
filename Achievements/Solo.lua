@@ -6,7 +6,7 @@ _G.extra_rules.Solo = solo_rules
 solo_rules.name = "Solo"
 solo_rules.title = "Solo"
 solo_rules.class = "All"
-solo_rules.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_default.blp"
+solo_rules.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_default.blp"
 solo_rules.description = ""
 
 -- Registers

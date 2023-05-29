@@ -31,7 +31,7 @@ gw = {
     api_table = {},
     compatibility = { identity = false, name2chat = false, incognito = false, elvui = false, prat = false, },
 }
-gw.version = GetAddOnMetadata('Hardcore', 'Version')
+gw.version = GetAddOnMetadata('HardcoreUnlocked', 'Version')
 gw.realm = GetRealmName()
 gw.player = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''

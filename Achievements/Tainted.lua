@@ -35,7 +35,7 @@ local dungeon_kill_trigger = {
 _achievement.name = "Tainted"
 _achievement.title = "Tainted"
 _achievement.class = "All"
-_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_tainted.blp"
+_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_tainted.blp"
 _achievement.level_cap = 59
 _achievement.kill_targets = {}
 for i, v in pairs(dungeon_kill_trigger) do

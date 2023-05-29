@@ -8,7 +8,7 @@ self_made_trio_achievement.name = "TrioMade"
 self_made_trio_achievement.title = "Trio-Made"
 self_made_trio_achievement.pts = 10
 self_made_trio_achievement.class = "All"
-self_made_trio_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_self_made.blp"
+self_made_trio_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_self_made.blp"
 self_made_trio_achievement.description =
 	"Complete the Hardcore challenge without at any point equipping an item that you or your trio have not crafted yourselves. Items your character has conjured (e.g. Firestones) are considered crafted. No items bought, dropped, or rewarded by quests are allowed to be equipped, fishing poles MAY be equipped. The items your character starts with are allowed to be equipped. Bags are equipped items."
 local Combine = {
@@ -164,8 +164,8 @@ end
 
 --Check if the item is selfMade
 local function isSelfCreated(...)
-	local teamduocheck = Hardcore_Character.team[1]
-	local teamtriocheck = Hardcore_Character.team[2]
+	local teamduocheck = HardcoreUnlocked_Character.team[1]
+	local teamtriocheck = HardcoreUnlocked_Character.team[2]
 	for i = 1, select("#", GameTooltip:GetRegions()) do
 		local region = select(i, GameTooltip:GetRegions())
 		if region and region:GetObjectType() == "FontString" then

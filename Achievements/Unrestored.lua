@@ -7,7 +7,7 @@ unrestored_achievement.name = "Unrestored"
 unrestored_achievement.title = "Unrestored"
 unrestored_achievement.pts = 10
 unrestored_achievement.class = "Druid"
-unrestored_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_unrestored.blp"
+unrestored_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_unrestored.blp"
 unrestored_achievement.description =
 	"Complete the Hardcore challenge without at any point using an ability within the “Restoration” tab of your spellbook. Only spells listed under “Feral Combat”, “Balance”, or “General” are allowed. You are allowed to put points into all talent trees, but active abilities thus unlocked that are in the “Restoration” tab of your spellbook are not allowed to be used."
 

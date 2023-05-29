@@ -7,7 +7,7 @@ insane_in_the_membrane_achievement.name = "InsaneInTheMembrane"
 insane_in_the_membrane_achievement.title = "Insane In The Membrane"
 insane_in_the_membrane_achievement.pts = 25
 insane_in_the_membrane_achievement.class = "All"
-insane_in_the_membrane_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_insane_in_the_membrane.blp"
+insane_in_the_membrane_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_insane_in_the_membrane.blp"
 insane_in_the_membrane_achievement.description =
 	"Complete the Hardcore challenge while flagged for PvP for the entire run.  This achievement can be done on any server. Dying to enemy players counts as a death."
 

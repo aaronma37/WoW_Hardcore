@@ -17,7 +17,7 @@ no_way_out_achievement.name = "NoWayOut"
 no_way_out_achievement.title = "No Way Out"
 no_way_out_achievement.pts = 10
 no_way_out_achievement.class = "Paladin"
-no_way_out_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_no_way_out.blp"
+no_way_out_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_no_way_out.blp"
 no_way_out_achievement.description =
 	"Complete the Hardcore challenge without at any point using an immunity spell. Divine Shield, Divine Protection, Blessing/Hand of Protection, and Blessing/Hand of Freedom are not allowed."
 

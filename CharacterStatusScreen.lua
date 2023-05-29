@@ -54,7 +54,7 @@ br:SetWidth(128)
 br:SetHeight(256)
 
 local title_text = f:CreateFontString(nil, "ARTWORK")
-title_text:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 22, "")
+title_text:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 22, "")
 title_text:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 150, -45)
 title_text:SetTextColor(1, 0.82, 0)
 title_text:SetText("Hardcore")
@@ -285,7 +285,7 @@ function UpdateCharacterHC(
 	achievements_title:SetRelativeWidth(1.0)
 	achievements_title:SetHeight(40)
 	achievements_title:SetText("Achievements - " .. _acheivement_pts .. "pts")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+	achievements_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 16, "")
 	achievements_container:AddChild(achievements_title)
 	if _hardcore_character.achievements ~= nil then
 		for i, v in ipairs(_hardcore_character.achievements) do
@@ -335,7 +335,7 @@ function ShowCharacterHC(_hardcore_character)
 	UpdateCharacterHC(
 		_hardcore_character,
 		UnitName("player"),
-		GetAddOnMetadata("Hardcore", "Version"),
+		GetAddOnMetadata("HardcoreUnlocked", "Version"),
 		f2,
 		class,
 		class_en,
@@ -388,7 +388,7 @@ _G["HardcoreCharacterTab"]:SetScript("OnClick", function(self, arg1)
 	if _G["TokenFrame"] ~= nil then
 		_G["TokenFrame"]:Hide()
 	end
-	ShowCharacterHC(Hardcore_Character)
+	ShowCharacterHC(HardcoreUnlocked_Character)
 end)
 
 TabGUI:SetScript("OnEvent", function(self, event, ...)
@@ -422,7 +422,7 @@ TabGUI:SetScript("OnEvent", function(self, event, ...)
 			if _G["TokenFrame"] ~= nil then
 				_G["TokenFrame"]:Hide()
 			end
-			ShowCharacterHC(Hardcore_Character)
+			ShowCharacterHC(HardcoreUnlocked_Character)
 		end)
 	end
 end)

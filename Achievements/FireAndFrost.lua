@@ -6,7 +6,7 @@ _achievement.name = "ElementalBalance"
 _achievement.title = "Elemental Balance"
 _achievement.class = "Mage"
 _achievement.pts = 10
-_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_fireandfrost.blp"
+_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_fireandfrost.blp"
 _achievement.bl_text = "Starting Achievement"
 _achievement.description =
 	"Complete the Hardcore challenge without at any point casting two elemental damage spells of the same element (fire or ice) in a row. Arcane spells that deal damage are not allowed to be cast."
@@ -172,7 +172,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["fire"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["fire"]:SetHeight(40)
 	frame_textures["fire"]:SetWidth(40)
-	frame_textures["fire"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_fireball.blp")
+	frame_textures["fire"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_fireball.blp")
 	frame_textures["fire"]:Hide()
 
 	frame_textures["frost"] = fire_and_frost_frame:CreateTexture(nil, "OVERLAY")
@@ -180,7 +180,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["frost"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["frost"]:SetHeight(40)
 	frame_textures["frost"]:SetWidth(40)
-	frame_textures["frost"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_frost.blp")
+	frame_textures["frost"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_frost.blp")
 	frame_textures["frost"]:Hide()
 
 	frame_textures["frostfire"] = fire_and_frost_frame:CreateTexture(nil, "OVERLAY")
@@ -188,7 +188,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["frostfire"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["frostfire"]:SetHeight(40)
 	frame_textures["frostfire"]:SetWidth(40)
-	frame_textures["frostfire"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_fireandfrost.blp")
+	frame_textures["frostfire"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_fireandfrost.blp")
 	frame_textures["frostfire"]:Show()
 
 	for i=1,72 do

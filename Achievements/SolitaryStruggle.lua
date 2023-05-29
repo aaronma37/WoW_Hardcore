@@ -7,7 +7,7 @@ solitary_struggle_achievement.name = "SolitaryStruggle"
 solitary_struggle_achievement.title = "Solitary Struggle"
 solitary_struggle_achievement.pts = 25
 solitary_struggle_achievement.class = "All"
-solitary_struggle_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_solitary_struggle.blp"
+solitary_struggle_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_solitary_struggle.blp"
 solitary_struggle_achievement.description =
 	"Complete the Hardcore challenge without at any point joining a group for a dungeon. Entering a dungeon alone is allowed."
 

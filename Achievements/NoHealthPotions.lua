@@ -7,7 +7,7 @@ no_health_potions_achievement.name = "NoHealthPotions"
 no_health_potions_achievement.pts = 25
 no_health_potions_achievement.title = "No Health Potions"
 no_health_potions_achievement.class = "All"
-no_health_potions_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_no_health_potions.blp"
+no_health_potions_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_no_health_potions.blp"
 no_health_potions_achievement.description =
 	"Complete the Hardcore challenge without at any point consuming a health potion (items with ‘Healing Potion’ in their name). Items that restore health which are not Healing Potions (e.g. Healthstones or Crystal Restore) can be used."
 

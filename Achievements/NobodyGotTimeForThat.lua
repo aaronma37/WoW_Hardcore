@@ -25,7 +25,7 @@ nobody_got_time_for_that_achievement.name = "NobodyGotTimeForThat"
 nobody_got_time_for_that_achievement.pts = 25
 nobody_got_time_for_that_achievement.title = "Nobody Got Time For That"
 nobody_got_time_for_that_achievement.class = "All"
-nobody_got_time_for_that_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_nobody_got_time_for_that.blp"
+nobody_got_time_for_that_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_nobody_got_time_for_that.blp"
 nobody_got_time_for_that_achievement.description =
 	"Complete the Hardcore challenge without learning or using any professions. Secondary professions such as Cooking, Fishing and First Aid are not allowed. Lockpicking, Poisons, and Beast Training are class skills, not professions."
 if _G["HardcoreBuildLabel"] == "WotLK" then

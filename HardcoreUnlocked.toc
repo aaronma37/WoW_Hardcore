@@ -1,15 +1,15 @@
 ## Interface: 11403
-## Title: Hardcore 0.11.22 + Greenwall 1.11.5+classic
+## Title: HardcoreUnlocked 0.0.1 + Greenwall 1.11.5+classic
 ## Notes: Supports Classic Hardcore
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author 
-## X-License: All Rights Reserved
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
+## X-License: GNU GPLv3
 ## X-Category: Leveling,Guild
-## Version: 0.11.22
+## Version: 0.0.1
 
 
 ## DefaultState: enabled
-## SavedVariables: Hardcore_Settings,GreenWallAccount, Backup_Character_Data
-## SavedVariablesPerCharacter: Hardcore_Character,GreenWall,GreenWallMeta,GreenWallLog
+## SavedVariables: HardcoreUnlocked_Settings,GreenWallAccount, Backup_Character_Data
+## SavedVariablesPerCharacter: HardcoreUnlocked_Character,GreenWall,GreenWallMeta,GreenWallLog
 
 embeds.xml
 
@@ -17,10 +17,8 @@ CustomLayouts.lua
 utils.lua
 Hardcore.xml
 
-#Tokens
-DKToken.lua
-PartyChangeToken.lua
-
+Libs/ascii85/ascii85.lua
+RuleDefinitions.lua
 Achievements/AchievementG.lua
 
 Achievements/Solo.lua
@@ -153,7 +151,6 @@ CharacterStatusScreen.lua
 InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
-Dungeons.lua
 MainMenu.lua
 TextureUtils.lua
 TextureInfo.lua

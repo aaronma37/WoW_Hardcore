@@ -8,7 +8,7 @@ local in_game_limit_seconds = 100 * 60 * 60 -- seconds
 speedrunner_achievement.name = "Speedrunner"
 speedrunner_achievement.title = "Speedrunner"
 speedrunner_achievement.class = "All"
-speedrunner_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_speedrunner.blp"
+speedrunner_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_speedrunner.blp"
 speedrunner_achievement.description =
 	"Complete the Hardcore challenge in less than 100 hours (4 days and 4 hours) of played time. Make sure to show your /played time when you hit 60. The run must be completed within eight weeks of real time. You are NOT allowed to log off in rested areas."
 speedrunner_achievement.restricted_game_versions = {

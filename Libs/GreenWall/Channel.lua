@@ -309,7 +309,7 @@ function GwChannel:tl_send(type, message)
     self:tl_flush()
 
     -- Format the message segment
-    if (Hardcore_Settings.rank_type and Hardcore_Settings.rank_type == "officer") then
+    if (HardcoreUnlocked_Settings.rank_type and HardcoreUnlocked_Settings.rank_type == "officer") then
 	    local segment = strsub(strjoin('#', "L", gw.config.guild_id, '', ""), 1, GW_MAX_MESSAGE_LENGTH)
 	    -- Send the message
 	    self:tl_enqueue(segment)

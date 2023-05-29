@@ -6,7 +6,7 @@ _achievement.name = "ShadowAndFlame"
 _achievement.title = "Shadow and Flame"
 _achievement.class = "Warlock"
 _achievement.pts = 10
-_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_shadow_and_flame.blp"
+_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_shadow_and_flame.blp"
 _achievement.bl_text = "Starting Achievement"
 _achievement.description =
 	"Complete the Hardcore challenge without at any point casting two shadow or two flame spells in a row during combat."
@@ -165,7 +165,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["shadow"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["shadow"]:SetHeight(40)
 	frame_textures["shadow"]:SetWidth(40)
-	frame_textures["shadow"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_shadow_ele.blp")
+	frame_textures["shadow"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_shadow_ele.blp")
 	frame_textures["shadow"]:Hide()
 
 	frame_textures["flame"] = shadow_and_flame_frame:CreateTexture(nil, "OVERLAY")
@@ -173,7 +173,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["flame"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["flame"]:SetHeight(40)
 	frame_textures["flame"]:SetWidth(40)
-	frame_textures["flame"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_flame_ele.blp")
+	frame_textures["flame"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_flame_ele.blp")
 	frame_textures["flame"]:Hide()
 
 	frame_textures["flameshadow"] = shadow_and_flame_frame:CreateTexture(nil, "OVERLAY")
@@ -181,7 +181,7 @@ function _achievement:Register(fail_function_executor)
 	frame_textures["flameshadow"]:SetDrawLayer("OVERLAY",2)
 	frame_textures["flameshadow"]:SetHeight(40)
 	frame_textures["flameshadow"]:SetWidth(40)
-	frame_textures["flameshadow"]:SetTexture("Interface\\Addons\\Hardcore\\Media\\icon_shadow_and_flame.blp")
+	frame_textures["flameshadow"]:SetTexture("Interface\\Addons\\HardcoreUnlocked\\Media\\icon_shadow_and_flame.blp")
 	frame_textures["flameshadow"]:Show()
 
 	for i=1,72 do

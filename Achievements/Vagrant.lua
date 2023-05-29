@@ -7,7 +7,7 @@ vagrant_achievement.name = "Vagrant"
 vagrant_achievement.title = "Vagrant"
 vagrant_achievement.pts = 10
 vagrant_achievement.class = "All"
-vagrant_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_vagrant.blp"
+vagrant_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_vagrant.blp"
 vagrant_achievement.description =
 	"Complete the Hardcore challenge without at any point using the Bank or a Hearthstone. No item can be stored in your character’s bank account."
 

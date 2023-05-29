@@ -45,7 +45,7 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		local first_menu_description_title = AceGUI:Create("Label")
 		first_menu_description_title:SetFullWidth(1)
 		first_menu_description_title:SetText("Welcome to Classic hardcore!")
-		first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+		first_menu_description_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 		-- first_menu_description_title:SetPoint("TOP", 2,5)
 		scroll_frame:AddChild(first_menu_description_title)
 
@@ -65,13 +65,13 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		local second_menu_description_title = AceGUI:Create("Label")
 		second_menu_description_title:SetFullWidth(1)
 		second_menu_description_title:SetText("The Hardcore Contract")
-		second_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+		second_menu_description_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 		scroll_frame:AddChild(second_menu_description_title)
 
 		local second_menu_description_subtitle = AceGUI:Create("Label")
 		second_menu_description_subtitle:SetFullWidth(1)
 		second_menu_description_subtitle:SetText("Join the Discord!")
-		second_menu_description_subtitle:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+		second_menu_description_subtitle:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 16, "")
 		scroll_frame:AddChild(second_menu_description_subtitle)
 
 		local second_menu_description = AceGUI:Create("Label")
@@ -99,7 +99,7 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		title:SetWidth(700)
 		title:SetHeight(60)
 		title:SetText("Rules for Duos and Trios\n\n")
-		title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+		title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
 		_scroll_frame:AddChild(title)
 
 		local first_menu_description = AceGUI:Create("Label")

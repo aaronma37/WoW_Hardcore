@@ -6,7 +6,7 @@ _G.achievements.PowerFromWithin = power_from_within_achievement
 power_from_within_achievement.name = "PowerFromWithin"
 power_from_within_achievement.title = "Power From Within"
 power_from_within_achievement.class = "All"
-power_from_within_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_power_from_within.blp"
+power_from_within_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_power_from_within.blp"
 power_from_within_achievement.description =
 	"Complete the Hardcore challenge without getting any World Buffs. World Buffs are: Warchief’s Blessing, Rallying Cry of the Dragonslayer, and Spirit of Zandalar. If you get a World Buff by accident, click it off as soon as possible. Darkmoon Faire Fortune Buffs and Songflowers are allowed."
 

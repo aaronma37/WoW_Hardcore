@@ -242,7 +242,7 @@ local function Constructor()
 	-- title:SetAllPoints(titlebg)
 
 	local titletext = title:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	titletext:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20)
+	titletext:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20)
 	titletext:SetPoint("TOP", titlebg, "TOP", 0, -20)
 
 

@@ -8,7 +8,7 @@ local check_rate = 15 -- Checks every 15 seconds
 trio_rules.name = "Trio"
 trio_rules.title = "Trio"
 trio_rules.class = "All"
-trio_rules.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_default.blp"
+trio_rules.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_default.blp"
 trio_rules.description = ""
 trio_rules.minimap_button_info = {}
 trio_rules.minimap_button = nil
@@ -17,7 +17,7 @@ trio_rules.warn_reason = ""
 local minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject("Trio", {
 	type = "data source",
 	text = "Hardcore",
-	icon = "Interface\\Addons\\Hardcore\\Media\\duo_minimap.blp",
+	icon = "Interface\\Addons\\HardcoreUnlocked\\Media\\duo_minimap.blp",
 	OnTooltipShow = function(tooltip)
 		if not tooltip or not tooltip.AddLine then
 			return
@@ -197,7 +197,7 @@ function trio_rules:Warn()
 	end
 	trio_rules.accumulated_warn_time = trio_rules.accumulated_warn_time + check_rate
 	if max_warn_time - trio_rules.accumulated_warn_time > 0 then
-		minimap_button.icon = "Interface\\Addons\\Hardcore\\Media\\duo_minimap_warning.blp"
+		minimap_button.icon = "Interface\\Addons\\HardcoreUnlocked\\Media\\duo_minimap_warning.blp"
 		minimap_button.OnTooltipShow = function(tooltip)
 			if not tooltip or not tooltip.AddLine then
 				return
@@ -220,7 +220,7 @@ function trio_rules:ResetWarn()
 	if trio_rules.accumulated_warn_time > 1 then
 		Hardcore:Print("Trio - All conditions met.")
 
-		minimap_button.icon = "Interface\\Addons\\Hardcore\\Media\\duo_minimap.blp"
+		minimap_button.icon = "Interface\\Addons\\HardcoreUnlocked\\Media\\duo_minimap.blp"
 		minimap_button.OnTooltipShow = function(tooltip)
 			if not tooltip or not tooltip.AddLine then
 				return
@@ -234,11 +234,11 @@ end
 
 function trio_rules:Check()
 	-- this code causes the rules checker to ignore all duo/trio rules at max level
-	if Hardcore_Character.game_version ~= nil then
+	if HardcoreUnlocked_Character.game_version ~= nil then
 		local max_level
-		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
+		if HardcoreUnlocked_Character.game_version == "Era" or HardcoreUnlocked_Character.game_version == "SoM" then
 			max_level = 60
-		else -- if Hardcore_Character.game_version == "WotLK" or anything else
+		else -- if HardcoreUnlocked_Character.game_version == "WotLK" or anything else
 			max_level = 80
 		end
 		if UnitLevel("player") >= max_level then

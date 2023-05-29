@@ -18,7 +18,7 @@ i_can_see_you_achievement.title = "I Can See You"
 i_can_see_you_achievement.class = "Rogue"
 i_can_see_you_achievement.bl_text = "Starting Achievement"
 i_can_see_you_achievement.pts = 10
-i_can_see_you_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_i_can_see_you.blp"
+i_can_see_you_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_i_can_see_you.blp"
 i_can_see_you_achievement.description =
 	"Complete the Hardcore challenge without at any point using Stealth, Shadowmeld or Vanish. Invisibility potions are allowed."
 

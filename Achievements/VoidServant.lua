@@ -7,7 +7,7 @@ void_servant_achievement.name = "VoidServant"
 void_servant_achievement.title = "Void Servant"
 void_servant_achievement.pts = 10
 void_servant_achievement.class = "Priest"
-void_servant_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_void_servant.blp"
+void_servant_achievement.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_void_servant.blp"
 void_servant_achievement.description =
 	"Complete the Hardcore challenge without at any point using an ability within the “Holy” tab of your spellbook. Only spells listed under “Shadow Magic”, “Discipline”, or “General” are allowed. You are allowed to put points into all talent trees, but active abilities thus unlocked that are in the “Holy” tab of your spellbook are not allowed to be used."
 

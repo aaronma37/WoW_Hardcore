@@ -37,7 +37,7 @@ hc_fire_tex:SetPoint("CENTER", death_log_icon_frame, "CENTER", -6, 4)
 hc_fire_tex:SetDrawLayer("OVERLAY",3)
 hc_fire_tex:SetHeight(25)
 hc_fire_tex:SetWidth(25)
-hc_fire_tex:SetTexture("Interface\\AddOns\\Hardcore\\Media\\wowhc-emblem-white-red.blp")
+hc_fire_tex:SetTexture("Interface\\AddOns\\HardcoreUnlocked\\Media\\wowhc-emblem-white-red.blp")
 
 local gold_ring_tex = death_log_icon_frame:CreateTexture(nil, "OVERLAY")
 gold_ring_tex:SetPoint("CENTER", death_log_icon_frame, "CENTER", 0,0)

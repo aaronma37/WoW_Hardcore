@@ -17,7 +17,7 @@ HCTextureInfo = _G.HCTextureInfo
 
 HCTextureInfo.TestFrame = {}
 HCTextureInfo.TestFrame.test_sprite = {
-	Str = "Interface\\AddOns\\Hardcore\\Media\\test_sprite.blp",
+	Str = "Interface\\AddOns\\HardcoreUnlocked\\Media\\test_sprite.blp",
 	OffsetX_0 = 16,
 	OffsetX_1 = 50,
 	OffsetY_0 = 30,

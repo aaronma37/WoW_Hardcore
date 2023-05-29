@@ -302,12 +302,12 @@ passive_achievement_kill_handler:SetScript("OnEvent", function(self, event, ...)
 		local combat_log_payload = { CombatLogGetCurrentEventInfo() }
 		local v = arg[1]:match("(.+) dies")
 		if kill_list_dict[v] then
-			if Hardcore_Character then
-				if Hardcore_Character.kill_list_dict == nil then
-					Hardcore_Character.kill_list_dict = {}
+			if HardcoreUnlocked_Character then
+				if HardcoreUnlocked_Character.kill_list_dict == nil then
+					HardcoreUnlocked_Character.kill_list_dict = {}
 				end
 
-				if Hardcore_Character.kill_list_dict[v] == nil then
+				if HardcoreUnlocked_Character.kill_list_dict[v] == nil then
 					if _G.passive_achievements[kill_list_dict[v]] then
 						Hardcore:Print(
 							"["
@@ -318,10 +318,10 @@ passive_achievement_kill_handler:SetScript("OnEvent", function(self, event, ...)
 						)
 					end
 					for _, registered_kill_event_achievement in pairs(registered_kill_event_achievements) do
-						registered_kill_event_achievement:HandleKillEvent(v, Hardcore_Character)
+						registered_kill_event_achievement:HandleKillEvent(v, HardcoreUnlocked_Character)
 					end
 				end
-				Hardcore_Character.kill_list_dict[v] = 1
+				HardcoreUnlocked_Character.kill_list_dict[v] = 1
 			end
 		end
 	end
@@ -366,7 +366,7 @@ function HCCommonPassiveAchievementKillCheck(_achievement, _event, _args)
 			)
 		then
 			if
-				Hardcore_Character.kill_list_dict ~= nil and Hardcore_Character.kill_list_dict[_achievement.kill_target]
+				HardcoreUnlocked_Character.kill_list_dict ~= nil and HardcoreUnlocked_Character.kill_list_dict[_achievement.kill_target]
 			then
 				_achievement.succeed_function_executor.Succeed(_achievement.name)
 			else
@@ -406,14 +406,14 @@ function HCCommonPassiveAchievementCraftedCheck(_achievement, _event, _args)
 				and string.match(_args[1], "You create")
 				and UnitLevel("player") <= _achievement.level_cap
 			then
-				if Hardcore_Character then
-					if Hardcore_Character.crafted_list_dict == nil then
-						Hardcore_Character.crafted_list_dict = {}
+				if HardcoreUnlocked_Character then
+					if HardcoreUnlocked_Character.crafted_list_dict == nil then
+						HardcoreUnlocked_Character.crafted_list_dict = {}
 					end
 
-					Hardcore_Character.crafted_list_dict[k] = 1
+					HardcoreUnlocked_Character.crafted_list_dict[k] = 1
 					for craft_item, _ in pairs(_achievement.craft_set) do
-						if Hardcore_Character.crafted_list_dict[craft_item] == nil then
+						if HardcoreUnlocked_Character.crafted_list_dict[craft_item] == nil then
 							Hardcore:Print(
 								"["
 									.. _achievement.title
