@@ -101,6 +101,19 @@ death_tomb_frame_tex_glow:SetHeight(55)
 death_tomb_frame_tex_glow:SetWidth(55)
 death_tomb_frame_tex_glow:Hide()
 
+local death_log_frame_font = "Fonts\\FRIZQT__.TTF"
+local locale = GetLocale()
+local non_english_locales = {
+  koKR=1,
+  zhCN=1,
+  zhTW=1
+}
+
+if non_english_locales[locale] == 1 then
+  death_log_frame_font = "Fonts\\2002.TTF"
+end
+
+
 local function encodeMessage(name, guild, source_id, race_id, class_id, level, instance_id, map_id, map_pos)
   if name == nil then return end
   -- if guild == nil then return end -- TODO 
@@ -268,7 +281,7 @@ for i=1,20 do
 	    _entry.font_strings[v[1]]:SetWidth(v[2])
 	  end
 	  _entry.font_strings[v[1]]:SetTextColor(1,1,1)
-	  _entry.font_strings[v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
+	  _entry.font_strings[v[1]]:SetFont(death_log_frame_font, 11, "")
 	end
 
 	_entry.background = _entry.frame:CreateTexture(nil, "OVERLAY")
@@ -280,7 +293,7 @@ for i=1,20 do
 	_entry.background:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
 
 	_entry:SetHeight(40)
-	_entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
+	_entry:SetFont(death_log_frame_font, 16, "")
 	_entry:SetColor(1,1,1)
 	_entry:SetText(" ")
 
