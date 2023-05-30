@@ -308,6 +308,21 @@ local display = "Rules"
 local displaylist = Hardcore_Settings.level_list
 local icon = nil
 
+
+local locale = GetLocale()
+hardcore_locale_supported_font = nil
+local non_english_locales = {
+  koKR=1,
+  zhCN=1,
+  zhTW=1
+}
+
+if non_english_locales[locale] == 1 then
+	hardcore_locale_supported_font = "Fonts\\2002.TTF"
+	_G["HardcoreFont"]:SetFont(hardcore_locale_supported_font,26, "")
+end
+
+
 -- available alert frame/icon styles
 local MEDIA_DIR = "Interface\\AddOns\\Hardcore\\Media\\"
 local ALERT_STYLES = {
