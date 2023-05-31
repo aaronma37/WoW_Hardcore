@@ -3996,7 +3996,7 @@ local options = {
 				reload_reminder_interval = {
 					type = "input",
 					name = "Reminder interval",
-					desc = "Reload reminder interval (in seconds, 0 = auto)",
+					desc = "Reload reminder interval (in minutes, 0 = automatic)",
 					get = function()
 						if Hardcore_Settings.reload_reminder_interval then
 							return "" .. Hardcore_Settings.reload_reminder_interval
