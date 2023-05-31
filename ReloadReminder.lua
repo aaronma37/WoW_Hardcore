@@ -12,6 +12,7 @@ local rr_last_played_heartbeat = 0     -- Last time of a PLAYED_TIME_MSG in Hard
 local rr_last_track_heartbeat = 0      -- Last time of a tracked time ticker in Hardcore.lua
 local rr_last_dung_heartbeat = 0       -- Last time of a dungeon ticker in Hardcore.lua
 local rr_frame
+local rr_num_times_closed = 0
 
 -- These variables correspond to the HC options
 local rr_show_warning = true
@@ -20,7 +21,6 @@ local rr_set_interval = 0               -- 0 indicates automatic
 -- Definitions
 local RR_TIME_STEP = 1                  -- How often our timer is called
 local RR_WARN_SUPPRESS = 60             -- How long to wait before another warning is output, to prevent spamming the user
-
 local RR_LOST_VS_AUTO_INTERVAL = {
     { 3600, 3600 },         -- With less than 1 hour of lost time, warn every hour
     { 7200, 2700 },         -- With 1-2 hours of lost time, warn every 45m
@@ -124,6 +124,14 @@ local function ReloadReminderCleanup(widget)
     AceGUI:Release(widget)
     rr_frame = nil
     rr_last_warning = GetServerTime()           -- Suppress warnings for maximum time from now
+
+    -- Tell the user that he can disable the reloader if he closes three times without reloading
+    rr_num_times_closed = rr_num_times_closed + 1
+    if rr_num_times_closed == 3 then
+        Hardcore:Print("You can customize and disable the reload reminder in the Hardcore options.")
+        Hardcore:Print("Using the reload reminder will mitigate data loss in case of DCs and crashes.")
+    end
+
 
 end
 
