@@ -6,8 +6,8 @@
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local rr_last_reload = 0                -- Last time of a reload (basically, last time since ReloadReminderInitiate())
-local rr_last_warning = 0               -- Last time of an actually output warning
+local rr_last_reload = 0               -- Last time of a reload (basically, last time since ReloadReminderInitiate())
+local rr_last_warning = 0              -- Last time of an actually output warning
 local rr_last_played_heartbeat = 0     -- Last time of a PLAYED_TIME_MSG in Hardcore.lua
 local rr_last_track_heartbeat = 0      -- Last time of a tracked time ticker in Hardcore.lua
 local rr_last_dung_heartbeat = 0       -- Last time of a dungeon ticker in Hardcore.lua
@@ -25,17 +25,17 @@ local RR_LOST_VS_AUTO_INTERVAL = {
     { 3600, 3600 },         -- With less than 1 hour of lost time, warn every hour
     { 7200, 2700 },         -- With 1-2 hours of lost time, warn every 45m
     {10800, 1800 },         -- With 2-3 hours of lost time, warn every 30m
-    {   -1,  900 }          -- All other cases: warn every 15m; this is crazy, really... You're reloading mroe than playing. But okay, this is just a warning
+    {   -1,  900 }          -- All other cases: warn every 15m
 }
 
 -- debug values
 if false then
     RR_WARN_SUPPRESS = 5
     RR_LOST_VS_AUTO_INTERVAL = {
-        { 3600, 15 },         -- With less than 1 hour of lost time, warn every hour
-        { 7200, 20 },         -- With 1-2 hours of lost time, warn every 45m
-        { 1800, 10 },         -- With 2-3 hours of lost time, warn every 30m
-        {   -1, 5 }           -- All other cases: warn every 15m; this is crazy, really... You're reloading mroe than playing. But okay, this is just a warning
+        { 3600, 30 },
+        { 7200, 20 },
+        {10800, 10 },
+        {   -1,  5 }
     }
 end
 
