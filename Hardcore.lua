@@ -337,46 +337,6 @@ Hardcore.ALERT_STYLES = ALERT_STYLES
 
 Hardcore_Frame:ApplyBackdrop()
 
-local function startXGuildChatMsgRelay(msg)
-	local commMessage = COMM_COMMANDS[12] .. COMM_COMMAND_DELIM .. msg
-	for _, v in pairs(hardcore_guild_member_dict) do
-		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
-	end
-end
-
-local function startXGuildDeathMsgRelay()
-	local zone, mapID
-	if IsInInstance() then
-		zone = GetInstanceInfo()
-	else
-		mapID = C_Map.GetBestMapForUnit("player")
-		zone = C_Map.GetMapInfo(mapID).name
-	end
-
-	if Last_Attack_Source == nil then
-		Last_Attack_Source = "unknown"
-	end
-	local class = UnitClass("player")
-
-	-- player name, level, zone, attack_source, class
-	local commMessage = COMM_COMMANDS[10]
-		.. COMM_COMMAND_DELIM
-		.. UnitName("player")
-		.. "^"
-		.. UnitLevel("player")
-		.. "^"
-		.. zone
-		.. "^"
-		.. Last_Attack_Source
-		.. "^"
-		.. class
-		.. "^"
-
-	for _, v in pairs(hardcore_guild_member_dict) do
-		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
-	end
-end
-
 function FailureFunction(achievement_name)
 	local max_level = 60
 	if
@@ -404,8 +364,6 @@ function FailureFunction(achievement_name)
 
 				local messageString = UnitName("player") .. " has failed " .. _G.achievements[achievement_name].title
 				SendChatMessage(messageString, "GUILD")
-				startXGuildChatMsgRelay(messageString)
-				startXGuildDeathMsgRelay()
 				if CTL then
 					CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
 				end
@@ -1002,7 +960,7 @@ function Hardcore:PLAYER_LOGIN()
 			HardcoreUnlocked_Character.first_recorded = GetServerTime()
 		end)
 	end
-	HardcoreUnlocked_Character.rules = { 1, 2 }
+	HardcoreUnlocked_Character.rules = { [1] = 1, [2] = 1 }
 	HCU_enableRules(HardcoreUnlocked_Character)
 	-- print(table.concat(HCU_decodeRules(HCU_encodeRules(HardcoreUnlocked_Character.rules))))
 
@@ -1431,8 +1389,6 @@ function Hardcore:PLAYER_DEAD()
 	selfDeathAlertLastWords(recent_msg["text"])
 
 	SendChatMessage(messageString, "GUILD")
-	startXGuildChatMsgRelay(messageString)
-	startXGuildDeathMsgRelay()
 	Hardcore:Print(messageString)
 
 	-- Send addon alert notice
@@ -1495,7 +1451,6 @@ function Hardcore:PLAYER_UNGHOST()
 
 	-- broadcast to guild and greenwall
 	SendChatMessage(message, "GUILD", nil, nil)
-	startXGuildChatMsgRelay(message)
 end
 
 function Hardcore:PLAYER_LEVEL_UP(...)
@@ -1529,7 +1484,6 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 		local messageFormat = "%s the %s has reached level %s!"
 		local messageString = string.format(messageFormat, playerName, localizedClass, level)
 		SendChatMessage(messageString, "GUILD", nil, nil)
-		startXGuildChatMsgRelay(messageString)
 	end
 end
 
@@ -1624,15 +1578,6 @@ function Hardcore:RequestTimePlayed()
 		HIDE_RTP_CHAT_MSG_BUFFER = HIDE_RTP_CHAT_MSG_BUFFER_MAX
 	end
 	RequestTimePlayed()
-end
-
--- player name, level, zone, attack_source, class
-local function receiveXGuildChat(data, sender, command)
-	if last_received_xguild_chat and last_received_xguild_chat == data then
-		return
-	end
-	last_received_xguild_chat = data
-	-- Hardcore:FakeGuildMsg("< " .. sender .. "> " .. data)
 end
 
 -- player name, level, zone, attack_source, class
@@ -1752,7 +1697,6 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			return
 		end
 		if command == COMM_COMMANDS[13] then -- Send guild chat from another guild to this guild
-			-- receiveXGuildChat(data, sender, command) -- Disable greenwall
 			return
 		end
 		if command == COMM_COMMANDS[7] then -- Received request for party change
@@ -2707,7 +2651,6 @@ local options = {
 					desc = "Type of death alerts.",
 					values = {
 						guild_only = "guild only",
-						greenwall_guilds_only = "greenwall guilds only",
 						faction_wide = "faction wide",
 					},
 					get = function()
@@ -2728,7 +2671,6 @@ local options = {
 					values = {
 						off = "off",
 						guild_only = "guild only",
-						greenwall_guilds_only = "greenwall guilds only",
 						faction_wide = "faction wide",
 					},
 					get = function()
@@ -2736,7 +2678,7 @@ local options = {
 							if HardcoreUnlocked_Settings.alert_subset then
 								return HardcoreUnlocked_Settings.alert_subset
 							end
-							return "guild_only"
+							return "faction_wide"
 						end
 						return "off"
 					end,
@@ -3104,7 +3046,7 @@ local options = {
 	},
 }
 
-LibStub("AceConfig-3.0"):RegisterOptionsTable("Hardcore", options)
+LibStub("AceConfig-3.0"):RegisterOptionsTable("Hardcore Unlocked", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Hardcore Unlocked", "Hardcore Unlocked")
 
 reorderPassiveAchievements()

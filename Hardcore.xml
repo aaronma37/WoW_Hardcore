@@ -1,11 +1,11 @@
 <Ui>
-  <Font name="DeathListFont" font="Interface\AddOns\Hardcore\Media\UbuntuMono-R.ttf" virtual="true">
+  <Font name="DeathListFont" font="Interface\AddOns\HardcoreUnlocked\Media\UbuntuMono-R.ttf" virtual="true">
     <FontHeight>
       <AbsValue val="12"/>
     </FontHeight>
   </Font>
 
-  <Font name="HardcoreFont" font="Interface\AddOns\Hardcore\Media\BreatheFire.ttf" virtual="true">
+  <Font name="HardcoreFont" font="Interface\AddOns\HardcoreUnlocked\Media\BreatheFire.ttf" virtual="true">
 
 	<Color r="0.98" g="0.86" b="0" a="1"/> -- 252, 222, 0
 	<FontHeight val="32"/>
@@ -42,10 +42,10 @@
 		</Anchors>
 		<Layers>
 			<Layer>
-				<Texture name="Hardcore_Alert_Icon" file="Interface\AddOns\Hardcore\Media\logo-emblem.blp">
+				<Texture name="Hardcore_Alert_Icon" file="Interface\AddOns\HardcoreUnlocked\Media\logo-emblem.blp">
 					<Size x="400" y="200" />
 					<Anchors>
-						<Anchor point="TOP" relativeTo="Hardcore_Alert_Frame" relativePoint="TOP" y="50" /> 
+						<Anchor point="TOP" relativeTo="Hardcore_Alert_Frame" relativePoint="TOP" y="50" />
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -70,7 +70,7 @@
 		</KeyValues>
 		<Layers>
 		<Layer>
-			<Texture name="Hardcore_Logo1" file="Interface\AddOns\Hardcore\Media\wowhc-emblem-white-red.blp">
+			<Texture name="Hardcore_Logo1" file="Interface\AddOns\HardcoreUnlocked\Media\wowhc-emblem-white-red.blp">
 				<Size x="50" y="50" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="235" y="-5" />
@@ -415,7 +415,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Hardcore:DKConvert("sacrifice") 
+						Hardcore:DKConvert("sacrifice")
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -431,7 +431,7 @@
 				</Scripts>
 			</Button>
 
-			
+
 			<Button name="Hardcore_Close" inherits="UIPanelButtonTemplate" text="X">
 				<Size x="30" y="30" />
 				<Anchors>

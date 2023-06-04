@@ -275,26 +275,221 @@ local function CreateDescriptionLabel(text, frame)
 	frame:AddChild(label)
 end
 
+local rule_pool_frame = CreateFrame("frame", nil, UIParent, "BackdropTemplate")
+rule_pool_frame.rule_frame = {}
 local function DrawGeneralTab(container)
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
-	tabcontainer:AddChild(scroll_container)
+	local rule_container = AceGUI:Create("SimpleGroup")
+	rule_container:SetFullWidth(true)
+	rule_container:SetFullHeight(true)
+	rule_container:SetLayout("Fill")
+	container:AddChild(rule_container)
 
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("Flow")
-	scroll_container:AddChild(scroll_frame)
+	local function refreshShownRules()
+		if rule_pool_frame.current_rules_display and rule_pool_frame.current_rules_display.rules then
+			local msg = ""
+			local idx = 1
+			msg = msg .. idx .. ". " .. "Death=Delete" .. "\n"
+			for id, _ in pairs(HardcoreUnlocked_Character.rules) do
+				idx = idx + 1
+				msg = msg .. idx .. ". " .. HCU_rules[id].name .. "\n"
+			end
+			rule_pool_frame.current_rules_display.rules:SetText(msg)
 
-	local first_menu_description_title = AceGUI:Create("Label")
-	first_menu_description_title:SetWidth(500)
-	first_menu_description_title:SetText("Welcome to Classic hardcore!")
-	first_menu_description_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
-	-- first_menu_description_title:SetPoint("TOP", 2,5)
-	scroll_frame:AddChild(first_menu_description_title)
+			if HardcoreUnlocked_Character.rules == nil then
+				HardcoreUnlocked_Character.rules = {}
+			end
+			rule_pool_frame.current_rules_display.code:SetText(
+				"Rule Code: " .. HCU_encodeRules(HardcoreUnlocked_Character.rules)
+			)
+		end
+	end
+
+	local function createRuleFrame(rule_id)
+		local frame = CreateFrame("frame")
+		frame:SetParent(rule_pool_frame)
+		frame:SetWidth(224 * 3 / 4)
+		frame:SetHeight(56 * 3 / 4)
+		frame:SetPoint("TOPLEFT", rule_pool_frame, "TOPLEFT", 0, 0)
+		frame:Show()
+
+		local tex = frame:CreateTexture(nil, "OVERLAY")
+		tex:SetDrawLayer("OVERLAY", 7)
+		tex:SetTexture("Interface\\Store\\Shop")
+		tex:SetTexCoord(0.3, 0.88, 0, 0.28)
+		tex:SetVertexColor(0.8, 0.8, 0.9, 1)
+		-- tex:SetDesaturated(1)
+		tex:SetAllPoints()
+		tex:Show()
+
+		frame.icon = frame:CreateTexture(nil, "OVERLAY")
+		frame.icon:SetDrawLayer("OVERLAY", 6)
+		frame.icon:SetTexture("Interface\\" .. HCU_rules[rule_id].icon)
+		frame.icon:SetPoint("LEFT")
+		frame.icon:SetWidth(frame:GetHeight() * 0.8)
+		frame.icon:SetHeight(frame:GetHeight() * 0.8)
+		frame.icon:Show()
+
+		local font = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		font:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 14, "")
+		font:SetWidth(frame:GetWidth() - 50)
+		font:SetTextColor(1, 1, 1, 1)
+		font:SetPoint("TOP", 15, -14)
+		font:SetJustifyH("LEFT")
+		font:SetText(HCU_rules[rule_id].name)
+		font:Show()
+
+		local desription = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		desription:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		desription:SetWidth(frame:GetWidth() - 50)
+		desription:SetTextColor(0.7, 0.7, 0.7, 1)
+		if #HCU_rules[rule_id].description > 30 then
+			desription:SetPoint("TOP", 30, -27)
+		else
+			desription:SetPoint("TOP", 30, -35)
+		end
+		desription:SetJustifyH("LEFT")
+		desription:SetText(HCU_rules[rule_id].description)
+		desription:Hide()
+
+		frame:EnableMouse(true)
+		frame:SetScript("OnMouseDown", function()
+			if HardcoreUnlocked_Character.rules[rule_id] == nil then
+				HardcoreUnlocked_Character.rules[rule_id] = 1
+			else
+				HardcoreUnlocked_Character.rules[rule_id] = nil
+			end
+
+			if HardcoreUnlocked_Character.rules[rule_id] then
+				rule_pool_frame.rule_frame[rule_id].icon:SetDesaturated(nil)
+			else
+				rule_pool_frame.rule_frame[rule_id].icon:SetDesaturated(1)
+			end
+			refreshShownRules()
+		end)
+		return frame
+	end
+
+	for i = 1, #HCU_rule_ids do
+		if rule_pool_frame.rule_frame[i] == nil then
+			rule_pool_frame.rule_frame[i] = createRuleFrame(i)
+		end
+		rule_pool_frame.rule_frame[i]:SetPoint(
+			"TOPLEFT",
+			rule_pool_frame,
+			"TOPLEFT",
+			((i + 1) % 3) * 175 + 25,
+			math.floor((i - 1) / 3) * -50 - 75
+		)
+		if HardcoreUnlocked_Character.rules[i] then
+			rule_pool_frame.rule_frame[i].icon:SetDesaturated(nil)
+		else
+			rule_pool_frame.rule_frame[i].icon:SetDesaturated(1)
+		end
+	end
+
+	rule_pool_frame:SetWidth(container.frame:GetWidth())
+	rule_pool_frame:SetHeight(container.frame:GetHeight())
+	rule_pool_frame:SetParent(rule_container.frame)
+
+	-- rule_pool_frame:SetBackdrop(PaneBackdrop)
+	-- rule_pool_frame:SetBackdropColor(0.6, 0.6, 0.6, 0.1)
+	-- rule_pool_frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+	rule_pool_frame:SetAllPoints(container.border)
+	rule_pool_frame:Show()
+
+	if rule_pool_frame.current_rules_display == nil then
+		rule_pool_frame.current_rules_display = rule_pool_frame:CreateTexture(nil, "OVERLAY")
+		rule_pool_frame.current_rules_display.font = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		rule_pool_frame.current_rules_display.code = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		rule_pool_frame.current_rules_display.rules = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		rule_pool_frame.title = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	end
+	rule_pool_frame.current_rules_display:SetDrawLayer("OVERLAY", 7)
+	rule_pool_frame.current_rules_display:SetTexture("Interface\\Store\\Services")
+	rule_pool_frame.current_rules_display:SetTexCoord(0.05, 0.45, 0.08, 0.79)
+	rule_pool_frame.current_rules_display:SetWidth(250)
+	rule_pool_frame.current_rules_display:SetHeight(450)
+	rule_pool_frame.current_rules_display:SetPoint("RIGHT", -20, 0)
+	rule_pool_frame.current_rules_display:Show()
+
+	rule_pool_frame.current_rules_display.font:SetFont(
+		"Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf",
+		20,
+		""
+	)
+	rule_pool_frame.current_rules_display.font:SetWidth(rule_pool_frame.current_rules_display:GetWidth() - 15)
+	rule_pool_frame.current_rules_display.font:SetTextColor(1, 1, 1, 1)
+	rule_pool_frame.current_rules_display.font:SetPoint("TOP", rule_pool_frame.current_rules_display, "TOP", 0, -30)
+	rule_pool_frame.current_rules_display.font:SetJustifyH("CENTER")
+	rule_pool_frame.current_rules_display.font:SetText(UnitName("player") .. "'s Rules")
+	rule_pool_frame.current_rules_display.font:Show()
+
+	rule_pool_frame.current_rules_display.rules:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	rule_pool_frame.current_rules_display.rules:SetWidth(rule_pool_frame.current_rules_display:GetWidth() - 15)
+	rule_pool_frame.current_rules_display.rules:SetTextColor(0.8, 0.8, 0.8, 1)
+	rule_pool_frame.current_rules_display.rules:SetPoint("TOP", rule_pool_frame.current_rules_display, "TOP", 0, -100)
+	rule_pool_frame.current_rules_display.rules:SetJustifyH("CENTER")
+	refreshShownRules()
+	rule_pool_frame.current_rules_display.rules:Show()
+
+	rule_pool_frame.current_rules_display.code:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
+	rule_pool_frame.current_rules_display.code:SetWidth(rule_pool_frame.current_rules_display:GetWidth() - 15)
+	rule_pool_frame.current_rules_display.code:SetTextColor(0.6, 0.6, 0.6, 1)
+	rule_pool_frame.current_rules_display.code:SetPoint(
+		"BOTTOM",
+		rule_pool_frame.current_rules_display,
+		"BOTTOM",
+		0,
+		30
+	)
+	rule_pool_frame.current_rules_display.code:SetJustifyH("CENTER")
+	rule_pool_frame.current_rules_display.code:SetText(
+		"Rule Code: " .. HCU_encodeRules(HardcoreUnlocked_Character.rules)
+	)
+	rule_pool_frame.current_rules_display.code:Show()
+
+	-- Title
+	rule_pool_frame.title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 24, "")
+	rule_pool_frame.title:SetWidth(rule_pool_frame.current_rules_display:GetWidth() - 15)
+	rule_pool_frame.title:SetTextColor(1, 1, 1, 1)
+	rule_pool_frame.title:SetPoint("TOPLEFT", rule_pool_frame, "TOPLEFT", 160, -10)
+	rule_pool_frame.title:SetJustifyH("CENTER")
+	rule_pool_frame.title:SetText("Rules")
+	rule_pool_frame.title:Show()
+
+	if rule_pool_frame.rules_heading == nil then
+		rule_pool_frame.rules_heading = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		rule_pool_frame.rules_heading:SetText("Rules Selection")
+		rule_pool_frame.rules_heading:SetFont("Fonts\\blei00d.TTF", 18, "")
+		rule_pool_frame.rules_heading:SetJustifyV("TOP")
+		rule_pool_frame.rules_heading:SetJustifyH("CENTER")
+		rule_pool_frame.rules_heading:SetTextColor(0.9, 0.9, 0.9)
+		rule_pool_frame.rules_heading:SetPoint("TOP", rule_pool_frame.title, "TOP", 0, -40)
+		rule_pool_frame.rules_heading:Show()
+	end
+
+	if rule_pool_frame.rules_heading_left == nil then
+		rule_pool_frame.rules_heading_left = rule_pool_frame:CreateTexture(nil, "BACKGROUND")
+		rule_pool_frame.rules_heading_left:SetHeight(8)
+		rule_pool_frame.rules_heading_left:SetPoint("LEFT", rule_pool_frame.rules_heading, "LEFT", -60, 0)
+		rule_pool_frame.rules_heading_left:SetPoint("RIGHT", rule_pool_frame.rules_heading, "LEFT", -5, 0)
+		rule_pool_frame.rules_heading_left:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+		rule_pool_frame.rules_heading_left:SetTexCoord(0.81, 0.94, 0.5, 1)
+	end
+
+	if rule_pool_frame.rules_heading_right == nil then
+		rule_pool_frame.rules_heading_right = rule_pool_frame:CreateTexture(nil, "BACKGROUND")
+		rule_pool_frame.rules_heading_right:SetHeight(8)
+		rule_pool_frame.rules_heading_right:SetPoint("RIGHT", rule_pool_frame.rules_heading, "RIGHT", 60, 0)
+		rule_pool_frame.rules_heading_right:SetPoint("LEFT", rule_pool_frame.rules_heading, "RIGHT", 5, 0)
+		rule_pool_frame.rules_heading_right:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+		rule_pool_frame.rules_heading_right:SetTexCoord(0.81, 0.94, 0.5, 1)
+	end
+
+	rule_container.frame:HookScript("OnHide", function()
+		rule_pool_frame:Hide()
+	end)
 end
-
-local function DrawRulesTab(container) end
 
 local function DrawLevelsTab(container, _hardcore_settings)
 	local function DrawNameColumn(_scroll_frame, _level_list, _player_list, width, start, max_lines)
@@ -1050,102 +1245,6 @@ local function DrawPassiveAchievementsTab(container)
 	scroll_container:AddChild(achievements_title)
 end
 
-local function DrawOfficerToolsTab(container)
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("List")
-	tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("List")
-	scroll_container:AddChild(scroll_frame)
-
-	local officer_announcement_container = AceGUI:Create("SimpleGroup")
-	officer_announcement_container:SetFullWidth(true)
-	officer_announcement_container:SetLayout("List")
-	-- officer_announcement_container:SetTitle("Officer Announcements")
-	scroll_frame:AddChild(officer_announcement_container)
-
-	local announcement_edit_text = AceGUI:Create("EditBox")
-	announcement_edit_text:SetWidth(800)
-	-- announcement_edit_text:SetHeight(120)
-	announcement_edit_text:SetDisabled(false)
-	announcement_edit_text:SetLabel("Send Announcement")
-	announcement_edit_text:SetPoint("TOP", 2, 5)
-	announcement_edit_text:DisableButton(false)
-
-	announcement_edit_text:SetCallback("OnEnterPressed", function()
-		local text = announcement_edit_text:GetText()
-		gw.config.channel.guild:send(GW_MTYPE_HC_ANNOUNCEMENT, text)
-	end)
-
-	officer_announcement_container:AddChild(announcement_edit_text)
-
-	local green_wall_config_container = AceGUI:Create("InlineGroup")
-	green_wall_config_container:SetFullWidth(true)
-	green_wall_config_container:SetLayout("Flow")
-	green_wall_config_container:SetTitle("Current Greenwall Configuration")
-	scroll_frame:AddChild(green_wall_config_container)
-
-	local current_gw_config_text = AceGUI:Create("Label")
-	current_gw_config_text:SetWidth(850)
-
-	local peer_guild_text = "    Peer Guilds:\n        "
-
-	for k, v in pairs(gw.config.peer) do
-		peer_guild_text = peer_guild_text .. "|c0000FFFF" .. k .. "|r "
-	end
-
-	peer_guild_text = peer_guild_text .. "\n\n    Custom Options:\n"
-
-	if hc_self_block_flag and hc_self_block_flag == true then
-		peer_guild_text = peer_guild_text
-			.. "        |c00FFFF00Defense Mode|r  - Players from this guild will not emit death alerts\n"
-	end
-
-	if hc_gw_lfgm_mode and hc_gw_lfgm_mode == true then
-		peer_guild_text = peer_guild_text
-			.. "        |c00FFFF00LF Mode|r  - Only `looking for` +/- 10 levels, death alerts, and hc notifications will be communicated across guilds\n"
-	end
-
-	if hc_mute_inguild and tonumber(hc_mute_inguild) > 0 then
-		peer_guild_text = peer_guild_text
-			.. "        |c00FFFF00Mute low level|r  - Players in this guild under level "
-			.. tonumber(hc_mute_inguild)
-			.. " will be muted\n"
-	end
-
-	peer_guild_text = peer_guild_text .. "\n\n    Banned Tags:\n        "
-	if gw_banned_tags then
-		for k, v in pairs(gw_banned_tags) do
-			peer_guild_text = peer_guild_text .. k .. " "
-		end
-	end
-
-	peer_guild_text = peer_guild_text .. "\n\n"
-
-	current_gw_config_text:SetText(peer_guild_text)
-
-	current_gw_config_text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
-	green_wall_config_container:AddChild(current_gw_config_text)
-
-	local officer_notes_guide_container = AceGUI:Create("InlineGroup")
-	officer_notes_guide_container:SetFullWidth(true)
-	officer_notes_guide_container:SetHeight(1000)
-	officer_notes_guide_container:SetLayout("Flow")
-	officer_notes_guide_container:SetTitle("Officer Notes Guide")
-	scroll_frame:AddChild(officer_notes_guide_container)
-
-	local officer_notes_guide_text = AceGUI:Create("Label")
-	officer_notes_guide_text:SetWidth(850)
-	officer_notes_guide_text:SetText(
-		"The followiong commands are used in officer notes to configure greenwall.\n\n |c00FFFF00GWr:|r - Puts guild into LFG/LFM mode. In LFG/LFM mode, x-guild chat will only show up for LF messages and only if the requester is within 10 levels of the receiving character. Announcements can still be made using the announcement tool below. NOTE that there must be a color `:`.\nExample usage: |c00FFFF00GWr:|r\n\n |c00FFFF00GWd:|r - Puts guild into HC defense mode. NOTE that the colon `:` is needed. If this is put into officer notes, players in this guild will not emit a death notice.\nExample usage: |c00FFFF00GWd:|r\n\n |c00FFFF00GWi:x|r - Mute guild member under x level.\nExample usage: |c00FFFF00GWi:15|r, will mute players (within the guild) under level 15\n\n |c00FFFF00GWb:x|r - Mutes messages coming from a guild with the matching tag.\nExample usage: |c00FFFF00GWb:HG|r, will mute all messages coming from HG players.\n\n |c00FFFF00GWp:<GuildName>:<GuildTag>|r - Adds a peer guild. Messages coming from other guilds will be prefixed with <GuildTag>.\nExample usage: |c00FFFF00GWp:HC Honor Guard:HG|r - Players will get messages from HC Honor Guard, which will be prefixed with <HG>.\n\n |c00FFFF00GWc:<CustomChannelName>:<ChannelPassword>|r - [REQUIRED] This determines what channel and password to use for communication.\nExample usage: |c00FFFF00GWc:HCCommonCommunicationChannel:SomeHCPassword|r - Players will communicate over the hidden HCCommonCommunicationChannel which requires SomeHCPassword password.\n\n"
-	)
-	officer_notes_guide_text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
-	officer_notes_guide_container:AddChild(officer_notes_guide_text)
-end
-
 local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
@@ -1170,7 +1269,7 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetWidth(_menu_width)
 	first_menu_description:SetText(
-		"Statistics for deaths that you have witnessed. You have witnessed "
+		"Statistics for deaths that you have recorded. For more in-depth statistics, try the stand-alone deathlog addon.  You have recorded "
 			.. #_hardcore_settings["death_log_entries"]
 			.. " deaths.\n\n\n"
 	)
@@ -1363,7 +1462,7 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 	_G["HardcoreModernMenu"] = hardcore_modern_menu.frame -- Close on <ESC>
 	tinsert(UISpecialFrames, "HardcoreModernMenu")
 
-	hardcore_modern_menu:SetTitle("Classic Hardcore")
+	hardcore_modern_menu:SetTitle("Hardcore Unlocked")
 	hardcore_modern_menu:SetStatusText("")
 	hardcore_modern_menu:SetLayout("Flow")
 	hardcore_modern_menu:SetHeight(_menu_height)
@@ -1371,8 +1470,7 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 
 	tabcontainer = AceGUI:Create("TabGroup") -- "InlineGroup" is also good
 	local tab_table = {
-		{ value = "WelcomeTab", text = "General" },
-		{ value = "RulesTab", text = "Rules" },
+		{ value = "WelcomeTab", text = "Rules" },
 		{ value = "LevelsTab", text = "Levels" },
 		{ value = "AccountabilityTab", text = "Guild Members" },
 		{ value = "AchievementsTab", text = "Achievements" },
@@ -1397,8 +1495,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		end
 		if group == "WelcomeTab" then
 			DrawGeneralTab(container)
-		elseif group == "RulesTab" then
-			DrawRulesTab(container)
 		elseif group == "LevelsTab" then
 			DrawLevelsTab(container, _hardcore_settings)
 		elseif group == "AccountabilityTab" then

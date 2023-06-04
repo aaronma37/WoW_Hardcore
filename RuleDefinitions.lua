@@ -1,6 +1,11 @@
 HCU_rule_ids = {
 	[1] = "No Auction House",
 	[2] = "No Mailbox",
+	[3] = "No Bubble Hearth",
+	[4] = "Max Group Size: 1",
+	[5] = "Max Group Size: 2",
+	[6] = "Max Group Size: 3",
+	[7] = "No Trading",
 }
 
 HCU_rule_name_to_id = {}
@@ -10,18 +15,13 @@ for k, v in pairs(HCU_rule_ids) do
 	num_rules = num_rules + 1
 end
 
-function HCU_encodeRules(rule_id_list)
+function HCU_encodeRules(rule_id_tbl)
 	local code = ""
-	local rule_ids = {}
-	for _, k in ipairs(rule_id_list) do
-		rule_ids[k] = 1
-	end
-
 	counter = 0
 	local str = {}
 	for i = 1, num_rules do
 		counter = counter + 1
-		if rule_ids[i] then
+		if rule_id_tbl[i] then
 			str[#str + 1] = 1
 		else
 			str[#str + 1] = 0
@@ -108,6 +108,7 @@ end
 name = "No Auction House"
 HCU_rules[HCU_rule_name_to_id[name]] = {
 	["name"] = name,
+	["icon"] = "ICONS\\INV_Misc_Coin_01",
 	["description"] = "Disables the auction house.",
 	["enable"] = function()
 		registerFunction("AUCTION_HOUSE_SHOW", HCU_rule_name_to_id[name], function()
@@ -123,6 +124,7 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 name = "No Mailbox"
 HCU_rules[HCU_rule_name_to_id[name]] = {
 	["name"] = name,
+	["icon"] = "ICONS\\INV_Letter_17",
 	["description"] = "Disables the mailbox.",
 	["enable"] = function()
 		registerFunction("MAIL_SHOW", HCU_rule_name_to_id[name], function()
@@ -133,4 +135,49 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 	["disable"] = function()
 		unregisterFunction("MAIL_SHOW", HCU_rule_name_to_id[name])
 	end,
+}
+
+name = "No Bubble Hearth"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\Spell_Holy_DivineIntervention",
+	["description"] = "Cancels bubble aura when casting hearthstone.",
+	["enable"] = function() end,
+	["disable"] = function() end,
+}
+
+name = "Max Group Size: 1"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\Spell_Holy_DivineSpirit",
+	["description"] = "Max group size.",
+	["enable"] = function() end,
+	["disable"] = function() end,
+}
+
+name = "Max Group Size: 2"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\Spell_Nature_MassTeleport",
+	["description"] = "Max group size.",
+	["enable"] = function() end,
+	["disable"] = function() end,
+}
+
+name = "Max Group Size: 3"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\Spell_Holy_PrayerofSpirit",
+	["description"] = "Max group size.",
+	["enable"] = function() end,
+	["disable"] = function() end,
+}
+
+name = "No Trading"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\INV_Scroll_03.PNG",
+	["description"] = "Max group size.",
+	["enable"] = function() end,
+	["disable"] = function() end,
 }
