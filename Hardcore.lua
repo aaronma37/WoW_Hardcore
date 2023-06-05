@@ -191,7 +191,8 @@ local COMM_COMMANDS = {
 	"REQUEST_RECOVERY_TIME", -- 16 Used to request recovery segments if detected DC
 	"REQUEST_RECOVERY_TIME_ACK", -- 17 Recovery request ack
 	"SURVEY_REQ",	-- 18 Request for survey info (from GM)
-	"SURVEY_ACK"	-- 19 Answer to survey info (to GM)
+	"SURVEY_ACK",	-- 19 Answer to survey info (to GM)
+	"SHARED_DL",	-- 20 Receive shared deathlog data
 }
 local COMM_SPAM_THRESHOLD = { -- msgs received within durations (s) are flagged as spam
 	PULSE = 3,
@@ -420,6 +421,17 @@ local function startXGuildChatMsgRelay(msg)
 	for _, v in pairs(hardcore_guild_member_dict) do
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
 	end
+end
+
+function Hardcore:initSendSharedDLMsg(target_player)
+  local publishFunc = function(encoded_msg)
+	local commMessage = COMM_COMMANDS[20]
+		.. COMM_COMMAND_DELIM
+		.. encoded_msg
+
+	CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", target_player)
+  end
+  HardcoreDeathlog_beginSendSharedMsg(publishFunc)
 end
 
 local function startXGuildDeathMsgRelay()
@@ -2150,6 +2162,10 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		if command == COMM_COMMANDS[19] then
 			SurveyReceiveResponse(data, sender)
 			return
+		end
+		if command == COMM_COMMANDS[20] then
+		  HardcoreDeathlog_receiveSharedMsg(data)
+		  return
 		end
 		if DEPRECATED_COMMANDS[command] or alert_msg_time[command] == nil then
 			return

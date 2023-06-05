@@ -545,6 +545,23 @@ local function SlashHandler(msg, editbox)
 			end
 		end
 
+	elseif cmd == "sharedeathlogdata" then
+		local target = nil
+		for substring in args:gmatch("%S+") do
+			target = substring
+		end
+
+		---@diagnostic disable-next-line: undefined-field
+		if target == nil then
+		  Hardcore:Print("Did not start sharing; Provide target player name.")
+		  return
+		end
+		Hardcore:Print("Sharing deathlog data with " .. target .. ". /reload if you want to stop.")
+		Hardcore:initSendSharedDLMsg(target)
+
+	elseif cmd == "receivedeathlogdata" then
+		HardcoreDeathlog_beginReceiveSharedMsg()
+
 	elseif cmd == "dk" then
 		-- sacrifice your current lvl 55 char to allow for making DK
 		local dk_convert_option = ""
