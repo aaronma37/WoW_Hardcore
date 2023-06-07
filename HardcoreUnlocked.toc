@@ -4,7 +4,7 @@
 ## Author: The Classic Hardcore team, Yazpad for unlocked modifications
 ## X-License: GNU GPLv3
 ## X-Category: Leveling,Guild
-## Version: 0.0.1
+## Version: HCU0.0.1
 
 
 ## DefaultState: enabled

@@ -1,9 +1,11 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "HardcoreFrameModernMenu", 28
+local Type, Version = "HardcoreUFrameModernMenu", 28
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
-if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
+if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then
+	return
+end
 
 -- Lua APIs
 local pairs, assert, type = pairs, assert, type
@@ -88,7 +90,7 @@ local methods = {
 		self:SetStatusText()
 		self:ApplyStatus()
 		self:Show()
-        self:EnableResize(true)
+		self:EnableResize(true)
 	end,
 
 	["OnRelease"] = function(self)
@@ -159,7 +161,7 @@ local methods = {
 		else
 			frame:SetPoint("CENTER")
 		end
-	end
+	end,
 }
 
 --[[-----------------------------------------------------------------------------
@@ -168,15 +170,19 @@ Constructor
 local FrameBackdrop = {
 	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
 	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-	tile = true, tileSize = 32, edgeSize = 32,
-	insets = { left = 8, right = 8, top = 8, bottom = 8 }
+	tile = true,
+	tileSize = 32,
+	edgeSize = 32,
+	insets = { left = 8, right = 8, top = 8, bottom = 8 },
 }
 
-local PaneBackdrop  = {
+local PaneBackdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	tile = true, tileSize = 16, edgeSize = 16,
-	insets = { left = 3, right = 3, top = 5, bottom = 3 }
+	tile = true,
+	tileSize = 16,
+	edgeSize = 16,
+	insets = { left = 3, right = 3, top = 5, bottom = 3 },
 }
 
 local function Constructor()
@@ -213,8 +219,8 @@ local function Constructor()
 	statusbg:SetPoint("BOTTOMRIGHT", -132, 15)
 	statusbg:SetHeight(24)
 	statusbg:SetBackdrop(PaneBackdrop)
-	statusbg:SetBackdropColor(0.1,0.1,0.1)
-	statusbg:SetBackdropBorderColor(0.4,0.4,0.4)
+	statusbg:SetBackdropColor(0.1, 0.1, 0.1)
+	statusbg:SetBackdropBorderColor(0.4, 0.4, 0.4)
 	statusbg:SetScript("OnEnter", StatusBar_OnEnter)
 	statusbg:SetScript("OnLeave", StatusBar_OnLeave)
 	statusbg:Hide()
@@ -243,7 +249,6 @@ local function Constructor()
 	titletext:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20)
 	titletext:SetPoint("TOP", titlebg, "TOP", 0, -20)
 
-
 	local titlebg_l = frame:CreateTexture(nil, "OVERLAY")
 	titlebg_l:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
 	titlebg_l:SetTexCoord(0.21, 0.31, 0, 0.63)
@@ -263,7 +268,7 @@ local function Constructor()
 	sizer_se:SetWidth(25)
 	sizer_se:SetHeight(25)
 	sizer_se:EnableMouse()
-	sizer_se:SetScript("OnMouseDown",SizerSE_OnMouseDown)
+	sizer_se:SetScript("OnMouseDown", SizerSE_OnMouseDown)
 	sizer_se:SetScript("OnMouseUp", MoverSizer_OnMouseUp)
 
 	local line1 = sizer_se:CreateTexture(nil, "BACKGROUND")
@@ -271,7 +276,7 @@ local function Constructor()
 	line1:SetHeight(14)
 	line1:SetPoint("BOTTOMRIGHT", -8, 8)
 	line1:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
-	local x = 0.1 * 14/17
+	local x = 0.1 * 14 / 17
 	line1:SetTexCoord(0.05 - x, 0.5, 0.05, 0.5 + x, 0.05, 0.5 - x, 0.5 + x, 0.5)
 
 	local line2 = sizer_se:CreateTexture(nil, "BACKGROUND")
@@ -279,7 +284,7 @@ local function Constructor()
 	line2:SetHeight(8)
 	line2:SetPoint("BOTTOMRIGHT", -8, 8)
 	line2:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
-	local x = 0.1 * 8/17
+	local x = 0.1 * 8 / 17
 	line2:SetTexCoord(0.05 - x, 0.5, 0.05, 0.5 + x, 0.05, 0.5 - x, 0.5 + x, 0.5)
 
 	local sizer_s = CreateFrame("Frame", nil, frame)
@@ -305,15 +310,15 @@ local function Constructor()
 
 	local widget = {
 		localstatus = {},
-		titletext   = titletext,
-		statustext  = statustext,
-		titlebg     = titlebg,
-		sizer_se    = sizer_se,
-		sizer_s     = sizer_s,
-		sizer_e     = sizer_e,
-		content     = content,
-		frame       = frame,
-		type        = Type
+		titletext = titletext,
+		statustext = statustext,
+		titlebg = titlebg,
+		sizer_se = sizer_se,
+		sizer_s = sizer_s,
+		sizer_e = sizer_e,
+		content = content,
+		frame = frame,
+		type = Type,
 	}
 	for method, func in pairs(methods) do
 		widget[method] = func

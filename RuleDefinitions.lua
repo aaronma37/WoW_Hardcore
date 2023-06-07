@@ -1,8 +1,14 @@
+local bubble_hearth_vars = {
+	spell_id = 8690,
+	bubble_name = "Divine Shield",
+	light_of_elune_name = "Light of Elune",
+}
+
 HCU_rule_ids = {
 	[1] = "No Auction House",
 	[2] = "No Mailbox",
 	[3] = "No Bubble Hearth",
-	[4] = "Max Group Size: 1",
+	[4] = "Solo",
 	[5] = "Max Group Size: 2",
 	[6] = "Max Group Size: 3",
 	[7] = "No Trading",
@@ -53,6 +59,17 @@ function HCU_decodeRules(code)
 	end
 	return rule_list
 end
+
+function HCU_applyFromCode(hcu_character, code)
+	if code == nil then
+		return
+	end
+	local rule_list = HCU_decodeRules(code)
+	hcu_character.rules = {}
+	for _, v in ipairs(rule_list) do
+		hcu_character.rules[v] = 1
+	end
+end
 -- local achievement_list = decodeAchievements(achievement_str, _G.id_a)
 -- local passive_achievement_list = decodeAchievements(passive_achievements_str, _G.id_pa)
 -- return time_tracked, first_recorded, achievement_list, passive_achievement_list
@@ -66,8 +83,10 @@ end
 
 function HCU_enableRules(hcu_character)
 	if hcu_character.rules then
-		for _, rule_id in ipairs(hcu_character.rules) do
-			HCU_rules[rule_id].enable()
+		if hcu_character.rules then
+			for rule_id, _ in pairs(hcu_character.rules) do
+				HCU_rules[rule_id].enable()
+			end
 		end
 	end
 end
@@ -142,11 +161,32 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 	["name"] = name,
 	["icon"] = "ICONS\\Spell_Holy_DivineIntervention",
 	["description"] = "Cancels bubble aura when casting hearthstone.",
-	["enable"] = function() end,
-	["disable"] = function() end,
+	["enable"] = function()
+		registerFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id[name], function(...)
+			local unit, _, spell_id, _, _ = ...
+			if unit == "player" and spell_id == bubble_hearth_vars.spell_id then
+				for i = 1, 40 do
+					local name, _, _, _, _, _, _, _, _, _, _ = UnitBuff("player", i)
+					if name == nil then
+						return
+					elseif name == bubble_hearth_vars.bubble_name or name == bubble_hearth_vars.light_of_elune_name then
+						Hardcore:Print("WARNING: Bubble-hearth Detected\nCancel Hearthing Immediately.")
+						Hardcore:ShowAlertFrame(
+							ALERT_STYLES.hc_red,
+							"Bubble-hearth Detected\nCancel Hearthing Immediately."
+						)
+						return
+					end
+				end
+			end
+		end)
+	end,
+	["disable"] = function()
+		unregisterFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id[name])
+	end,
 }
 
-name = "Max Group Size: 1"
+name = "Solo"
 HCU_rules[HCU_rule_name_to_id[name]] = {
 	["name"] = name,
 	["icon"] = "ICONS\\Spell_Holy_DivineSpirit",
@@ -177,7 +217,21 @@ name = "No Trading"
 HCU_rules[HCU_rule_name_to_id[name]] = {
 	["name"] = name,
 	["icon"] = "ICONS\\INV_Scroll_03.PNG",
-	["description"] = "Max group size.",
-	["enable"] = function() end,
-	["disable"] = function() end,
+	["enabled"] = false,
+	["loaded"] = false,
+	["description"] = "Disallows trading.",
+	["enable"] = function()
+		HCU_rules[HCU_rule_name_to_id[name]].enabled = true
+		if HCU_rules[HCU_rule_name_to_id[name]].loaded == false then
+			hooksecurefunc("TradeFrame_OnShow", function(self, button)
+				if HCU_rules[HCU_rule_name_to_id[name]].enabled then
+					_G["TradeFrame"]:Hide()
+				end
+			end)
+		end
+		HCU_rules[HCU_rule_name_to_id[name]].loaded = true
+	end,
+	["disable"] = function(self)
+		HCU_rules[HCU_rule_name_to_id[name]].enabled = false
+	end,
 }

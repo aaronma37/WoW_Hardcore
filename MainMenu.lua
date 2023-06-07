@@ -284,6 +284,19 @@ local function DrawGeneralTab(container)
 	rule_container:SetLayout("Fill")
 	container:AddChild(rule_container)
 
+	local txt = GetGuildInfoText() --.. "HCU{huE`W}" -- for debug only
+	local guild_ruleset_guild = nil
+	if txt then
+		local guild_rules = string.match(txt, "HCU{(.*)}")
+		if guild_rules then
+			HCU_applyFromCode(HardcoreUnlocked_Character, guild_rules)
+			local guildName, guildRankName, guildRankIndex = GetGuildInfo("player")
+			-- Hardcore:Print("Applying guild rules for: " .. guildName)
+			-- HCU_enableRules(HardcoreUnlocked_Character)
+			guild_ruleset_guild = guildName
+		end
+	end
+
 	local function refreshShownRules()
 		if rule_pool_frame.current_rules_display and rule_pool_frame.current_rules_display.rules then
 			local msg = ""
@@ -298,9 +311,10 @@ local function DrawGeneralTab(container)
 			if HardcoreUnlocked_Character.rules == nil then
 				HardcoreUnlocked_Character.rules = {}
 			end
-			rule_pool_frame.current_rules_display.code:SetText(
-				"Rule Code: " .. HCU_encodeRules(HardcoreUnlocked_Character.rules)
-			)
+			local encoded = HCU_encodeRules(HardcoreUnlocked_Character.rules)
+			rule_pool_frame.current_rules_display.code:SetText("Rule Code: " .. encoded)
+
+			rule_pool_frame.copy_paste_code:SetText("HCU{" .. encoded .. "}")
 		end
 	end
 
@@ -314,27 +328,34 @@ local function DrawGeneralTab(container)
 
 		local tex = frame:CreateTexture(nil, "OVERLAY")
 		tex:SetDrawLayer("OVERLAY", 7)
-		tex:SetTexture("Interface\\Store\\Shop")
-		tex:SetTexCoord(0.3, 0.88, 0, 0.28)
-		tex:SetVertexColor(0.8, 0.8, 0.9, 1)
-		-- tex:SetDesaturated(1)
+		tex:SetTexture("Interface\\LootFrame\\LootToastAtlas")
+		tex:SetTexCoord(0.55, 0.82, 0.4, 0.67)
 		tex:SetAllPoints()
 		tex:Show()
+
+		frame.glow = frame:CreateTexture(nil, "OVERLAY")
+		frame.glow:SetDrawLayer("OVERLAY", 7)
+		frame.glow:SetTexture("Interface\\LootFrame\\LootToastAtlas")
+		frame.glow:SetTexCoord(0., 0.275, 0., 0.4)
+		frame.glow:SetVertexColor(0.5, 1, 0.5, 0.5)
+		frame.glow:SetAllPoints()
+		frame.glow:SetBlendMode("ADD")
+		frame.glow:Hide()
 
 		frame.icon = frame:CreateTexture(nil, "OVERLAY")
 		frame.icon:SetDrawLayer("OVERLAY", 6)
 		frame.icon:SetTexture("Interface\\" .. HCU_rules[rule_id].icon)
-		frame.icon:SetPoint("LEFT")
-		frame.icon:SetWidth(frame:GetHeight() * 0.8)
-		frame.icon:SetHeight(frame:GetHeight() * 0.8)
+		frame.icon:SetPoint("LEFT", 20, 0)
+		frame.icon:SetWidth(frame:GetHeight() * 0.6)
+		frame.icon:SetHeight(frame:GetHeight() * 0.6)
 		frame.icon:Show()
 
 		local font = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-		font:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 14, "")
+		font:SetFont("FONTS\\FRIZQT__.ttf", 11, "")
 		font:SetWidth(frame:GetWidth() - 50)
 		font:SetTextColor(1, 1, 1, 1)
-		font:SetPoint("TOP", 15, -14)
-		font:SetJustifyH("LEFT")
+		font:SetPoint("TOP", 20, -14)
+		font:SetJustifyH("CENTER")
 		font:SetText(HCU_rules[rule_id].name)
 		font:Show()
 
@@ -361,9 +382,14 @@ local function DrawGeneralTab(container)
 
 			if HardcoreUnlocked_Character.rules[rule_id] then
 				rule_pool_frame.rule_frame[rule_id].icon:SetDesaturated(nil)
+
+				frame.glow:Show()
 			else
 				rule_pool_frame.rule_frame[rule_id].icon:SetDesaturated(1)
+				frame.glow:Hide()
 			end
+			HCU_disableRules(HardcoreUnlocked_Character)
+			HCU_enableRules(HardcoreUnlocked_Character)
 			refreshShownRules()
 		end)
 		return frame
@@ -378,12 +404,14 @@ local function DrawGeneralTab(container)
 			rule_pool_frame,
 			"TOPLEFT",
 			((i + 1) % 3) * 175 + 25,
-			math.floor((i - 1) / 3) * -50 - 75
+			math.floor((i - 1) / 3) * -50 - 200
 		)
 		if HardcoreUnlocked_Character.rules[i] then
 			rule_pool_frame.rule_frame[i].icon:SetDesaturated(nil)
+			rule_pool_frame.rule_frame[i].glow:Show()
 		else
 			rule_pool_frame.rule_frame[i].icon:SetDesaturated(1)
+			rule_pool_frame.rule_frame[i].glow:Hide()
 		end
 	end
 
@@ -391,9 +419,6 @@ local function DrawGeneralTab(container)
 	rule_pool_frame:SetHeight(container.frame:GetHeight())
 	rule_pool_frame:SetParent(rule_container.frame)
 
-	-- rule_pool_frame:SetBackdrop(PaneBackdrop)
-	-- rule_pool_frame:SetBackdropColor(0.6, 0.6, 0.6, 0.1)
-	-- rule_pool_frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
 	rule_pool_frame:SetAllPoints(container.border)
 	rule_pool_frame:Show()
 
@@ -403,6 +428,7 @@ local function DrawGeneralTab(container)
 		rule_pool_frame.current_rules_display.code = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		rule_pool_frame.current_rules_display.rules = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		rule_pool_frame.title = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		rule_pool_frame.desc = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	end
 	rule_pool_frame.current_rules_display:SetDrawLayer("OVERLAY", 7)
 	rule_pool_frame.current_rules_display:SetTexture("Interface\\Store\\Services")
@@ -421,15 +447,18 @@ local function DrawGeneralTab(container)
 	rule_pool_frame.current_rules_display.font:SetTextColor(1, 1, 1, 1)
 	rule_pool_frame.current_rules_display.font:SetPoint("TOP", rule_pool_frame.current_rules_display, "TOP", 0, -30)
 	rule_pool_frame.current_rules_display.font:SetJustifyH("CENTER")
-	rule_pool_frame.current_rules_display.font:SetText(UnitName("player") .. "'s Rules")
+	if guild_ruleset_guild then
+		rule_pool_frame.current_rules_display.font:SetText(guild_ruleset_guild .. "'s Rules")
+	else
+		rule_pool_frame.current_rules_display.font:SetText(UnitName("player") .. "'s Rules")
+	end
 	rule_pool_frame.current_rules_display.font:Show()
 
 	rule_pool_frame.current_rules_display.rules:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	rule_pool_frame.current_rules_display.rules:SetWidth(rule_pool_frame.current_rules_display:GetWidth() - 15)
 	rule_pool_frame.current_rules_display.rules:SetTextColor(0.8, 0.8, 0.8, 1)
-	rule_pool_frame.current_rules_display.rules:SetPoint("TOP", rule_pool_frame.current_rules_display, "TOP", 0, -100)
-	rule_pool_frame.current_rules_display.rules:SetJustifyH("CENTER")
-	refreshShownRules()
+	rule_pool_frame.current_rules_display.rules:SetPoint("TOP", rule_pool_frame.current_rules_display, "TOP", 50, -100)
+	rule_pool_frame.current_rules_display.rules:SetJustifyH("LEFT")
 	rule_pool_frame.current_rules_display.rules:Show()
 
 	rule_pool_frame.current_rules_display.code:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
@@ -454,8 +483,19 @@ local function DrawGeneralTab(container)
 	rule_pool_frame.title:SetTextColor(1, 1, 1, 1)
 	rule_pool_frame.title:SetPoint("TOPLEFT", rule_pool_frame, "TOPLEFT", 160, -10)
 	rule_pool_frame.title:SetJustifyH("CENTER")
-	rule_pool_frame.title:SetText("Rules")
+	rule_pool_frame.title:SetText("Hardcore Unlocked")
 	rule_pool_frame.title:Show()
+
+	-- Description
+	rule_pool_frame.desc:SetFont("Interface\\FONTS\blei00d.ttf", 12, "")
+	rule_pool_frame.desc:SetWidth(550)
+	rule_pool_frame.desc:SetTextColor(1, 1, 1, 1)
+	rule_pool_frame.desc:SetPoint("TOPLEFT", rule_pool_frame, "TOPLEFT", 25, -40)
+	rule_pool_frame.desc:SetJustifyH("CENTER")
+	rule_pool_frame.desc:SetText(
+		"Welcome to Hardcore Unlocked! This is a cut-down version of the original Hardcore addon aiming to improve performance and user experience by removing heavy security features and letting the player choose their own ruleset.  Additionally, joining a guild that uses this addon will enforce that guilds ruleset.  |c00ffff00Officers|r: To enforce a ruleset, copy and paste the 'Officer code' at the bottom of this page into the guild information.\n\n|c00ffff00**READ**|r This addon will not verify you for the website leaderboard\nPlayers using the original Hardcore addon might not group with you.\nGuilds using the original Hardcore addon might not accept you into their guild if they exclusively use the original Hardcore addon."
+	)
+	rule_pool_frame.desc:Show()
 
 	if rule_pool_frame.rules_heading == nil then
 		rule_pool_frame.rules_heading = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -464,7 +504,7 @@ local function DrawGeneralTab(container)
 		rule_pool_frame.rules_heading:SetJustifyV("TOP")
 		rule_pool_frame.rules_heading:SetJustifyH("CENTER")
 		rule_pool_frame.rules_heading:SetTextColor(0.9, 0.9, 0.9)
-		rule_pool_frame.rules_heading:SetPoint("TOP", rule_pool_frame.title, "TOP", 0, -40)
+		rule_pool_frame.rules_heading:SetPoint("TOP", rule_pool_frame.title, "TOP", 0, -170)
 		rule_pool_frame.rules_heading:Show()
 	end
 
@@ -485,6 +525,31 @@ local function DrawGeneralTab(container)
 		rule_pool_frame.rules_heading_right:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
 		rule_pool_frame.rules_heading_right:SetTexCoord(0.81, 0.94, 0.5, 1)
 	end
+
+	if rule_pool_frame.copy_paste_code == nil then
+		rule_pool_frame.copy_paste_code = CreateFrame("EditBox", nil, rule_pool_frame, "InputBoxTemplate")
+	end
+	if rule_pool_frame.copy_paste_code.text == nil then
+		rule_pool_frame.copy_paste_code.text = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	end
+
+	rule_pool_frame.copy_paste_code:SetPoint("TOP", rule_pool_frame.rules_heading, "BOTTOM", 0, -270)
+	rule_pool_frame.copy_paste_code:SetPoint("BOTTOM", rule_pool_frame.rules_heading, "BOTTOM", 0, -300)
+	rule_pool_frame.copy_paste_code:SetWidth(120)
+	rule_pool_frame.copy_paste_code:SetFont("Fonts\\blei00d.TTF", 14, "")
+	rule_pool_frame.copy_paste_code:SetMovable(false)
+	rule_pool_frame.copy_paste_code:SetBlinkSpeed(1)
+	rule_pool_frame.copy_paste_code:SetAutoFocus(false)
+	rule_pool_frame.copy_paste_code:SetMultiLine(false)
+	rule_pool_frame.copy_paste_code:SetMaxLetters(20)
+	rule_pool_frame.copy_paste_code:SetText("")
+	rule_pool_frame.copy_paste_code.text:SetPoint("LEFT", rule_pool_frame.copy_paste_code, "LEFT", 0, 15)
+	rule_pool_frame.copy_paste_code.text:SetFont("Fonts\\blei00d.TTF", 12, "")
+	rule_pool_frame.copy_paste_code.text:SetTextColor(255 / 255, 215 / 255, 0)
+	rule_pool_frame.copy_paste_code.text:SetText("Officer Code")
+	rule_pool_frame.copy_paste_code.text:Show()
+
+	refreshShownRules()
 
 	rule_container.frame:HookScript("OnHide", function()
 		rule_pool_frame:Hide()
@@ -1245,204 +1310,8 @@ local function DrawPassiveAchievementsTab(container)
 	scroll_container:AddChild(achievements_title)
 end
 
-local function DrawDeathStatisticsTab(container, _hardcore_settings)
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
-	tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("List")
-	scroll_container:AddChild(scroll_frame)
-
-	local first_menu_description_title = AceGUI:Create("Label")
-	first_menu_description_title:SetWidth(500)
-	first_menu_description_title:SetText("Death Statistics")
-	first_menu_description_title:SetFont("Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf", 20, "")
-	-- first_menu_description_title:SetPoint("TOP", 2,5)
-	scroll_frame:AddChild(first_menu_description_title)
-	if _hardcore_settings["death_log_entries"] == nil then
-		return
-	end
-
-	local first_menu_description = AceGUI:Create("Label")
-	first_menu_description:SetWidth(_menu_width)
-	first_menu_description:SetText(
-		"Statistics for deaths that you have recorded. For more in-depth statistics, try the stand-alone deathlog addon.  You have recorded "
-			.. #_hardcore_settings["death_log_entries"]
-			.. " deaths.\n\n\n"
-	)
-	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(first_menu_description)
-
-	local death_map_button_container = AceGUI:Create("SimpleGroup")
-	local death_map_button = AceGUI:Create("Button")
-	death_map_button:SetText("Show deaths in my zone")
-	death_map_button:SetWidth(200)
-
-	death_map_button:SetCallback("OnClick", function()
-		local WorldMapButton = WorldMapFrame:GetCanvas()
-		local death_tomb_frame = CreateFrame("frame", nil, WorldMapButton)
-		death_tomb_frame:SetAllPoints()
-		death_tomb_frame:SetFrameLevel(15000)
-		death_tomb_frame.entry_textures = {}
-
-		for k, v in ipairs(_hardcore_settings["death_log_entries"]) do
-			if v["map_id"] and v["map_pos"] then
-				local death_tomb_frame_tex = death_tomb_frame:CreateTexture(nil, "OVERLAY")
-				death_tomb_frame_tex:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame-Skull")
-				death_tomb_frame_tex:SetDrawLayer("OVERLAY", 4)
-				death_tomb_frame_tex:SetHeight(25)
-				death_tomb_frame_tex:SetWidth(25)
-				death_tomb_frame_tex:Hide()
-
-				death_tomb_frame_tex.map_id = v["map_id"]
-				local x, y = strsplit(",", v["map_pos"], 2)
-				death_tomb_frame_tex.coordinates = { x, y }
-				table.insert(death_tomb_frame.entry_textures, death_tomb_frame_tex)
-			end
-		end
-		WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
-		local map_id = WorldMapFrame:GetMapID()
-		local mWidth, mHeight = WorldMapFrame:GetCanvas():GetSize()
-		for k, v in ipairs(death_tomb_frame.entry_textures) do
-			if v.map_id == map_id then
-				v:SetPoint("CENTER", WorldMapButton, "TOPLEFT", mWidth * v.coordinates[1], -mHeight * v.coordinates[2])
-				v:Show()
-			end
-		end
-
-		WorldMapFrame:HookScript("OnHide", function()
-			if death_tomb_frame == nil then
-				return
-			end
-			if death_tomb_frame.entry_textures == nil then
-				return
-			end
-			for k, v in ipairs(death_tomb_frame.entry_textures) do
-				v:Hide()
-				v = nil
-			end
-			death_tomb_frame = nil
-		end)
-	end)
-	scroll_frame:AddChild(death_map_button)
-
-	local function getDefaultStats()
-		return { ["sum"] = 0, ["num"] = 0 }
-	end
-	local stats = {}
-	stats["avg_level"] = getDefaultStats()
-	stats["avg_level_class"] = {}
-
-	local detected_classes = {}
-	for i, v in pairs(_hardcore_settings["death_log_entries"]) do
-		if v["level"] then
-			stats["avg_level"]["sum"] = stats["avg_level"]["sum"] + v["level"]
-			stats["avg_level"]["num"] = stats["avg_level"]["num"] + 1
-			if v["class_id"] then
-				if stats["avg_level_class"][v["class_id"]] == nil then
-					stats["avg_level_class"][v["class_id"]] = getDefaultStats()
-				end
-				detected_classes[v["class_id"]] = 1
-				stats["avg_level_class"][v["class_id"]]["sum"] = stats["avg_level_class"][v["class_id"]]["sum"]
-					+ v["level"]
-				stats["avg_level_class"][v["class_id"]]["num"] = stats["avg_level_class"][v["class_id"]]["num"] + 1
-			end
-		end
-	end
-
-	local class_stats_container = AceGUI:Create("InlineGroup")
-	class_stats_container:SetLayout("List")
-	scroll_frame:AddChild(class_stats_container)
-
-	local subtitles = {
-		{ "Class", 0 },
-		{ "# Recorded", 90 },
-		{ "%", 180 },
-		{ "Avg. Death Lvl.", 275 },
-	}
-
-	local class_types = {}
-
-	local entry_data = {}
-	for k, _ in pairs(detected_classes) do
-		class_types[k] = 1
-		stats["avg_level_class"][k]["avg"] = stats["avg_level_class"][k]["sum"] / stats["avg_level_class"][k]["num"]
-		local class_str, _, _ = GetClassInfo(k)
-		entry_data[k] = {}
-		entry_data[k]["Class"] = class_str
-		entry_data[k]["# Recorded"] = stats["avg_level_class"][k]["num"]
-		entry_data[k]["%"] = string.format(
-			"%.1f",
-			stats["avg_level_class"][k]["num"] / stats["avg_level"]["num"] * 100.0
-		) .. "%"
-		entry_data[k]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level_class"][k]["avg"])
-	end
-
-	class_types["All"] = 1
-	stats["avg_level"]["avg"] = stats["avg_level"]["sum"] / stats["avg_level"]["num"]
-
-	entry_data["All"] = {}
-	entry_data["All"]["Class"] = "All"
-	entry_data["All"]["# Recorded"] = stats["avg_level"]["num"]
-	entry_data["All"]["%"] = "100%"
-	entry_data["All"]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level"]["avg"])
-
-	local header = AceGUI:Create("Label")
-	header:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
-	header:SetText(" ")
-	class_stats_container:SetWidth(400)
-	header.font_strings = {}
-	for _, v in ipairs(subtitles) do
-		header.font_strings[v[1]] = header.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-		header.font_strings[v[1]]:SetPoint("LEFT", header.frame, "LEFT", v[2], 0)
-		header.font_strings[v[1]]:SetText(v[1])
-	end
-	class_stats_container:AddChild(header)
-
-	local entries = {}
-	for k, _ in pairs(class_types) do
-		local entry = AceGUI:Create("Label")
-		table.insert(entries, entry)
-		entry:SetText(" ")
-		entry.font_strings = {}
-		for _, v in ipairs(subtitles) do
-			entry.font_strings[v[1]] = entry.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-			entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
-			entry.font_strings[v[1]]:SetPoint("LEFT", entry.frame, "LEFT", v[2], 0)
-			entry.font_strings[v[1]]:SetTextColor(1, 1, 1)
-			entry.font_strings[v[1]]:SetText(entry_data[k][v[1]])
-		end
-		class_stats_container:AddChild(entry)
-	end
-
-	scroll_frame.frame:HookScript("OnHide", function()
-		death_tomb_frame = nil
-		if header ~= nil then
-			for k, _ in pairs(header.font_strings) do
-				header.font_strings[k]:Hide()
-				header.font_strings[k] = nil
-			end
-			header = nil
-		end
-
-		if entries ~= nil then
-			for _, v in ipairs(entries) do
-				for k, _ in pairs(v.font_strings) do
-					v.font_strings[k]:Hide()
-					v.font_strings[k] = nil
-				end
-				v = nil
-			end
-			entries = nil
-		end
-	end)
-end
-
 function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_function)
-	hardcore_modern_menu = AceGUI:Create("HardcoreFrameModernMenu")
+	hardcore_modern_menu = AceGUI:Create("HardcoreUFrameModernMenu")
 	hardcore_modern_menu:SetCallback("OnClose", function(widget)
 		if hardcore_modern_menu_state.ticker_handler ~= nil then
 			hardcore_modern_menu_state.ticker_handler:Cancel()
@@ -1470,15 +1339,11 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 
 	tabcontainer = AceGUI:Create("TabGroup") -- "InlineGroup" is also good
 	local tab_table = {
-		{ value = "WelcomeTab", text = "Rules" },
+		{ value = "WelcomeTab", text = "General" },
 		{ value = "LevelsTab", text = "Levels" },
 		{ value = "AccountabilityTab", text = "Guild Members" },
 		{ value = "AchievementsTab", text = "Achievements" },
-		{ value = "DeathStatisticsTab", text = "Death Statistics" },
 	}
-	if hc_guild_rank_index and hc_guild_rank_index < 2 then -- 0 is GM, 1 is generally officer
-		table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
-	end
 
 	tabcontainer:SetTabs(tab_table)
 	tabcontainer:SetFullWidth(true)
@@ -1511,10 +1376,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 			scroll_container:AddChild(scroll_frame)
 		elseif group == "AchievementsTab" then
 			achievement_tab_handler:DrawAchievementTab(tabcontainer, _hardcore_character, false)
-		elseif group == "DeathStatisticsTab" then
-			DrawDeathStatisticsTab(tabcontainer, _hardcore_settings)
-		elseif group == "OfficerToolsTab" then
-			DrawOfficerToolsTab(container)
 		end
 	end
 

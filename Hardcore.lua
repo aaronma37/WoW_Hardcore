@@ -122,6 +122,7 @@ local monitor_msg_throttle = {
 	ADD = {},
 	DEAD = {},
 }
+local applied_guild_rules = false
 local guild_player_first_ping_time = {}
 local online_pulsing = {}
 local guild_versions = {}
@@ -893,42 +894,6 @@ function Hardcore:InitializeSettingsSavedVariables()
 	end
 end
 
---[[ Override default WoW UI ]]
---
-
-TradeFrameTradeButton:SetScript("OnClick", function()
-	local duo_trio_partner = false
-	local legacy_duo_support = #HardcoreUnlocked_Character.trade_partners > 0
-	local target_trader = TradeFrameRecipientNameText:GetText()
-	local level = UnitLevel("player")
-	local max_level = 60
-	if
-		(HardcoreUnlocked_Character.game_version ~= "")
-		and (HardcoreUnlocked_Character.game_version ~= "Era")
-		and (HardcoreUnlocked_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
-	if HardcoreUnlocked_Character.team ~= nil then
-		for _, name in ipairs(HardcoreUnlocked_Character.team) do
-			if target_trader == name then
-				duo_trio_partner = true
-				break
-			end
-		end
-	end
-
-	if duo_trio_partner == true then
-		AcceptTrade()
-	elseif (level == max_level) or legacy_duo_support then
-		table.insert(HardcoreUnlocked_Character.trade_partners, target_trader)
-		HardcoreUnlocked_Character.trade_partners = Hardcore_FilterUnique(HardcoreUnlocked_Character.trade_partners)
-		AcceptTrade()
-	else
-		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios.")
-	end
-end)
-
 --[[ Startup ]]
 --
 
@@ -960,7 +925,10 @@ function Hardcore:PLAYER_LOGIN()
 			HardcoreUnlocked_Character.first_recorded = GetServerTime()
 		end)
 	end
-	HardcoreUnlocked_Character.rules = { [1] = 1, [2] = 1 }
+	-- HardcoreUnlocked_Character.rules = { [1] = 1, [2] = 1 }
+	if HardcoreUnlocked_Character.rules == nil then
+		HardcoreUnlocked_Character.rules = {}
+	end
 	HCU_enableRules(HardcoreUnlocked_Character)
 	-- print(table.concat(HCU_decodeRules(HCU_encodeRules(HardcoreUnlocked_Character.rules))))
 
@@ -1053,7 +1021,6 @@ function Hardcore:PLAYER_LOGIN()
 
 	-- different guid means new character with the same name
 	if HardcoreUnlocked_Character.guid ~= PLAYER_GUID then
-		Hardcore:Print("New character detected.  Contact a mod or technician in #addon-appeal if this is unexpected.")
 		Hardcore:ForceResetSavedVariables()
 	end
 
@@ -1173,7 +1140,7 @@ local function RequestHCDataIfValid(unit_id)
 		if UnitIsFriend("player", unit_id) then
 			if
 				other_hardcore_character_cache[UnitName(unit_id)] == nil
-				or time() - other_hardcore_character_cache[UnitName(unit_id)].last_received > 30
+				or time() - other_hardcore_character_cache[UnitName(unit_id)].last_received > 60 * 60 -- 1hr
 			then
 				if UnitAffectingCombat("player") == false and UnitAffectingCombat(unit_id) == false then
 					Hardcore:RequestCharacterData(UnitName(unit_id))
@@ -1911,6 +1878,19 @@ end
 
 function Hardcore:GUILD_ROSTER_UPDATE(...)
 	guild_roster_loading = false
+	if applied_guild_rules == false then
+		local txt = GetGuildInfoText() -- .. "HCU{huE`W}" -- for debug only
+		if txt then
+			local guild_rules = string.match(txt, "HCU{(.*)}")
+			if guild_rules then
+				HCU_applyFromCode(HardcoreUnlocked_Character, guild_rules)
+				applied_guild_rules = true
+				local guildName, guildRankName, guildRankIndex = GetGuildInfo("player")
+				Hardcore:Print("Applying guild rules for: " .. guildName)
+				HCU_enableRules(HardcoreUnlocked_Character)
+			end
+		end
+	end
 
 	-- Create a new dictionary of just online people every time roster is updated
 	guild_online = {}
@@ -2022,7 +2002,6 @@ function Hardcore:ShowPassiveAchievementFrame(icon_path, message, delay)
 	achievement_alert_handler:SetIcon(icon_path)
 	achievement_alert_handler:SetMsg(message)
 	achievement_alert_handler:ShowTimed(delay)
-	-- PlaySound(12891)
 	PlaySoundFile("Interface\\Addons\\HardcoreUnlocked\\Media\\achievement_sound.ogg")
 
 	if alertSound then
@@ -2061,10 +2040,6 @@ function Hardcore:Add(data, sender, command)
 					end
 					level = level > 0 and level < 61 and level or guildLevel -- If player is using an older version of the addon, will have to get level from guild roster.
 					local messageFormat = "%s the %s%s|r has died at level %d in %s"
-					if command == COMM_COMMANDS[6] then
-						messageFormat =
-							"%s the %s%s|r is choosing to follow the Path of the Ebon Blade at level %d in %s"
-					end
 					local messageString = messageFormat:format(
 						name:gsub("%-.*", ""),
 						"|c" .. RAID_CLASS_COLORS[class].colorStr,
@@ -2498,11 +2473,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message
 		end
 	end
 
-	local _name, _ = string.split("-", sender)
-	if _G.hc_online_player_ranks[_name] and _G.hc_online_player_ranks[_name] == "officer" then
-		message = "\124cFFFF0000<MOD>\124r " .. message
-		-- message = "|T" .. "Interface\\Addons\\HardcoreUnlocked\\\Media\\icon_crown.blp" .. ":8:8:0:0:64:64:4:60:4:60|t " .. message -- crown
-	end
 	return false, message, sender, ... -- don't hide this message
 	-- note that you must return *all* of the values that were passed to your filter, even ones you didn't change
 end)
@@ -2512,16 +2482,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(frame, event, messag
 		return true, nil, sender, ...
 	end
 	return false, message, sender, ... -- don't hide this message
-end)
-
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(frame, event, message, sender, ...)
-	local _name, _ = string.split("-", sender)
-	local _prefix, _ = string.split("#", message)
-	if _prefix == "L" then
-		_G.hc_online_player_ranks[_name] = "officer"
-	end
-	return false, message, sender, ... -- don't hide this message
-	-- note that you must return *all* of the values that were passed to your filter, even ones you didn't change
 end)
 
 function Hardcore:SetGriefAlertCondition(grief_alert_option)
@@ -2663,6 +2623,23 @@ local options = {
 						HardcoreUnlocked_Settings.death_log_types = value
 					end,
 					order = 2,
+				},
+				max_entries = {
+					type = "range",
+					name = "Max entries to record",
+					desc = "Specifies how many entries to keep recorded.",
+					min = 0,
+					max = 100000,
+					get = function()
+						if HardcoreUnlocked_Settings.deathlog_max_entries == nil then
+							HardcoreUnlocked_Settings.deathlog_max_entries = 1000
+						end
+						return HardcoreUnlocked_Settings.deathlog_max_entries
+					end,
+					set = function(info, value)
+						HardcoreUnlocked_Settings.deathlog_max_entries = value
+					end,
+					order = 4,
 				},
 				death_alerts = {
 					type = "select",

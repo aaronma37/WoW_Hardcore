@@ -572,10 +572,16 @@ local function createEntry(checksum)
 	if hardcore_settings["death_log_entries"] == nil then
 		hardcore_settings["death_log_entries"] = {}
 	end
-	table.insert(hardcore_settings["death_log_entries"], death_ping_lru_cache_tbl[checksum]["player_data"])
+	if HardcoreUnlocked_Settings.deathlog_max_entries ~= nil and HardcoreUnlocked_Settings.deathlog_max_entries > 0 then
+		table.insert(hardcore_settings["death_log_entries"], death_ping_lru_cache_tbl[checksum]["player_data"])
+	end
 
 	-- Cap list size, otherwise loading time will increase
-	if hardcore_settings["death_log_entries"] and #hardcore_settings["death_log_entries"] > HC_DEATH_LOG_MAX then -- TODO parameterize
+	if
+		hardcore_settings["death_log_entries"]
+			and #hardcore_settings["death_log_entries"] > HardcoreUnlocked_Settings.deathlog_max_entries
+		or HC_DEATH_LOG_MAX
+	then -- TODO parameterize
 		table.remove(hardcore_settings["death_log_entries"], 1)
 	end
 
@@ -665,6 +671,10 @@ function selfDeathAlert(death_source_str)
 	local death_source = "-1"
 	if DeathLog_Last_Attack_Source then
 		death_source = npc_to_id[death_source_str]
+	end
+
+	if death_source_str and environment_damage[death_source_str] then
+		death_source = death_source_str
 	end
 
 	msg = encodeMessage(
@@ -866,11 +876,6 @@ end
 function deathlogJoinChannel()
 	JoinChannelByName(death_alerts_channel, death_alerts_channel_pw)
 	local channel_num = GetChannelName(death_alerts_channel)
-	if channel_num == 0 then
-		print("Failed to join death alerts channel")
-	else
-		print("Successfully joined deathlog channel.")
-	end
 
 	for i = 1, 10 do
 		if _G["ChatFrame" .. i] then
