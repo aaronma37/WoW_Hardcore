@@ -6,6 +6,7 @@ A modification of the Hardcore addon which allows for variable rulesets.  This a
 - 0.0.2b Strip down databases.  They are currently very large and we now have the data to get what we need with 10% of the dbs
 - 0.0.3b Use native icons.  Lots of loading incurred via custom achievement icons
 - 0.0.1  Add minimalism mode: turns off achievement tracking, deathlog recording (alerts will still work); Chat hyperlinks for rulesets
+- 0.0.1+ Bug fixes for current acheivements.  Updated UI and customizations. Some additional fonts.
 
 ## Motivation and Demographic
 - Enable players who do not want to follow the Solo-Self Found ruleset, to enjoy the Hardcore Addon features (Achievements, Death Alerts, Death log)
