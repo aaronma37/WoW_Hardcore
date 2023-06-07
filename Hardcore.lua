@@ -73,6 +73,8 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
+	reload_reminder_interval = 0,
+	reload_reminder_show = true
 }
 
 WARNING = ""
@@ -571,6 +573,8 @@ local settings_saved_variable_meta = {
 	["use_alternative_menu"] = false,
 	["ignore_xguild_chat"] = false,
 	["ignore_xguild_alerts"] = false,
+	["reload_reminder_interval"] = 0,
+	["reload_reminder_show"] = true,
 }
 
 --[[ Post-utility functions]]
@@ -1014,6 +1018,9 @@ function Hardcore:PLAYER_LOGIN()
 
 	-- initiate survey module (pass Hardcore.lua locals needed for communication)
 	SurveyInitiate(COMM_NAME, COMM_COMMANDS[18], COMM_COMMANDS[19], COMM_COMMAND_DELIM, COMM_FIELD_DELIM)
+
+	-- initiate reload reminder module
+	ReloadReminderInitiate()
 
 	-- check players version against highest version
 	local FULL_PLAYER_NAME = Hardcore_GetPlayerPlusRealmName()
@@ -1651,6 +1658,9 @@ function Hardcore:TIME_PLAYED_MSG(...)
 	end
 
 	Hardcore:Debug(Hardcore_Character.tracked_played_percentage)
+
+	-- Tell the watchdog we are still alive
+	ReloadReminderPlayedTimeUpdate()
 
 	-- Check to see if the gap since the last recording is too long.  When receiving played time for the first time.
 	if RECEIVED_FIRST_PLAYED_TIME_MSG == false and Hardcore_Character.accumulated_time_diff ~= nil then
@@ -3350,6 +3360,8 @@ function Hardcore:InitiatePulsePlayed()
 		if RECEIVED_FIRST_PLAYED_TIME_MSG == true then
 			Hardcore_Character.accumulated_time_diff = Hardcore_Character.time_played - Hardcore_Character.time_tracked
 		end
+		-- Tell the watchdog we are still alive
+		ReloadReminderTrackedTimeUpdate()
 	end)
 
 	--played time tracking
@@ -3958,7 +3970,7 @@ local options = {
 						Hardcore_Settings.hardcore_player_name = val
 						Hardcore_Character.hardcore_player_name = val
 					end,
-					order = 11,
+					order = 13,
 				},
 				use_alternative_menu = {
 					type = "toggle",
@@ -3970,7 +3982,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.use_alternative_menu = not Hardcore_Settings.use_alternative_menu
 					end,
-					order = 12,
+					order = 11,
 				},
 				show_minimap_icon_option = {
 					type = "toggle",
@@ -3982,14 +3994,46 @@ local options = {
 					set = function()
 						Hardcore:ToggleMinimapIcon()
 					end,
-					order = 13,
+					order = 12,
+				},
+				reload_reminder_show = {
+					type = "toggle",
+					name = "Show reload reminder",
+					desc = "Show reload reminder",
+					get = function()
+						return Hardcore_Settings.reload_reminder_show
+					end,
+					set = function()
+						Hardcore_Settings.reload_reminder_show = not Hardcore_Settings.reload_reminder_show
+						ReloadReminderEnableWarning(Hardcore_Settings.reload_reminder_show)
+					end,
+					order = 14,
+				},
+				reload_reminder_interval = {
+					type = "input",
+					name = "Reminder interval",
+					desc = "Reload reminder interval (in minutes, 0 = automatic)",
+					get = function()
+						if Hardcore_Settings.reload_reminder_interval then
+							return "" .. Hardcore_Settings.reload_reminder_interval
+						else
+							return "0"
+						end
+					end,
+					set = function(info, val)
+						if tonumber( val ) and tonumber(val) >= 0 then
+							Hardcore_Settings.reload_reminder_interval = tonumber(val)
+							ReloadReminderSetInterval( tonumber(val) )
+						end
+					end,
+					order = 15,
 				},
 			},
 		},
 		cross_guild_header = {
 			type = "group",
 			name = "Cross-Guild",
-			order = 14,
+			order = 16,
 			inline = true,
 			args = {
 				ignore_xguild_chat = {
@@ -4003,7 +4047,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.ignore_xguild_chat = not Hardcore_Settings.ignore_xguild_chat
 					end,
-					order = 15,
+					order = 17,
 				},
 				ignore_xguild_alerts = {
 					type = "toggle",
@@ -4015,7 +4059,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.ignore_xguild_alerts = not Hardcore_Settings.ignore_xguild_alerts
 					end,
-					order = 17,
+					order = 18,
 				},
 			},
 		},
@@ -4037,6 +4081,8 @@ local options = {
 				Hardcore_Settings.show_minimap_mailbox_icon = false
 				Hardcore_Settings.ignore_xguild_alerts = false
 				Hardcore_Settings.ignore_xguild_chat = false
+				Hardcore_Settings.reload_reminder_show = true
+				Hardcore_Settings.reload_reminder_interval = 0				
 				Hardcore:ApplyAlertFrameSettings()
 			end,
 			order = 20,
