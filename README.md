@@ -20,13 +20,13 @@ A modification of the Hardcore addon which allows for custom (or no) rulesets.  
 ## Features
 
 ### Customizeable Ruleset
-Mix and match rules to cater to your Hardcore journey.  Join guilds with guild-wide rulesets to automatically participate.
+**Using rulesets is optional!!!** Mix and match rules to cater to your Hardcore journey.  Join guilds with guild-wide rulesets to automatically participate.  Rulesets are integrated into character inspection frames. Rulesets can be hyperlinked through chat.  Future plans to integrate rulesets into the deathlog, so you can view what rules other players were following when they died.
 
 ### Guild Mandated Rulesets
 Officers: Copy achievement code specified by `officer code` in the main menu in the guild information.  Players with this addon will automatically be assigned the matching ruleset.
 
-### Removed Security Components
-Rules in this addon function as guiderails and there is no "Failure" that can be appealed.  For example, the `No Auction House` rule will close the auction house if you attempt to open interact with the auctioneer, as opposed to applying a `failed` status to your character.  Security related warning text, verification tab, and verification status via inspection have been removed.
+### Removed Verification Components
+Rules in this addon function as guiderails and there is no "Failure" that can be appealed.  For example, the `No Auction House` rule will close the auction house if you attempt to open interact with the auctioneer, as opposed to applying a `failed` status to your character.  Security related warning text, verification tab, and verification status via inspection have been removed.  Since this is a self-imposed challenge, this addon makes no effort to detect cheating. Instead it provides a framework for communities to use rulesets (if they want), and aims to optimize for performance and user experience.
 
 ## Contributions
 
