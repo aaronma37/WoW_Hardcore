@@ -50,6 +50,9 @@ function HCU_encodeRules(rule_id_tbl)
 end
 
 function HCU_decodeRules(code)
+	if code == nil or tostring(code) == nil then
+		return
+	end
 	local rule_list = {}
 	local bin = ascii85ToBinary(code)
 	for i = 1, #bin do

@@ -469,7 +469,7 @@ for i = 1, 20 do
 		end
 
 		if _entry.player_data["source_id"] then
-			local source_id = id_to_npc[_entry.player_data["source_id"]]
+			local source_id = hcu_id_to_npc[_entry.player_data["source_id"]]
 			if source_id then
 				GameTooltip:AddLine("Killed by: " .. source_id, 1, 1, 1, true)
 			elseif environment_damage[_entry.player_data["source_id"]] then
@@ -642,7 +642,7 @@ function selfDeathAlertLastWords(last_words)
 	end
 	local death_source = "-1"
 	if DeathLog_Last_Attack_Source then
-		death_source = npc_to_id[death_source_str]
+		death_source = hcu_npc_to_id[death_source_str]
 	end
 
 	local player_data =
@@ -670,7 +670,7 @@ function selfDeathAlert(death_source_str)
 	local _, _, class_id = UnitClass("player")
 	local death_source = "-1"
 	if DeathLog_Last_Attack_Source then
-		death_source = npc_to_id[death_source_str]
+		death_source = hcu_npc_to_id[death_source_str]
 	end
 
 	if death_source_str and environment_damage[death_source_str] then

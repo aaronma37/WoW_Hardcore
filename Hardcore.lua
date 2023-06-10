@@ -1702,7 +1702,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		end
 		if command == COMM_COMMANDS[4] then -- Received hc character data
 			local name, _ = string.split("-", sender)
-			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str =
+			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, ruleset_code =
 				string.split(COMM_FIELD_DELIM, data)
 			local achievements_l = { string.split(COMM_SUBFIELD_DELIM, achievements_str) }
 			other_achievements_ds = {}
@@ -1722,6 +1722,13 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				end
 			end
 
+			local other_rules = {}
+			if ruleset_code and HCU_decodeRules(ruleset_code) then
+				for _, v in ipairs(HCU_decodeRules(ruleset_code)) do
+					other_rules[v] = 1
+				end
+			end
+
 			local team_l = { string.split(COMM_SUBFIELD_DELIM, team_str) }
 			other_hardcore_character_cache[name] = {
 				first_recorded = creation_time,
@@ -1732,6 +1739,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				team = team_l,
 				last_received = time(),
 				hardcore_player_name = hc_tag,
+				rules = other_rules,
 			}
 			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
 			return
@@ -2297,6 +2305,8 @@ function Hardcore:SendCharacterData(dest)
 			commMessage = commMessage .. _G.pa_id[v] .. COMM_SUBFIELD_DELIM -- Add unknown creation time
 		end
 
+		commMessage = commMessage .. COMM_FIELD_DELIM .. HCU_encodeRules(HardcoreUnlocked_Character.rules)
+
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", dest)
 	end
 end
@@ -2632,7 +2642,7 @@ local options = {
 					max = 100000,
 					get = function()
 						if HardcoreUnlocked_Settings.deathlog_max_entries == nil then
-							HardcoreUnlocked_Settings.deathlog_max_entries = 1000
+							HardcoreUnlocked_Settings.deathlog_max_entries = 0
 						end
 						return HardcoreUnlocked_Settings.deathlog_max_entries
 					end,
@@ -3022,6 +3032,75 @@ local options = {
 		},
 	},
 }
+local f = CreateFrame("frame")
+local function HyperlinkHandler(...)
+	local _, linkType = ...
+	local _, myIdentifier, sender, rules = strsplit(":", linkType)
+
+	if myIdentifier == "myAddonName" then
+		if HCU_decodeRules(rules) == nil then
+			return
+		end
+		-- Do whatever you want.
+		local name, _ = string.split("-", sender)
+		local ruleset = {}
+
+		for _, v in ipairs(HCU_decodeRules(rules)) do
+			ruleset[v] = 1
+		end
+		HCU_showRulesRefFrame(name, ruleset)
+	end
+end
+
+hooksecurefunc(ItemRefTooltip, "SetHyperlink", HyperlinkHandler)
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
+	local rules = string.match(message, "HCU{(.*)}")
+	if rules then
+		message = message:gsub(
+			"HCU{" .. rules .. "}",
+			"|c0000FFFF|Hitem:myAddonName:" .. sender .. ":" .. rules .. "|h[HC Ruleset]|h|r"
+		)
+	end
+	local sixty_name, sixty_class = string.match(message, "(%w+) the (%w+) has reached level 60!")
+	if sixty_name and sixty_class then
+		HCU_showLegendaryFrame(sixty_name, sixty_class)
+	end
+	return false, message, sender, ... -- don't hide this message
+end)
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(frame, event, message, sender, ...)
+	local rules = string.match(message, "HCU{(.*)}")
+	if rules then
+		message = message:gsub(
+			"HCU{" .. rules .. "}",
+			"|c0000FFFF|Hitem:myAddonName:" .. sender .. ":" .. rules .. "|h[HC Ruleset]|h|r"
+		)
+	end
+	return false, message, sender, ... -- don't hide this message
+end)
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(frame, event, message, sender, ...)
+	local rules = string.match(message, "HCU{(.*)}")
+	if rules then
+		message = message:gsub(
+			"HCU{" .. rules .. "}",
+			"|c0000FFFF|Hitem:myAddonName:" .. sender .. ":" .. rules .. "|h[HC Ruleset]|h|r"
+		)
+	end
+	return false, message, sender, ... -- don't hide this message
+end)
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", function(frame, event, message, sender, ...)
+	local rules = string.match(message, "HCU{(.*)}")
+	if rules then
+		message = message:gsub(
+			"HCU{" .. rules .. "}",
+			"|c0000FFFF|Hitem:myAddonName:" .. sender .. ":" .. rules .. "|h[HC Ruleset]|h|r"
+		)
+	end
+	return false, message, sender, ... -- don't hide this message
+end)
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable("Hardcore Unlocked", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Hardcore Unlocked", "Hardcore Unlocked")

@@ -1,10 +1,10 @@
 ## Interface: 11403
-## Title: HardcoreUnlocked 0.0.1
+## Title: HardcoreUnlocked 0.0.1b3
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Yazpad for unlocked modifications
 ## X-License: GNU GPLv3
 ## X-Category: Leveling,Guild
-## Version: HCU0.0.1
+## Version: HCU0.0.1b3
 
 
 ## DefaultState: enabled
@@ -158,4 +158,6 @@ AchievementAlertFrame.lua
 id_to_npc_classic.lua
 npc_to_id_classic.lua
 DeathLog.lua
+RulesRefFrame.lua
+LevelToast.lua
 Hardcore.lua

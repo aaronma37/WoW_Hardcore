@@ -264,14 +264,62 @@ function UpdateCharacterHC(
 		hc_tag_f:SetHeight(60)
 		local hc_tag_string = _hardcore_character.hardcore_player_name
 		hc_tag_f:SetText("HC Tag: " .. hc_tag_string)
-		hc_tag_f:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		hc_tag_f:SetFont("Fonts\\FRIZQT__.TTF", 8, "")
 		character_meta_data_container:AddChild(hc_tag_f)
+	end
+
+	if _hardcore_character.rules ~= nil then
+		local rule_label = AceGUI:Create("HardcoreClassTitleLabel")
+		rule_label:SetRelativeWidth(1.0)
+		rule_label:SetHeight(60)
+		local msg = "\nRuleset\n"
+		local idx = 1
+		msg = msg .. idx .. ". " .. "Death=Delete" .. "\n"
+		for id, _ in pairs(_hardcore_character.rules) do
+			idx = idx + 1
+			msg = msg .. idx .. ". " .. HCU_rules[id].name .. "\n"
+		end
+		rule_label:SetText(msg)
+		rule_label:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+		rule_label.label:SetTextColor(0.5, 0.5, 0.5, 1)
+		character_meta_data_container:AddChild(rule_label)
+
+		local rule_label_link = AceGUI:Create("InteractiveLabel")
+		rule_label_link:SetRelativeWidth(1.0)
+		rule_label_link:SetHeight(60)
+		local msg =
+			"                                       |c0000FFFF|Hitem:myAddonName:value1:value2|h[Ruleset Link]|h|r"
+		rule_label_link:SetText(msg)
+		rule_label_link:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		rule_label_link:SetCallback("OnClick", function()
+			if IsShiftKeyDown() then
+				_G["ChatFrame1EditBox"]:SetText(
+					_G["ChatFrame1EditBox"]:GetText() .. "HCU{" .. HCU_encodeRules(_hardcore_character.rules) .. "}"
+				)
+			else
+				HCU_showRulesRefFrame(_player_name, _hardcore_character.rules)
+			end
+		end)
+		character_meta_data_container:AddChild(rule_label_link)
+
+		if Panel.rulereflink == nil then
+			Panel.rulereflink = CreateFrame("frame")
+			Panel.rulereflink:SetParent(rule_label.frame)
+			Panel.rulereflink:SetSize(80, 40)
+		end
+		Panel.rulereflink:SetPoint("TOP", rule_label.label, "BOTTOM", 0, -10)
+		Panel.rulereflink:Show()
+		Panel.rulereflink:SetScript("OnMouseDown", function()
+			_G["ChatFrame1EditBox"]:SetText(
+				_G["ChatFrame1EditBox"]:GetText() .. "HCU<" .. HCU_encodeRules(_hardcore_character.rules) .. ">"
+			)
+		end)
 	end
 
 	local v_buffer = AceGUI:Create("Label")
 	v_buffer:SetRelativeWidth(1.0)
-	v_buffer:SetHeight(100)
-	v_buffer:SetText("\n\n\n\n\n")
+	v_buffer:SetHeight(25)
+	v_buffer:SetText("\n")
 	frame_to_update:AddChild(v_buffer)
 
 	local achievements_container = AceGUI:Create("SimpleGroup")
