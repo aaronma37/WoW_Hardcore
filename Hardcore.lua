@@ -124,6 +124,7 @@ local speedrun_levels = {
 }
 local last_received_xguild_chat = ""
 local debug = false
+local player_logged_out = false
 local dc_recovery_info = nil
 local received_recover_time_ack = nil
 local expecting_achievement_appeal = false
@@ -1079,6 +1080,11 @@ function Hardcore:PLAYER_LOGIN()
 end
 
 function Hardcore:PLAYER_LOGOUT()
+
+	-- Stop further updates to the played time and tracked time, don't want them
+	-- changing after the checksum is stored
+	player_logged_out = true
+
 	-- Calculate the data file checksum
 	Hardcore_StoreChecksum()
 
@@ -1646,6 +1652,10 @@ local function initiateRecoverTime(duration_since_last_recording)
 end
 
 function Hardcore:TIME_PLAYED_MSG(...)
+
+	-- Don't update anymore after the data security checksum has been calculated
+	if player_logged_out == true then return end
+
 	local totalTimePlayed, _ = ...
 	Hardcore_Character.time_played = totalTimePlayed or 1
 	-- Check playtime gap percentage
@@ -3356,6 +3366,7 @@ function Hardcore:InitiatePulsePlayed()
 
 	--time accumulator
 	C_Timer.NewTicker(TIME_TRACK_PULSE, function()
+		if player_logged_out == true then return end
 		Hardcore_Character.time_tracked = Hardcore_Character.time_tracked + TIME_TRACK_PULSE
 		if RECEIVED_FIRST_PLAYED_TIME_MSG == true then
 			Hardcore_Character.accumulated_time_diff = Hardcore_Character.time_played - Hardcore_Character.time_tracked
