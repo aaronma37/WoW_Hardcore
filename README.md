@@ -26,13 +26,13 @@ A modification of the Hardcore addon which allows for custom (or no) rulesets.  
 Officers: Copy achievement code specified by `officer code` in the main menu in the guild information.  Players with this addon will automatically be assigned the matching ruleset.
 
 ### Inspect Ruleset
-Inspect to see a characters ruleset [ruleset](git_images/inspecthcu.png)
+Inspect to see a characters ruleset ![ruleset](git_images/inspecthcu.png)
 
 ### Link Ruleset
-Clicking a ruleset hyperlink shows [ruleset](git_images/itemrefhcu.png)
+Clicking a ruleset hyperlink shows ![ruleset](git_images/itemrefhcu.png)
 
 ### Level 60 toast
-New level 60s in the guild will now alert with [ruleset](git_images/level60toast.png)
+New level 60s in the guild will now alert with ![ruleset](git_images/level60toast.png)
 
 ### Removed Verification Components
 Rules in this addon function as guiderails and there is no "Failure" that can be appealed.  For example, the `No Auction House` rule will close the auction house if you attempt to open interact with the auctioneer, as opposed to applying a `failed` status to your character.  Security related warning text, verification tab, and verification status via inspection have been removed.  Since this is a self-imposed challenge, this addon makes no effort to detect cheating. Instead it provides a framework for communities to use rulesets (if they want), and aims to optimize for performance and user experience.
