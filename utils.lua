@@ -255,7 +255,7 @@ function Hardcore_CalcRequiredBits(data)
 		s1 = (s1 + string.byte(string.sub(data,i,i))) % 255;
 		s2 = (s2 + s1) % 255;
 	end
-	return bit.bor(bit.lshift(s2,8), 1)
+	return bit.bor(bit.lshift(s2,8), s1)
 end
 
 function Hardcore_CalculateResolutionChange()
@@ -278,7 +278,7 @@ function Hardcore_ReadjustTimeResolutions()
 		Hardcore_Character.tracked_played_percentage = Hardcore_RecalculateTrackedPercentage()
 		Hardcore_Character.last_segment_start_time = Hardcore_Character.last_segment_start_time * 10 + _h
 		Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time * 10 + (9-_h)
-		Hardcore_Character.last_segment_time_res = nil
+		Hardcore_Character.last_segment_time_res = 10
 	end
 end
 
@@ -287,17 +287,21 @@ function Hardcore_AdjustTimeResolutions()
 		local i = 0
 		local k = 0
 		_h = 0
-		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time > GetServerTime()) then
+		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time >= 9999999999) then
 			-- Undo time resolution increase
 			_h = Hardcore_Character.last_segment_start_time % 10
 			Hardcore_Character.last_segment_start_time = Hardcore_Character.last_segment_start_time / 10
 			i = i + 1
 		end
-		if (Hardcore_Character.last_segment_end_time ~= nil and Hardcore_Character.last_segment_end_time > GetServerTime()) then
+		if (Hardcore_Character.last_segment_end_time ~= nil and Hardcore_Character.last_segment_end_time >= 9999999999) then
 			-- Undo time resolution increase
 			k = Hardcore_Character.last_segment_end_time % 10
 			Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time / 10
 			i = i + 1
+		end
+		if Hardcore_Character.last_segment_time_res == nil then
+			Hardcore_Character.last_segment_time_res = 1
+			return
 		end
 		if i == 0 then return end
 
