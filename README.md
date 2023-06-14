@@ -37,6 +37,10 @@ New level 60s in the guild will now alert with ![ruleset](git_images/level60toas
 ### Removed Verification Components
 Rules in this addon function as guiderails and there is no "Failure" that can be appealed.  For example, the `No Auction House` rule will close the auction house if you attempt to open interact with the auctioneer, as opposed to applying a `failed` status to your character.  Security related warning text, verification tab, and verification status via inspection have been removed.  Since this is a self-imposed challenge, this addon makes no effort to detect cheating. Instead it provides a framework for communities to use rulesets (if they want), and aims to optimize for performance and user experience.
 
+## Instructions
+### Import from the Hardcore Addon
+You can import character information from the Hardcore addon to HardcoreUnlocked (but not the other way around).  In order to do this, you need to have both addons running at the same time.  Upon login you should see a message saying that both addon version are detected.  You can type `/hcu ImportFromHCU` in order to import your character data.  Upon entering that command, you should see a messaage saying that the import was successful.  If you see a message saying that the Hardcore Addon was not detected, make sure that both addons are running.  **NOTE** Make sure to turn off the Hardcore addon after importing.
+
 ## Contributions
 
 Please reachout to Yazpad (discord: lakai.#2409) to request additional rules/features/suggestions.  Feel free to copy or distribute (GNU GPLv3).  Feel free to make pull requests on github.
