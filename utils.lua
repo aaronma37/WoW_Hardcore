@@ -287,6 +287,10 @@ function Hardcore_AdjustTimeResolutions()
 		local i = 0
 		local k = 0
 		_h = 0
+		if Hardcore_Character.last_segment_time_res == nil then
+			Hardcore_Character.last_segment_time_res = 1
+			return
+		end
 		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time >= 9999999999) then
 			-- Undo time resolution increase
 			_h = Hardcore_Character.last_segment_start_time % 10
@@ -298,10 +302,6 @@ function Hardcore_AdjustTimeResolutions()
 			k = Hardcore_Character.last_segment_end_time % 10
 			Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time / 10
 			i = i + 1
-		end
-		if Hardcore_Character.last_segment_time_res == nil then
-			Hardcore_Character.last_segment_time_res = 1
-			return
 		end
 		if i == 0 then return end
 
