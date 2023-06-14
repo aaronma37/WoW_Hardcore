@@ -336,8 +336,6 @@ Hardcore_Alert_Frame:SetScale(0.7)
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
 Hardcore.ALERT_STYLES = ALERT_STYLES
 
-Hardcore_Frame:ApplyBackdrop()
-
 function FailureFunction(achievement_name)
 	local max_level = 60
 	if
@@ -425,14 +423,9 @@ local function SlashHandler(msg, editbox)
 	elseif cmd == "alllevels" then
 		Hardcore:Levels(true)
 	elseif cmd == "show" then
-		if HardcoreUnlocked_Settings.use_alternative_menu then
-			Hardcore_Frame:Show()
-		else
-			ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
-		end
+		ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
 	elseif cmd == "hide" then
 		-- they can click the hide button, dont really need a command for this
-		Hardcore_Frame:Hide()
 	elseif cmd == "debug" then
 		debug = not debug
 		Hardcore:Print("Debugging set to " .. tostring(debug))
@@ -631,6 +624,43 @@ local function SlashHandler(msg, editbox)
 		end
 	elseif cmd == "AppealDungeonCode" then
 		-- DungeonTrackerHandleAppealCode(args)
+	elseif cmd == "ImportFromHC" then
+		if Hardcore_Character then
+			local current_passive_achievements = {}
+			for _, v in ipairs(HardcoreUnlocked_Character.passive_achievements) do
+				current_passive_achievements[v] = 1
+			end
+			if Hardcore_Character.passive_achievements then
+				for _, v in ipairs(Hardcore_Character.passive_achievements) do
+					if current_passive_achievements[v] == nil then
+						table.insert(HardcoreUnlocked_Character.passive_achievements, v)
+					end
+				end
+			end
+
+			local current_achievements = {}
+			for _, v in ipairs(HardcoreUnlocked_Character.achievements) do
+				current_achievements[v] = 1
+			end
+			if Hardcore_Character.achievements then
+				for _, v in ipairs(Hardcore_Character.achievements) do
+					if current_achievements[v] == nil then
+						table.insert(HardcoreUnlocked_Character.achievements, v)
+					end
+				end
+			end
+
+			if HardcoreUnlocked_Character.first_recorded == nil or HardcoreUnlocked_Character.first_recorded == -1 then
+				if Hardcore_Character.first_recorded then
+					HardcoreUnlocked_Character.first_recorded = Hardcore_Character.first_recorded
+				end
+			end
+			Hardcore:Print("Import complete. Make sure to turn off the Hardcore addon and reload.")
+		else
+			Hardcore:Print(
+				"Did not detect the Hardcore Addon.  The Hardcore addon needs to be running if you want to import character data. Once character data is imported, you should turn off the Hardcore addon."
+			)
+		end
 	elseif cmd == "AppealPassiveAchievementCode" then
 		local code = nil
 		local ach_num = nil
@@ -810,8 +840,8 @@ local function SlashHandler(msg, editbox)
 	end
 end
 
-SLASH_HARDCORE1, SLASH_HARDCORE2 = "/hardcore", "/hc"
-SlashCmdList["HARDCORE"] = SlashHandler
+SLASH_HARDCOREUNLOCKED1, SLASH_HARDCOREUNLOCKED2, SLASH_HARDCOREUNLOCKED3 = "/hardcore", "/hc", "/hcu"
+SlashCmdList["HARDCOREUNLOCKED"] = SlashHandler
 
 local saved_variable_meta = {
 	{ key = "guid", initial_data = UnitGUID("player") },
@@ -1257,9 +1287,6 @@ function Hardcore:INSPECT_READY(...)
 end
 
 function Hardcore:PLAYER_ENTERING_WORLD()
-	Hardcore_Frame:RegisterForDrag("LeftButton")
-	Hardcore_Alerts_Button:SetText(HardcoreUnlocked_Settings.notify and "Disable alerts" or "Enable alerts")
-
 	-- cache player name
 	PLAYER_NAME, _ = UnitName("player")
 	Hardcore:Monitor("Monitoring malicious users enabled.")
@@ -1269,6 +1296,11 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 		C_ChatInfo.RegisterAddonMessagePrefix(COMM_NAME)
 	end
 
+	if Hardcore_Character ~= nil then
+		Hardcore:Print(
+			"Detected that both Hardcore and Hardcore Unlocked are being run. If you are trying to import Hardcore character data to Hardcore Unlocked, use the command /hcu ImportFromHC"
+		)
+	end
 	C_Timer.After(1.0, function()
 		deathlogApplySettings(HardcoreUnlocked_Settings)
 	end)
@@ -2127,9 +2159,6 @@ function Hardcore:SwitchDisplay(displayparam)
 	if displayparam ~= nil then
 		display = displayparam
 	end
-
-	-- refresh the page
-	Hardcore_Frame_OnShow()
 end
 
 function Hardcore_SortByLevel(pipe1, pipe2)
@@ -2139,7 +2168,6 @@ end
 -- Toggles death alerts on or off.
 function Hardcore_Toggle_Alerts()
 	HardcoreUnlocked_Settings.notify = not HardcoreUnlocked_Settings.notify
-	Hardcore_Alerts_Button:SetText(HardcoreUnlocked_Settings.notify and "Disable alerts" or "Enable alerts")
 end
 
 ----------------------------------------------------------------------
@@ -2170,32 +2198,23 @@ function Hardcore:initMinimapButton()
 				return
 			end
 
-			-- No modifier key toggles the options panel
-			if HardcoreUnlocked_Settings.use_alternative_menu then
-				if Hardcore_Frame:IsShown() then
-					Hardcore_Frame:Hide()
-				else
-					Hardcore_Frame:Show()
-				end
+			if hardcore_modern_menu == nil then
+				ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
 			else
-				if hardcore_modern_menu == nil then
-					ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
+				if hardcore_modern_menu:IsShown() then
+					hardcore_modern_menu:Hide() -- destructs
+					hardcore_modern_menu = nil
 				else
-					if hardcore_modern_menu:IsShown() then
-						hardcore_modern_menu:Hide() -- destructs
-						hardcore_modern_menu = nil
-					else
-						ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
-					end
+					ShowMainMenu(HardcoreUnlocked_Character, HardcoreUnlocked_Settings, Hardcore.DKConvert)
 				end
 			end
 		end
 	end
 
 	-- Create minimap button using LibDBIcon
-	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("Hardcore", {
+	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("HardcoreUnlocked", {
 		type = "data source",
-		text = "Hardcore",
+		text = "HardcoreUnlocked",
 		icon = "Interface\\AddOns\\HardcoreUnlocked\\Media\\logo-emblem.blp",
 		OnClick = function(self, btn)
 			MiniBtnClickFunc(btn)
@@ -2211,7 +2230,7 @@ function Hardcore:initMinimapButton()
 	})
 
 	icon = LibStub("LibDBIcon-1.0", true)
-	icon:Register("Hardcore", miniButton, HardcoreUnlocked_Settings)
+	icon:Register("HardcoreUnlocked", miniButton, HardcoreUnlocked_Settings)
 
 	-- -- Function to toggle LibDBIcon
 	-- function SetLibDBIconFunc()
@@ -2225,7 +2244,7 @@ function Hardcore:initMinimapButton()
 	-- end
 
 	if HardcoreUnlocked_Settings["hide"] == false then
-		icon:Show("Hardcore")
+		icon:Show("HardcoreUnlocked")
 	end
 
 	-- -- Set LibDBIcon when option is clicked and on startup
@@ -2313,10 +2332,6 @@ end
 
 function Hardcore:InitiatePulseCheck()
 	C_Timer.NewTicker(COMM_PULSE_CHECK_FREQUENCY, function()
-		if Hardcore_Frame:IsShown() and display == "AddonStatus" then
-			Hardcore:FetchGuildRoster()
-		end
-
 		-- Hardcore:Debug('Checking pulses now')
 		online_pulsing = {}
 
