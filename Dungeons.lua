@@ -498,7 +498,7 @@ local function DungeonTrackerWarnInfraction()
 	local chat_color = "\124cffFF0000"
 
 	-- We only warn if there is still chance to get out in time
-	local time_left = DT_INSIDE_MAX_TIME - Hardcore_Character.dt.current.time_inside
+	local time_left = DT_INSIDE_MAX_TIME_NO_KILLS - Hardcore_Character.dt.current.time_inside
 	if time_left <= 0 then
 		return
 	end
