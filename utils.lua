@@ -278,7 +278,8 @@ function Hardcore_ReadjustTimeResolutions()
 		Hardcore_Character.tracked_played_percentage = Hardcore_RecalculateTrackedPercentage()
 		Hardcore_Character.last_segment_start_time = Hardcore_Character.last_segment_start_time * 10 + _h
 		Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time * 10 + (9-_h)
-		Hardcore_Character.last_segment_time_res = 10
+		Hardcore_Character.last_segment_time_res = nil			-- Fix bad habit of shortening variable names
+		Hardcore_Character.last_segment_time_resolution = 10
 	end
 end
 
@@ -287,8 +288,8 @@ function Hardcore_AdjustTimeResolutions()
 		local i = 0
 		local k = 0
 		_h = 0
-		if Hardcore_Character.last_segment_time_res == nil then
-			Hardcore_Character.last_segment_time_res = 1
+		if Hardcore_Character.last_segment_time_resolution == nil or Hardcore_Character.tracked_played_percentage == 0 then
+			Hardcore_Character.last_segment_time_resolution = 1			-- Fix bad habit of shortening variable names
 			return
 		end
 		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time >= 9999999999) then
@@ -309,6 +310,6 @@ function Hardcore_AdjustTimeResolutions()
 		if (math.abs(new_tracked - Hardcore_Character.tracked_played_percentage) > 1e-8)  or (_h ~= (9-k)) then
 			if _h < 9 then _h = _h + 1 end
 		end
-		Hardcore_Character.last_segment_time_res = _h
+		Hardcore_Character.last_segment_time_resolution = _h
 	end
 end
