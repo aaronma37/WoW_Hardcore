@@ -169,6 +169,7 @@ hooksecurefunc(CharacterFrame, "Hide", function(self, button)
 end)
 
 function extractDetails(str, ignoreKeys)
+	if str == nil then return {} end
 	str = str:gsub("^%s*%((.+)%)%s*$", "%1")
 	local details_table = {}
 	for key, value in str:gmatch("(%S+)=(%S+)") do
