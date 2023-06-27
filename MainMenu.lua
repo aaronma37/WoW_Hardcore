@@ -310,7 +310,7 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
-	CreateHeadingLabel("11.39b1", scroll_frame)
+	CreateHeadingLabel("11.39b2", scroll_frame)
 	CreateDescriptionLabel("- Asian client support for death alerts, death logs and levels\n- Dungeon tracker improvements\n- Achievement bugfixes\n- File handling upgrades", scroll_frame)
 
 	CreateHeadingLabel("11.31", scroll_frame)
