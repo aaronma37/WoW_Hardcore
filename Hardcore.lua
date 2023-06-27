@@ -3055,7 +3055,7 @@ function Hardcore:GenerateVerificationStatusStrings()
 	local numAppeals = Hardcore_Character.appeals and #Hardcore_Character.appeals or 0
 	local numRealDeaths = Hardcore_Character.deaths and #Hardcore_Character.deaths or 0
 
-	local perc = string.format("tracked_time=%.1f%%", Hardcore_Character.tracked_played_percentage)
+	local perc = string.format("tracked_time=%.1f%%", math.floor(Hardcore_Character.tracked_played_percentage * 10)/10)
 	local numTrades = #Hardcore_Character.trade_partners
 	local numBubs = #Hardcore_Character.bubble_hearth_incidents
 	local numRepRuns = Hardcore_Character.dt.repeated_runs
