@@ -74,7 +74,6 @@ Hardcore_Settings = {
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
 	reload_reminder_interval = 0,
-	reload_reminder_show = true
 }
 
 WARNING = ""
@@ -574,8 +573,6 @@ local settings_saved_variable_meta = {
 	["use_alternative_menu"] = false,
 	["ignore_xguild_chat"] = false,
 	["ignore_xguild_alerts"] = false,
-	["reload_reminder_interval"] = 0,
-	["reload_reminder_show"] = true,
 }
 
 --[[ Post-utility functions]]
@@ -4023,7 +4020,7 @@ local options = {
 				reload_reminder_interval = {
 					type = "input",
 					name = "Reminder interval",
-					desc = "Reload reminder interval (in minutes, 0 = automatic)",
+					desc = "Reload reminder interval (in minutes, 0 = automatic, minimum = 5m)",
 					get = function()
 						if Hardcore_Settings.reload_reminder_interval then
 							return "" .. Hardcore_Settings.reload_reminder_interval

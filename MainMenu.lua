@@ -614,6 +614,8 @@ end
 
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
+	local string_format_new = false
+	local first_menu_description
 	local function GenerateVerificationString()
 		local version = GetAddOnMetadata("Hardcore", "Version")
 		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
@@ -648,11 +650,26 @@ local function DrawVerifyTab(container, _hardcore_character)
 		local bubbleHearthIncidentsVerificationString =
 			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
 		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
-		return Hardcore_join({
-			baseVerificationString,
-			bubbleHearthIncidentsVerificationString,
-			playedtimeGapsVerificationString,
-		}, ATTRIBUTE_SEPARATOR)
+		if string_format_new == false then
+			return Hardcore_join({
+				baseVerificationString,
+				bubbleHearthIncidentsVerificationString,
+				playedtimeGapsVerificationString,
+			}, ATTRIBUTE_SEPARATOR)
+		else
+			local d1, d2 = DungeonTrackerGetVerificationData()
+			return Hardcore_join({
+				baseVerificationString,
+				bubbleHearthIncidentsVerificationString,
+				playedtimeGapsVerificationString,
+				Hardcore_stringOrNumberToUnicode(d1),
+				Hardcore_stringOrNumberToUnicode(d2),
+				Hardcore_stringOrNumberToUnicode(""),					-- Future expansion for dungeon data
+				Hardcore_stringOrNumberToUnicode(Hardcore_GetSecurityStatus()),
+				Hardcore_stringOrNumberToUnicode(Hardcore_Character.last_segment_time_resolution),		-- Probably don't need this here
+				Hardcore_stringOrNumberToUnicode("")					-- Future expansion for other data
+			}, ATTRIBUTE_SEPARATOR)
+		end
 	end
 
 	local version = GetAddOnMetadata("Hardcore", "Version")
@@ -685,7 +702,6 @@ local function DrawVerifyTab(container, _hardcore_character)
 		max_level = 80
 	end
 
-
 	local first_menu_description_title = AceGUI:Create("Label")
 	first_menu_description_title:SetWidth(500)
 	first_menu_description_title:SetText("Verify Your Character - " .. version)
@@ -716,12 +732,26 @@ local function DrawVerifyTab(container, _hardcore_character)
 		extra_lines = "\n\n\n"
 	else
 		local general_rules_description = AceGUI:Create("Label")
-		general_rules_description:SetWidth(_menu_width)
-		general_rules_description:SetText("\n\nTo get verified, copy the string below and visit the classichc website.")
+		general_rules_description:SetWidth(600)
+		general_rules_description:SetText("\nTo get verified, copy the string below and visit the classichc website.")
 		general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		scroll_frame:AddChild(general_rules_description)
 
-		local first_menu_description = AceGUI:Create("MultiLineEditBox")
+		local switch_format_button = AceGUI:Create("Button")
+		switch_format_button:SetText("Use new format")
+		switch_format_button:SetWidth(130)
+		scroll_frame:AddChild(switch_format_button)
+		switch_format_button:SetCallback("OnClick", function()
+			if string_format_new == false then
+				switch_format_button:SetText("Use old format")
+			else
+				switch_format_button:SetText("Use new format")
+			end
+			string_format_new = not string_format_new
+			first_menu_description:SetText(GenerateVerificationString())
+		end)
+
+		first_menu_description = AceGUI:Create("MultiLineEditBox")
 		first_menu_description.button:Hide()
 		first_menu_description:SetMaxLetters(0)
 		first_menu_description:SetHeight(850)
@@ -742,7 +772,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 	local character_status_label = AceGUI:Create("Label")
 	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
-	local text = statusString1 .. "\n" .. statusString2
+	local text = "\n" .. statusString1 .. "\n" .. statusString2
 	character_status_label:SetText(text)
 	character_status_label:SetWidth(700)
 	character_status_label:SetFontObject(GameFontHighlightMedium)

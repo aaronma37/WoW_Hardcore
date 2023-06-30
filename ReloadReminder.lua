@@ -20,7 +20,7 @@ local rr_set_interval = 0               -- 0 indicates automatic
 
 -- Definitions
 local RR_TIME_STEP = 1                  -- How often our timer is called
-local RR_WARN_SUPPRESS = 60             -- How long to wait before another warning is output, to prevent spamming the user
+local RR_WARN_SUPPRESS = 300            -- How long to wait before another warning is output, to prevent spamming the user
 local RR_LOST_VS_AUTO_INTERVAL = {
     { 3600, 3600 },         -- With less than 1 hour of lost time, warn every hour
     { 7200, 2700 },         -- With 1-2 hours of lost time, warn every 45m
