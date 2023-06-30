@@ -311,16 +311,16 @@ function ReloadReminderInitiate()
     rr_last_reload = now
     rr_last_warning = now
 
-    -- Copy over the global setting
-    if _G.Hardcore_Settings ~= nil and _G.Hardcore_Settings.reload_reminder_show ~= nil then
+    -- Copy over the global setting, or initialise them if they are not set
+    if _G.Hardcore_Settings ~= nil then
+        if _G.Hardcore_Settings.reload_reminder_show == nil then
+            _G.Hardcore_Settings.reload_reminder_show = true
+        end
+        if _G.Hardcore_Settings.reload_reminder_interval == nil then
+            _G.Hardcore_Settings.reload_reminder_interval = 0
+        end
         ReloadReminderEnableWarning( _G.Hardcore_Settings.reload_reminder_show )
-    else
-        ReloadReminderEnableWarning( true )
-    end
-    if _G.Hardcore_Settings ~= nil and _G.Hardcore_Settings.reload_reminder_interval ~= nil then
         ReloadReminderSetInterval( _G.Hardcore_Settings.reload_reminder_interval )
-    else
-        ReloadReminderSetInterval( 0 )
     end
 
     -- Start our timer
