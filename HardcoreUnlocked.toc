@@ -1,10 +1,10 @@
-## Interface: 11403
-## Title: HardcoreUnlocked 0.0.1b4
+## Interface: 11404
+## Title: HardcoreUnlocked 0.1.0
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Yazpad for unlocked modifications
 ## X-License: GNU GPLv3
 ## X-Category: Leveling,Guild
-## Version: HCU0.0.1b4
+## Version: HCU0.1.0
 
 
 ## DefaultState: enabled
