@@ -5,8 +5,8 @@ A modification of the Hardcore addon which allows for custom (or no) rulesets.  
 - 0.0.1b1 Removed verification features, allow for custom rulesets, guild mandated rulesets
 - 0.0.1b2 Strip down databases.  They are currently very large and we now have the data to get what we need with 10% of the dbs
 - 0.0.1b3 Share hyperlink rulesets; rulesets in character inspect
-- 0.0.1  Add minimalism mode: turns off achievement tracking, deathlog recording (alerts will still work); Chat hyperlinks for rulesets
-- 0.0.1+ Bug fixes for current acheivements.  Updated UI and customizations. Some additional fonts. Max level toast alert (guild and faction-wide), rulesets integrated into deathlog, rulesets integrated into character history, data recovery via screenshots
+- 0.0.1 Official server release (1.14.4)
+- 0.0.1+ Bug fixes for current acheivements.  Updated UI and customizations. Some additional fonts. Max level toast alert (guild and faction-wide), rulesets integrated into deathlog, rulesets integrated into character history, data recovery via screenshots.Add minimalism mode: turns off achievement tracking, deathlog recording (alerts will still work); Chat hyperlinks for rulesets
 
 ## Motivation and Demographic
 - Enable players who do not want to follow the Solo-Self Found ruleset, to enjoy the Hardcore Addon features (Achievements, Death Alerts, Death log)
