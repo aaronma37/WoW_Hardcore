@@ -1074,6 +1074,9 @@ function Hardcore:PLAYER_LOGIN()
 			"Your character has a recorded name change.  Contact a mod or technician in #addon-appeal for approval to continue or disk your HC status."
 		)
 	end
+
+	-- Store some basic info that helps interpretation of the data file
+	Hardcore_StoreCharacterInfo()
 end
 
 function Hardcore:PLAYER_LOGOUT()
@@ -1565,6 +1568,9 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 		SendChatMessage(messageString, "GUILD", nil, nil)
 		startXGuildChatMsgRelay(messageString)
 	end
+
+	-- Update the character's statistics
+	Hardcore_StoreCharacterInfo( level )
 end
 
 local function initiateRecoverTime(duration_since_last_recording)
