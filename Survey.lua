@@ -89,6 +89,8 @@ function SurveyReceiveRequest(data, sender)
     else
         if variable == "guid" then
             value_to_send = "(secret)"
+        elseif variable == "money" then
+            value_to_send = GetMoney()
         else
             value_to_send = Hardcore_Character[ variable ]
         end
