@@ -152,20 +152,37 @@ function Hardcore_VerifyChecksum()
 end
 
 -- Store the relevant verification data to the Hardcore_Character
-function Hardcore_StoreCharacterInfo()
+-- This should not be called too soon after login, because then some variables aren't ready yet
+function Hardcore_StoreCharacterInfo( level )
 
 	if Hardcore_Character.char_info == nil then
 		Hardcore_Character.char_info = {}
 	end
 
-	Hardcore_Character.char_info.version = GetAddOnMetadata("Hardcore", "Version")
-	Hardcore_Character.char_info.realm = GetRealmName()
-	Hardcore_Character.char_info.level = UnitLevel("player")
-
-	local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	-- Check if we aren't running this too soon after 
+	local class, race, name, realm
+	local guid = UnitGUID("player")
+	if guid ~= nil then
+		_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	end
+	realm = GetRealmName()
+	if guid == nil or class == nil or race == nil or name == nil or realm == nil then
+		--Hardcore:Print( "GUID / name / race / realm = nil, postponing by one second")
+		C_Timer.After(1, function()
+			Hardcore_StoreCharacterInfo( level )
+		end)
+		return
+	end
 	Hardcore_Character.char_info.race = race
 	Hardcore_Character.char_info.class = class
 	Hardcore_Character.char_info.name = name
+	Hardcore_Character.char_info.realm = realm
+	Hardcore_Character.char_info.version = GetAddOnMetadata("Hardcore", "Version")
+	if level == nil then
+		Hardcore_Character.char_info.level = UnitLevel("player")
+	else
+		Hardcore_Character.char_info.level = level
+	end
 
 	-- Calculate the checksum, mix in the GUID to prevent copying this in from someone else
 	local _ci = Hardcore_Character.char_info
