@@ -78,19 +78,13 @@ function SurveyReceiveRequest(data, sender)
 
     -- Look up the variable
     local value_to_send
-    if string.sub( variable, 1, 1 ) == "#" then
-        variable = string.sub( variable, 2)
+    if variable == "guid" then
+        value_to_send = "(secret)"
+    elseif variable == "money" then
+        value_to_send = GetMoney()
+    else
         if type( Hardcore_Character[ variable ] ) == "table" then
             value_to_send = #Hardcore_Character[ variable ]
-        else
-            Hardcore:Debug( "Received a survey request for a variable " .. variable .. " that is not a table, but a " .. type( Hardcore_Character[ variable ] ) )
-            return
-        end
-    else
-        if variable == "guid" then
-            value_to_send = "(secret)"
-        elseif variable == "money" then
-            value_to_send = GetMoney()
         else
             value_to_send = Hardcore_Character[ variable ]
         end
@@ -156,11 +150,11 @@ function SurveyReceiveResponse(data, sender)
 
     -- Make sure this one didn't already pass the deadline (would need one reply out of time to have this flag, or flag could be set manually)
     if Hardcore_Settings.surveys[ survey_id ].closed ~= nil and Hardcore_Settings.surveys[ survey_id ].closed == true then
-        Hardcore:Debug( "Received a survey response for a closed survey ID: " .. survey_id )
+        Hardcore:Debug( "Received a survey response from " .. sender .. " for a closed survey ID: " .. survey_id )
         return
     end
     if Hardcore_Settings.surveys[ survey_id ].end_time < GetServerTime() then
-        Hardcore:Debug( "Received a survey response for a timed-out survey ID: " .. survey_id )
+        Hardcore:Debug( "Received a survey response from " .. sender .. " for a timed-out survey ID: " .. survey_id )
         Hardcore_Settings.surveys[ survey_id ].closed = true
         return
     end
@@ -172,7 +166,7 @@ function SurveyReceiveResponse(data, sender)
         RESPONSE.tag = hctag
         RESPONSE.value = value
         table.insert( Hardcore_Settings.surveys[ survey_id ].replies, RESPONSE )
-        Hardcore:Print( "Stored survey response from " .. sender )
+        Hardcore:Print( "Stored survey response from " .. sender .. ", value = " .. value )
     end
 
 end
@@ -205,6 +199,12 @@ function SurveyHandleCommand( args )
 			var = substring
 		end
 	end
+    if max_wait == "reset" then
+		Hardcore:Print("All survey data reset from settings file")
+        Hardcore_Settings.surveys = nil
+        return
+    end
+
 	if max_wait == nil or tonumber( max_wait ) == nil then
 		Hardcore:Print("Wrong syntax: Missing or ill-formed <number> argument")
 		Hardcore:Print(usage)
@@ -218,7 +218,7 @@ function SurveyHandleCommand( args )
 
     -- Make sure that the max_wait time isn't too low (would spam the GM)
     local _, num_online = GetNumGuildMembers()
-    if max_wait < num_online then
+    if tonumber(max_wait) < num_online then
         max_wait = num_online
         Hardcore:Print( "Adjusted the maximum wait time for your survey to " .. max_wait )
     end
@@ -242,7 +242,7 @@ function SurveyHandleCommand( args )
     -- Compile the request and send it
     local comm_msg = SURVEY_REQ_CMD .. COMM_COMMAND_DELIM .. SURVEY.request
     CTL:SendAddonMessage("NORMAL", COMM_NAME, comm_msg, "GUILD")
-    Hardcore:Print( "Sent out survey command: " .. comm_msg )
+    Hardcore:Print( "Sent out survey command: " .. SURVEY_REQ_CMD .. "$" .. SURVEY.id .. "/" .. max_wait .. "/" .. var )
 
 end
 
