@@ -1082,6 +1082,9 @@ function Hardcore:PLAYER_LOGOUT()
 	-- changing after the checksum is stored
 	player_logged_out = true
 
+	-- Store some basic info that helps interpretation of the data file
+	Hardcore_StoreCharacterInfo()
+
 	-- Calculate the data file checksum
 	Hardcore_StoreChecksum()
 

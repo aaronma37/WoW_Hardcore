@@ -150,3 +150,27 @@ function Hardcore_VerifyChecksum()
 		end
 	end
 end
+
+-- Store the relevant verification data to the Hardcore_Character
+function Hardcore_StoreCharacterInfo()
+
+	if Hardcore_Character.char_info == nil then
+		Hardcore_Character.char_info = {}
+	end
+
+	Hardcore_Character.char_info.version = GetAddOnMetadata("Hardcore", "Version")
+	Hardcore_Character.char_info.realm = GetRealmName()
+	Hardcore_Character.char_info.level = UnitLevel("player")
+
+	local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	Hardcore_Character.char_info.race = race
+	Hardcore_Character.char_info.class = class
+	Hardcore_Character.char_info.name = name
+
+	-- Calculate the checksum, mix in the GUID to prevent copying this in from someone else
+	local _ci = Hardcore_Character.char_info
+	local data = _ci.version .. _ci.realm .. _ci.level .. _ci.race .. _ci.class .. _ci.name .. UnitGUID("player")
+	Hardcore_Character.char_info.checksum = Hardcore_Checksum(data)
+
+end
+
