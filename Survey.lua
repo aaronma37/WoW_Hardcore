@@ -78,17 +78,13 @@ function SurveyReceiveRequest(data, sender)
 
     -- Look up the variable
     local value_to_send
-    if string.sub( variable, 1, 1 ) == "#" then
-        variable = string.sub( variable, 2)
+    if variable == "guid" then
+        value_to_send = "(secret)"
+    elseif variable == "money" then
+        value_to_send = GetMoney()
+    else
         if type( Hardcore_Character[ variable ] ) == "table" then
             value_to_send = #Hardcore_Character[ variable ]
-        else
-            Hardcore:Debug( "Received a survey request for a variable " .. variable .. " that is not a table, but a " .. type( Hardcore_Character[ variable ] ) )
-            return
-        end
-    else
-        if variable == "guid" then
-            value_to_send = "(secret)"
         else
             value_to_send = Hardcore_Character[ variable ]
         end
@@ -123,18 +119,18 @@ end
 
 function SurveyReceiveResponse(data, sender)
 
+    -- Foolproofing
+    if Hardcore_Settings.surveys == nil then
+        Hardcore:Debug( "Received a survey response, but you have not sent one out" )
+        return
+    end
+
     -- Check if you are the GM
     if guild_master == "" then
         guild_master = SurveyDetermineGuildMaster()
     end
     if SurveyGetLongName() ~= guild_master then
-        Hardcore:Print( "Received a survey response, but you are not the GM; " .. guild_master .. " is, and you are " .. SurveyGetLongName())
-        return
-    end
-
-    -- Foolproofing
-    if Hardcore_Settings.surveys == nil then
-        Hardcore:Print( "Received a survey response, but you have not even sent one out" )
+        Hardcore:Debug( "Received a survey response, but you are not the GM; " .. guild_master .. " is, and you are " .. SurveyGetLongName())
         return
     end
 
@@ -143,23 +139,34 @@ function SurveyReceiveResponse(data, sender)
 
 	-- Handle malformed requests
 	if id == nil or hctag == nil or value == nil then
-        Hardcore:Print("Received a malformed survey response from " .. sender )
+        Hardcore:Debug("Received a malformed survey response from " .. sender )
 		return
 	end
     local survey_id = tonumber( id )
-    if (survey_id < 0) or (survey_id > #Hardcore_Settings.surveys) or (Hardcore_Settings.surveys[ survey_id ] == nil) then
-        Hardcore:Print( "Received a survey response for an unknown survey ID: " .. survey_id )
+    if (survey_id <= 0) or (survey_id > #Hardcore_Settings.surveys) or (Hardcore_Settings.surveys[ survey_id ] == nil) then
+        Hardcore:Debug( "Received a survey response for an unknown survey ID: " .. survey_id )
+        return
+    end
+
+    -- Make sure this one didn't already pass the deadline (would need one reply out of time to have this flag, or flag could be set manually)
+    if Hardcore_Settings.surveys[ survey_id ].closed ~= nil and Hardcore_Settings.surveys[ survey_id ].closed == true then
+        Hardcore:Debug( "Received a survey response from " .. sender .. " for a closed survey ID: " .. survey_id )
+        return
+    end
+    if Hardcore_Settings.surveys[ survey_id ].end_time < GetServerTime() then
+        Hardcore:Debug( "Received a survey response from " .. sender .. " for a timed-out survey ID: " .. survey_id )
+        Hardcore_Settings.surveys[ survey_id ].closed = true
         return
     end
 
     -- Store it
-    if Hardcore_Settings.surveys[ survey_id ] ~= nil and Hardcore_Settings.surveys[ survey_id ].replies ~= nil then
+    if Hardcore_Settings.surveys[ survey_id ].replies ~= nil then
         local RESPONSE = {}
         RESPONSE.sender = sender
         RESPONSE.tag = hctag
         RESPONSE.value = value
         table.insert( Hardcore_Settings.surveys[ survey_id ].replies, RESPONSE )
-        Hardcore:Print( "Stored survey response from " .. sender )
+        Hardcore:Print( "Stored survey response from " .. sender .. ", value = " .. value )
     end
 
 end
@@ -192,6 +199,12 @@ function SurveyHandleCommand( args )
 			var = substring
 		end
 	end
+    if max_wait == "reset" then
+		Hardcore:Print("All survey data reset from settings file")
+        Hardcore_Settings.surveys = nil
+        return
+    end
+
 	if max_wait == nil or tonumber( max_wait ) == nil then
 		Hardcore:Print("Wrong syntax: Missing or ill-formed <number> argument")
 		Hardcore:Print(usage)
@@ -203,6 +216,13 @@ function SurveyHandleCommand( args )
 		return
 	end
 
+    -- Make sure that the max_wait time isn't too low (would spam the GM)
+    local _, num_online = GetNumGuildMembers()
+    if tonumber(max_wait) < num_online then
+        max_wait = num_online
+        Hardcore:Print( "Adjusted the maximum wait time for your survey to " .. max_wait )
+    end
+
     -- Initialise the place to receive survey requests
     if Hardcore_Settings ~= nil and Hardcore_Settings.surveys == nil then
         Hardcore_Settings.surveys = {}
@@ -211,6 +231,8 @@ function SurveyHandleCommand( args )
     -- Create a new survey
     local SURVEY = {}
     SURVEY.created_date = date("%m/%d/%y %H:%M:%S")
+    SURVEY.end_time = GetServerTime() + max_wait + 10
+    SURVEY.closed = false
     SURVEY.created_by = guild_master
     SURVEY.replies = {}
     SURVEY.id = #Hardcore_Settings.surveys + 1
@@ -220,7 +242,7 @@ function SurveyHandleCommand( args )
     -- Compile the request and send it
     local comm_msg = SURVEY_REQ_CMD .. COMM_COMMAND_DELIM .. SURVEY.request
     CTL:SendAddonMessage("NORMAL", COMM_NAME, comm_msg, "GUILD")
-    Hardcore:Print( "Sent out survey command: " .. comm_msg )
+    Hardcore:Print( "Sent out survey command: " .. SURVEY_REQ_CMD .. "$" .. SURVEY.id .. "/" .. max_wait .. "/" .. var )
 
 end
 
