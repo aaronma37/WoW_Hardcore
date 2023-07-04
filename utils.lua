@@ -289,7 +289,7 @@ function Hardcore_AdjustTimeResolutions()
 		local k = 0
 		_h = 0
 		if Hardcore_Character.last_segment_time_resolution == nil or Hardcore_Character.tracked_played_percentage == 0 then
-			Hardcore_Character.last_segment_time_resolution = 1			-- Fix bad habit of shortening variable names
+			Hardcore_Character.last_segment_time_resolution = 0			-- Fix bad habit of shortening variable names
 			return
 		end
 		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time >= 9999999999) then

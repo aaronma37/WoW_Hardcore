@@ -965,6 +965,7 @@ function Hardcore:PLAYER_LOGIN()
 	-- Do the security check
 	Hardcore_VerifyChecksum()
 	Hardcore:UpdateVerificationStatus()
+	Hardcore_GoldTrackerCheck()
 
 	local any_acheivement_registered = false
 	for i, v in ipairs(Hardcore_Character.achievements) do
@@ -1084,6 +1085,9 @@ function Hardcore:PLAYER_LOGOUT()
 	-- Stop further updates to the played time and tracked time, don't want them
 	-- changing after the checksum is stored
 	player_logged_out = true
+
+	-- Store the amount of gold that we have now
+	Hardcore_GoldTrackerUpdate()
 
 	-- Calculate the data file checksum
 	Hardcore_StoreChecksum()
