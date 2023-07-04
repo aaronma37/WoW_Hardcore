@@ -933,6 +933,7 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("CHAT_MSG_PARTY")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_GUILD")
+	--self:RegisterEvent("PLAYER_MONEY")
 
 	-- Register spell cast events for paladin for checking bubble hearth
 	self:RegisterEvent("UNIT_SPELLCAST_START")
@@ -965,7 +966,7 @@ function Hardcore:PLAYER_LOGIN()
 	-- Do the security check
 	Hardcore_VerifyChecksum()
 	Hardcore:UpdateVerificationStatus()
-	Hardcore_GoldTrackerCheck()
+	--Hardcore_GoldTrackerCheck()
 
 	local any_acheivement_registered = false
 	for i, v in ipairs(Hardcore_Character.achievements) do
@@ -1085,9 +1086,6 @@ function Hardcore:PLAYER_LOGOUT()
 	-- Stop further updates to the played time and tracked time, don't want them
 	-- changing after the checksum is stored
 	player_logged_out = true
-
-	-- Store the amount of gold that we have now
-	Hardcore_GoldTrackerUpdate()
 
 	-- Calculate the data file checksum
 	Hardcore_StoreChecksum()
@@ -2335,6 +2333,10 @@ function Hardcore:GUILD_ROSTER_UPDATE(...)
 	if display == "AddonStatus" then
 		Hardcore_SubTitle:SetText(STRING_ADDON_STATUS_SUBTITLE)
 	end
+end
+
+function Hardcore:PLAYER_MONEY( ... )
+	--Hardcore_GoldTrackerPlayerMoney()
 end
 
 --[[ Utility Methods ]]
