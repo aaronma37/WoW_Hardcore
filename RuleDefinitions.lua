@@ -12,6 +12,8 @@ HCU_rule_ids = {
 	[5] = "Max Group Size: 2",
 	[6] = "Max Group Size: 3",
 	[7] = "No Trading",
+	[8] = "Guild Only Trading",
+	[9] = "No Petri Hearth",
 }
 
 HCU_rule_name_to_id = {}
@@ -236,5 +238,78 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 	end,
 	["disable"] = function(self)
 		HCU_rules[HCU_rule_name_to_id[name]].enabled = false
+	end,
+}
+
+name = "Guild Only Trading"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\INV_Misc_Gift_01.PNG",
+	["enabled"] = false,
+	["loaded"] = false,
+	["description"] = "Disallows trading outside of the guild.",
+	["enable"] = function()
+		HCU_rules[HCU_rule_name_to_id[name]].enabled = true
+		if HCU_rules[HCU_rule_name_to_id[name]].loaded == false then
+			hooksecurefunc("TradeFrame_OnShow", function(self, button)
+				C_Timer.After(0.1, function()
+					local recv_name = _G["TradeFrameRecipientNameText"]:GetText()
+					local in_guild = false
+					for i = 1, GetNumGuildMembers() do
+						local name, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
+						local player_name_short = string.split("-", name)
+						if player_name_short == recv_name then
+							in_guild = true
+							break
+						end
+					end
+					if HCU_rules[HCU_rule_name_to_id[name]].enabled and in_guild == false then
+						print("Target trade recepient not in guild. " .. recv_name)
+						_G["TradeFrame"]:Hide()
+					end
+				end)
+			end)
+		end
+		HCU_rules[HCU_rule_name_to_id[name]].loaded = true
+	end,
+	["disable"] = function(self)
+		HCU_rules[HCU_rule_name_to_id[name]].enabled = false
+	end,
+}
+
+name = "No Petri Hearth"
+HCU_rules[HCU_rule_name_to_id[name]] = {
+	["name"] = name,
+	["icon"] = "ICONS\\INV_Potion_26.PNG",
+	["enabled"] = false,
+	["loaded"] = false,
+	["description"] = "Cancels petrification aura if in instance without a party or raid.",
+	["enable"] = function()
+		registerFunction("UNIT_AURA", HCU_rule_name_to_id[name], function()
+			local is_in_instance, _ = IsInInstance()
+			if is_in_instance == nil or is_in_instance == False then
+				return
+			end
+			local is_in_group = IsInGroup()
+			if is_in_group == nil or is_in_group == True then
+				return
+			end
+
+			if arg[1] == "player" then
+				for i = 1, 40 do
+					local buff_name, _, _, _, _, _, _, _, _, _, _ = UnitBuff("player", i)
+					if buff_name == nil then
+						return
+					end
+					if buff_name == "Petrification" then
+						CancelUnitBuff("player", i)
+						Hardcore:Print("Removing petrification buff " .. buff_name .. ".")
+					end
+				end
+			end
+		end)
+	end,
+	["disable"] = function(self)
+		unregisterFunction("UNIT_AURA", HCU_rule_name_to_id[name])
 	end,
 }

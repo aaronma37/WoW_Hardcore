@@ -392,6 +392,16 @@ local function DrawGeneralTab(container)
 			HCU_enableRules(HardcoreUnlocked_Character)
 			refreshShownRules()
 		end)
+
+		frame:SetScript("OnEnter", function(widget)
+			GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
+			GameTooltip:AddLine(HCU_rules[rule_id].name)
+			GameTooltip:AddLine(HCU_rules[rule_id].description, 1, 1, 1, true)
+			GameTooltip:Show()
+		end)
+		frame:SetScript("OnLeave", function(widget)
+			GameTooltip:Hide()
+		end)
 		return frame
 	end
 
