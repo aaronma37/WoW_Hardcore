@@ -808,6 +808,186 @@ local function GetSpacelessRealmName()
 	return string.gsub(name, "%s+", "")
 end
 
+local subtitle_data = {
+	{
+		"Name",
+		100,
+		function(_player_name_short, _player_name_long)
+			return _player_name_short or ""
+		end,
+	},
+	{
+		"Lvl",
+		30,
+		function(_player_name_short, _player_name_long)
+			if hardcore_modern_menu_state.guild_online[_player_name_long] == nil then
+				return ""
+			end
+			return hardcore_modern_menu_state.guild_online[_player_name_long].level or ""
+		end,
+	},
+	{
+		"Version",
+		90,
+		function(_player_name_short, _player_name_long)
+			local version_text
+			if
+				(
+					hardcore_modern_menu_state.online_pulsing[_player_name_long]
+					and hardcore_modern_menu_state.guild_online[_player_name_long]
+				) or _player_name_short == UnitName("player")
+			then
+				if _player_name_short == UnitName("player") then
+					version_text = GetAddOnMetadata("HardcoreUnlocked", "Version")
+				else
+					version_text = hardcore_modern_menu_state.guild_versions[_player_name_long]
+				end
+
+				if hardcore_modern_menu_state.guild_versions_status[_player_name_long] == "updated" then
+					version_text = "|c0000ff00" .. version_text .. "|r"
+				else
+					version_text = "|c00ffff00" .. version_text .. "|r"
+				end
+			else
+				version_text = "|c00ff0000Not detected|r"
+			end
+			return version_text or ""
+		end,
+	},
+	{
+		"Started",
+		60,
+		function(_player_name_short, _player_name_long)
+			if other_hardcore_character_cache[_player_name_short] == nil then
+				return ""
+			end
+			return date("%m/%d/%y", other_hardcore_character_cache[_player_name_short].first_recorded or 0)
+		end,
+	},
+	{
+		"Achievements",
+		120,
+		function(_player_name_short, _player_name_long)
+			if other_hardcore_character_cache[_player_name_short] == nil then
+				return ""
+			end
+			if
+				other_hardcore_character_cache[_player_name_short].achievements == nil
+				or #other_hardcore_character_cache[_player_name_short].achievements > 0
+				or #other_hardcore_character_cache[_player_name_short].passive_achievements > 0
+			then
+				local inline_text = ""
+				for i, achievement_name in ipairs(other_hardcore_character_cache[_player_name_short].achievements) do
+					if _G.achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				for i, achievement_name in
+					ipairs(other_hardcore_character_cache[_player_name_short].passive_achievements)
+				do
+					if _G.passive_achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.passive_achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				return inline_text
+			else
+				return ""
+			end
+		end,
+	},
+}
+
+local font_container = CreateFrame("Frame")
+font_container:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+font_container:Show()
+local row_entry = {}
+local font_strings = {} -- idx/columns
+local header_strings = {} -- columns
+local row_backgrounds = {} --idx
+local max_rows = 48 --idx
+local row_height = 10
+local guild_member_Width = 850
+
+for idx, v in ipairs(subtitle_data) do
+	header_strings[v[1]] = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	if idx == 1 then
+		header_strings[v[1]]:SetPoint("TOPLEFT", font_container, "TOPLEFT", 0, 2)
+	else
+		header_strings[v[1]]:SetPoint("LEFT", last_font_string, "RIGHT", 0, 0)
+	end
+	last_font_string = header_strings[v[1]]
+	header_strings[v[1]]:SetJustifyH("LEFT")
+	header_strings[v[1]]:SetWordWrap(false)
+
+	if idx + 1 <= #subtitle_data then
+		header_strings[v[1]]:SetWidth(v[2])
+	end
+	header_strings[v[1]]:SetTextColor(0.7, 0.7, 0.7)
+	header_strings[v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	header_strings[v[1]]:SetText(v[1])
+end
+
+for i = 1, max_rows do
+	font_strings[i] = {}
+	local last_font_string = nil
+	for idx, v in ipairs(subtitle_data) do
+		font_strings[i][v[1]] = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		if idx == 1 then
+			font_strings[i][v[1]]:SetPoint("TOPLEFT", font_container, "TOPLEFT", 0, -i * row_height)
+		else
+			font_strings[i][v[1]]:SetPoint("LEFT", last_font_string, "RIGHT", 0, 0)
+		end
+		last_font_string = font_strings[i][v[1]]
+		font_strings[i][v[1]]:SetJustifyH("LEFT")
+		font_strings[i][v[1]]:SetWordWrap(false)
+
+		if idx + 1 <= #subtitle_data then
+			font_strings[i][v[1]]:SetWidth(v[2])
+		end
+		font_strings[i][v[1]]:SetTextColor(1, 1, 1)
+		font_strings[i][v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+	end
+
+	row_backgrounds[i] = font_container:CreateTexture(nil, "OVERLAY")
+	row_backgrounds[i]:SetDrawLayer("OVERLAY", 2)
+	row_backgrounds[i]:SetVertexColor(0.5, 0.5, 0.5, (i % 2) / 10)
+	row_backgrounds[i]:SetHeight(row_height)
+	row_backgrounds[i]:SetWidth(guild_member_Width)
+	row_backgrounds[i]:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+	row_backgrounds[i]:SetPoint("TOPLEFT", font_container, "TOPLEFT", 0, -i * row_height)
+end
+
+local function clearGuildMemberData()
+	for i, v in ipairs(font_strings) do
+		for _, col in ipairs(subtitle_data) do
+			v[col[1]]:SetText("")
+		end
+	end
+end
+
+local function setGuildMemberData()
+	local rows_used = 1
+	for i = 1, GetNumGuildMembers() do
+		if rows_used > max_rows then
+			break
+		end
+		local player_name_long, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
+		if online then
+			local player_name_short = string.split("-", player_name_long)
+			for _, col in ipairs(subtitle_data) do
+				font_strings[rows_used][col[1]]:SetText(col[3](player_name_short, player_name_long))
+			end
+			rows_used = rows_used + 1
+		end
+	end
+end
+
 local function DrawAccountabilityTab(container)
 	local function updateLabelData(_label_tbls, player_name_short)
 		if other_hardcore_character_cache[player_name_short] ~= nil then
@@ -959,179 +1139,11 @@ local function DrawAccountabilityTab(container)
 	local scroll_frame = AceGUI:Create("ScrollFrame")
 	scroll_frame:SetLayout("List")
 	scroll_container:AddChild(scroll_frame)
-
-	local row_header = AceGUI:Create("SimpleGroup")
-	row_header:SetLayout("Flow")
-	row_header:SetFullWidth(true)
-	scroll_frame:AddChild(row_header)
-
-	local name_label = AceGUI:Create("InteractiveLabel")
-	name_label:SetWidth(110)
-	name_label:SetText("|c00FFFF00Name|r")
-	name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(name_label)
-
-	name_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "Alph" then
-			hardcore_modern_menu_state.accountability_sort_state = "Alph"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rAlph"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local level_label = AceGUI:Create("InteractiveLabel")
-	level_label:SetWidth(50)
-	level_label:SetText("|c00FFFF00Lvl|r")
-	level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(level_label)
-
-	level_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "lvl" then
-			hardcore_modern_menu_state.accountability_sort_state = "lvl"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rlvl"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local version_label = AceGUI:Create("InteractiveLabel")
-	version_label:SetWidth(80)
-	version_label:SetText("|c00FFFF00Version|r")
-	version_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(version_label)
-
-	version_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "v" then
-			hardcore_modern_menu_state.accountability_sort_state = "v"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rv"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local mode_label = AceGUI:Create("InteractiveLabel")
-	mode_label:SetWidth(75)
-	mode_label:SetText("|c00FFFF00Mode|r")
-	mode_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(mode_label)
-
-	mode_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "mode" then
-			hardcore_modern_menu_state.accountability_sort_state = "mode"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rmode"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local date_started_label = AceGUI:Create("InteractiveLabel")
-	date_started_label:SetWidth(85)
-	date_started_label:SetText("|c00FFFF00Started|r")
-	date_started_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(date_started_label)
-
-	date_started_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "simpledate" then
-			hardcore_modern_menu_state.accountability_sort_state = "simpledate"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rsimpledate"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local achievements_label = AceGUI:Create("InteractiveLabel")
-	achievements_label:SetWidth(320)
-	achievements_label:SetText("|c00FFFF00Achievements|r")
-	achievements_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(achievements_label)
-
-	achievements_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "achievements" then
-			hardcore_modern_menu_state.accountability_sort_state = "achievements"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rachievements"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	local hc_tag_label = AceGUI:Create("InteractiveLabel")
-	hc_tag_label:SetWidth(100)
-	hc_tag_label:SetText("|c00FFFF00HC Tag|r")
-	hc_tag_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(hc_tag_label)
-
-	hc_tag_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
-		hardcore_modern_menu_state.ticker_handler:Cancel()
-		hardcore_modern_menu_state.ticker_handler = nil
-		container:ReleaseChildren()
-		if hardcore_modern_menu_state.accountability_sort_state ~= "hctag" then
-			hardcore_modern_menu_state.accountability_sort_state = "hctag"
-		else
-			hardcore_modern_menu_state.accountability_sort_state = "rhctag"
-		end
-		DrawAccountabilityTab(container)
-	end)
-
-	self_name = UnitName("player")
-	for _player_name, _ in
-		spairs(
-			hardcore_modern_menu_state.guild_online,
-			sort_functions[hardcore_modern_menu_state.accountability_sort_state]
-		)
-	do
-		local player_name_short = string.split("-", _player_name)
-		addEntry(scroll_frame, player_name_short, self_name)
-	end
-
-	hardcore_modern_menu_state.ticker_handler = C_Timer.NewTicker(0.1, function()
-		for k, _ in pairs(hardcore_modern_menu_state.changeset) do
-			if hardcore_modern_menu_state.entry_tbl[k] == nil then
-				-- addEntry(scroll_frame, k, self_name)
-				-- No-op, this can look buggy
-			else
-				updateLabelData(hardcore_modern_menu_state.entry_tbl[k], k)
-			end
-		end
-		hardcore_modern_menu_state.changeset = {}
-	end)
-
-	local button_container = AceGUI:Create("SimpleGroup")
-	button_container:SetWidth(100)
-	button_container:SetHeight(100)
-	button_container:SetLayout("Flow")
-	scroll_container:AddChild(button_container)
-
-	local inspect_all_button = AceGUI:Create("Button")
-	inspect_all_button:SetText("Inspect All")
-	inspect_all_button:SetWidth(100)
-	button_container:AddChild(inspect_all_button)
-	inspect_all_button:SetCallback("OnClick", function()
+	font_container:SetParent(scroll_container.frame)
+	font_container:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT")
+	font_container:SetHeight(400)
+	font_container:SetWidth(200)
+	local function inspectAll()
 		for _player_name, _ in
 			spairs(
 				hardcore_modern_menu_state.guild_online,
@@ -1143,6 +1155,43 @@ local function DrawAccountabilityTab(container)
 				RequestHCData(player_name_short)
 			end
 		end
+	end
+	inspectAll()
+	setGuildMemberData()
+
+	if font_container.inspect_all_button == nil then
+		font_container.inspect_all_button = CreateFrame("Button", nil, font_container)
+		font_container.inspect_all_button:SetPoint("TOPLEFT", font_container, "TOPLEFT", 0, -495)
+		font_container.inspect_all_button:SetWidth(125)
+		font_container.inspect_all_button:SetHeight(40)
+		font_container.inspect_all_button:SetNormalTexture("Interface/Buttons/UI-DialogBox-Button-Up.PNG")
+		font_container.inspect_all_button:SetHighlightTexture("Interface/Buttons/UI-DialogBox-Button-Highlight.PNG")
+		font_container.inspect_all_button:SetPushedTexture("Interface/Buttons/UI-DialogBox-Button-Down.PNG")
+		font_container.inspect_all_button.text =
+			font_container.inspect_all_button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		font_container.inspect_all_button.text:SetFont(
+			"Interface\\Addons\\HardcoreUnlocked\\Media\\BreatheFire.ttf",
+			14,
+			""
+		)
+		font_container.inspect_all_button.text:SetWidth(125)
+		font_container.inspect_all_button.text:SetTextColor(1, 1, 1, 1)
+		font_container.inspect_all_button.text:SetPoint("CENTER", font_container.inspect_all_button, "CENTER", 0, 5)
+		font_container.inspect_all_button.text:SetJustifyH("CENTER")
+		font_container.inspect_all_button.text:SetText("Inspect All")
+	end
+
+	font_container.inspect_all_button:SetScript("OnClick", function()
+		inspectAll()
+	end)
+
+	hardcore_modern_menu_state.ticker_handler = C_Timer.NewTicker(1, function()
+		setGuildMemberData()
+	end)
+
+	font_container:Show()
+	scroll_container.frame:HookScript("OnHide", function()
+		font_container:Hide()
 	end)
 end
 
