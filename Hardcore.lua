@@ -42,16 +42,16 @@ local CLASSES = {
 }
 
 local CLASS_DICT = {
-  ["Warrior"] = 1,
-  ["Paladin"] = 1,
-  ["Hunter"] = 1,
-  ["Rogue"] = 1,
-  ["Priest"] = 1,
-  ["Death Knight"] = 1,
-  ["Shaman"] = 1,
-  ["Mage"] = 1,
-  ["Warlock"] = 1,
-  ["Druid"] = 1,
+	["Warrior"] = 1,
+	["Paladin"] = 1,
+	["Hunter"] = 1,
+	["Rogue"] = 1,
+	["Priest"] = 1,
+	["Death Knight"] = 1,
+	["Shaman"] = 1,
+	["Mage"] = 1,
+	["Warlock"] = 1,
+	["Druid"] = 1,
 }
 
 --[[ Global saved variables ]]
@@ -192,9 +192,9 @@ local COMM_COMMANDS = {
 	"DTPULSE", -- 15 dungeon tracker active pulse; if this changes, also change in Dungeons.lua / DTSendPulse!
 	"REQUEST_RECOVERY_TIME", -- 16 Used to request recovery segments if detected DC
 	"REQUEST_RECOVERY_TIME_ACK", -- 17 Recovery request ack
-	"SURVEY_REQ",	-- 18 Request for survey info (from GM)
-	"SURVEY_ACK",	-- 19 Answer to survey info (to GM)
-	"SHARED_DL",	-- 20 Receive shared deathlog data
+	"SURVEY_REQ", -- 18 Request for survey info (from GM)
+	"SURVEY_ACK", -- 19 Answer to survey info (to GM)
+	"SHARED_DL", -- 20 Receive shared deathlog data
 }
 local COMM_SPAM_THRESHOLD = { -- msgs received within durations (s) are flagged as spam
 	PULSE = 3,
@@ -261,10 +261,9 @@ local GRIEFING_MOBS = {
 	["Dessecus"] = 1,
 	["Emeraldon Tree Warder"] = 1,
 	["Black Dragonspawn"] = 1,
-	["Clunk"] = 1, 
+	["Clunk"] = 1,
 	["Emeraldon Oracle"] = 1,
 	["Gurubashi Warrior"] = 1,
-
 }
 local KNOWN_GRIEFERS = {
 	["Spinnaz"] = 1,
@@ -303,7 +302,6 @@ local KNOWN_GRIEFERS = {
 	["Lipstiklezbo"] = 1,
 	["Sweatyloser"] = 1,
 	["Elco"] = 1,
-
 }
 
 -- frame display
@@ -311,20 +309,18 @@ local display = "Rules"
 local displaylist = Hardcore_Settings.level_list
 local icon = nil
 
-
 local locale = GetLocale()
 hardcore_locale_supported_font = nil
 local non_english_locales = {
-  koKR=1,
-  zhCN=1,
-  zhTW=1
+	koKR = 1,
+	zhCN = 1,
+	zhTW = 1,
 }
 
 if non_english_locales[locale] == 1 then
 	hardcore_locale_supported_font = "Fonts\\2002.TTF"
-	_G["HardcoreFont"]:SetFont(hardcore_locale_supported_font,26, "")
+	_G["HardcoreFont"]:SetFont(hardcore_locale_supported_font, 26, "")
 end
-
 
 -- available alert frame/icon styles
 local MEDIA_DIR = "Interface\\AddOns\\Hardcore\\Media\\"
@@ -426,14 +422,12 @@ local function startXGuildChatMsgRelay(msg)
 end
 
 function Hardcore:initSendSharedDLMsg(target_player)
-  local publishFunc = function(encoded_msg)
-	local commMessage = COMM_COMMANDS[20]
-		.. COMM_COMMAND_DELIM
-		.. encoded_msg
+	local publishFunc = function(encoded_msg)
+		local commMessage = COMM_COMMANDS[20] .. COMM_COMMAND_DELIM .. encoded_msg
 
-	CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", target_player)
-  end
-  HardcoreDeathlog_beginSendSharedMsg(publishFunc)
+		CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", target_player)
+	end
+	HardcoreDeathlog_beginSendSharedMsg(publishFunc)
 end
 
 local function startXGuildDeathMsgRelay()
@@ -478,7 +472,9 @@ function FailureFunction(achievement_name)
 	then
 		max_level = 80
 	end
-	if UnitLevel("player") == max_level then return end
+	if UnitLevel("player") == max_level then
+		return
+	end
 
 	for i, v in ipairs(Hardcore_Character.achievements) do
 		if v == achievement_name then
@@ -1082,7 +1078,6 @@ function Hardcore:PLAYER_LOGIN()
 end
 
 function Hardcore:PLAYER_LOGOUT()
-
 	-- Stop further updates to the played time and tracked time, don't want them
 	-- changing after the checksum is stored
 	player_logged_out = true
@@ -1329,11 +1324,11 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	end
 
 	C_Timer.After(1.0, function()
-	  deathlogApplySettings(Hardcore_Settings)
+		deathlogApplySettings(Hardcore_Settings)
 	end)
 
 	C_Timer.After(5.0, function()
-	  deathlogJoinChannel()
+		deathlogJoinChannel()
 	end)
 end
 
@@ -1375,7 +1370,6 @@ function Hardcore:PLAYER_DEAD()
 		zone = C_Map.GetMapInfo(mapID).name
 	end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
-
 
 	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
 	if
@@ -1572,7 +1566,7 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 	end
 
 	-- Update the character's statistics
-	Hardcore_StoreCharacterInfo( level )
+	Hardcore_StoreCharacterInfo(level)
 end
 
 local function initiateRecoverTime(duration_since_last_recording)
@@ -1657,9 +1651,10 @@ local function initiateRecoverTime(duration_since_last_recording)
 end
 
 function Hardcore:TIME_PLAYED_MSG(...)
-
 	-- Don't update anymore after the data security checksum has been calculated
-	if player_logged_out == true then return end
+	if player_logged_out == true then
+		return
+	end
 
 	local totalTimePlayed, _ = ...
 	Hardcore_Character.time_played = totalTimePlayed or 1
@@ -1739,45 +1734,45 @@ function Hardcore:TIME_PLAYED_MSG(...)
 		Hardcore:Debug(debug_message)
 
 		-- if Hardcore_Character.time_tracked < 1800 and Hardcore_Character.time_played > 7200 then -- 1/2 hr, 2 hrs
-			-- local backup_name, backup_data = checkForBackupMatch()
+		-- local backup_name, backup_data = checkForBackupMatch()
 
-			-- local function recoverFunction(element, _backup_data)
-			-- 	if _backup_data[element] then
-			-- 		Hardcore_Character[element] = _backup_data[element]
-			-- 	end
-			-- end
-			-- if backup_name then
-			-- 	local player_name_short, _server_name = string.split("-", backup_name)
-			-- 	if player_name_short == UnitName("player") and GetRealmName() == _server_name then
-			-- 		Hardcore:Print("Detected lost player data.  Backup found; recovering data...", backup_name)
-			-- 		Hardcore_Character.name_changed = {
-			-- 			["before"] = player_name_short,
-			-- 			["after"] = UnitName("player"),
-			-- 		}
-			-- 	elseif player_name_short ~= UnitName("player") and GetRealmName() == _server_name then
-			-- 		Hardcore:Print("Detected player name change.  Backup found; recovering data...", backup_name)
-			-- 		Hardcore_Character.name_changed = {
-			-- 			["before"] = player_name_short,
-			-- 			["after"] = UnitName("player"),
-			-- 		}
-			-- 	elseif GetRealmName() ~= _server_name then
-			-- 		Hardcore:Print("Detected server change.  Backup found; recovering data...", backup_name)
-			-- 	end
+		-- local function recoverFunction(element, _backup_data)
+		-- 	if _backup_data[element] then
+		-- 		Hardcore_Character[element] = _backup_data[element]
+		-- 	end
+		-- end
+		-- if backup_name then
+		-- 	local player_name_short, _server_name = string.split("-", backup_name)
+		-- 	if player_name_short == UnitName("player") and GetRealmName() == _server_name then
+		-- 		Hardcore:Print("Detected lost player data.  Backup found; recovering data...", backup_name)
+		-- 		Hardcore_Character.name_changed = {
+		-- 			["before"] = player_name_short,
+		-- 			["after"] = UnitName("player"),
+		-- 		}
+		-- 	elseif player_name_short ~= UnitName("player") and GetRealmName() == _server_name then
+		-- 		Hardcore:Print("Detected player name change.  Backup found; recovering data...", backup_name)
+		-- 		Hardcore_Character.name_changed = {
+		-- 			["before"] = player_name_short,
+		-- 			["after"] = UnitName("player"),
+		-- 		}
+		-- 	elseif GetRealmName() ~= _server_name then
+		-- 		Hardcore:Print("Detected server change.  Backup found; recovering data...", backup_name)
+		-- 	end
 
-			-- 	recoverFunction("time_tracked", backup_data)
-			-- 	recoverFunction("achievements", backup_data)
-			-- 	recoverFunction("first_recorded", backup_data)
-			-- 	recoverFunction("played_time_gap_warnings", backup_data)
-			-- 	recoverFunction("deaths", backup_data)
-			-- 	recoverFunction("bubble_hearth_incidents", backup_data)
-			-- 	recoverFunction("passive_achievements", backup_data)
-			-- 	recoverFunction("trade_partners", backup_data)
-			-- 	recoverFunction("team", backup_data)
-			-- 	recoverFunction("dt", backup_data)
-			-- 	recoverFunction("party_mode", backup_data)
-			-- 	Hardcore:Print("Recovery complete. Reload now")
-			-- end
-			-- return
+		-- 	recoverFunction("time_tracked", backup_data)
+		-- 	recoverFunction("achievements", backup_data)
+		-- 	recoverFunction("first_recorded", backup_data)
+		-- 	recoverFunction("played_time_gap_warnings", backup_data)
+		-- 	recoverFunction("deaths", backup_data)
+		-- 	recoverFunction("bubble_hearth_incidents", backup_data)
+		-- 	recoverFunction("passive_achievements", backup_data)
+		-- 	recoverFunction("trade_partners", backup_data)
+		-- 	recoverFunction("team", backup_data)
+		-- 	recoverFunction("dt", backup_data)
+		-- 	recoverFunction("party_mode", backup_data)
+		-- 	Hardcore:Print("Recovery complete. Reload now")
+		-- end
+		-- return
 		-- end
 
 		if duration_since_last_recording > PLAYED_TIME_GAP_THRESH then
@@ -1951,9 +1946,9 @@ function Hardcore:DisplayPlaytimeWarning(level)
 		.. " If you have just installed the addon, start a new character."
 		.. " If this is not a new character, you have experienced data loss."
 		.. " Consider restoring from backups, and seek support from a mod or a technician in #addon-appeal"
-		
+
 	if level > 20 then
-		message = message .. ". Continuing on means you risk your HC Verified Status."		
+		message = message .. ". Continuing on means you risk your HC Verified Status."
 	end
 	Hardcore:Print(message)
 end
@@ -1969,13 +1964,14 @@ end
 
 -- player name, level, zone, attack_source, class
 local function receiveDeathMsg(data, sender, command)
-	if recent_death_alert_sender[sender] ~= nil then return end
+	if recent_death_alert_sender[sender] ~= nil then
+		return
+	end
 	recent_death_alert_sender[sender] = 1
 
 	C_Timer.After(DEATH_ALERT_COOLDOWN, function()
-	  recent_death_alert_sender[sender] = nil
+		recent_death_alert_sender[sender] = nil
 	end)
-
 
 	if Hardcore_Settings.ignore_xguild_alerts ~= nil and Hardcore_Settings.ignore_xguild_alerts == true then
 		return
@@ -2054,9 +2050,15 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			local class = ""
 			if data then
 				other_player_name, level, zone, attack_source, class = string.split("^", data)
-				if other_player_name and other_player_name ~= sender then return end
-				if level == nil or tonumber(level) == nil or tonumber(level) < 1 or tonumber(level) > 80 then return end
-				if class == nil or CLASS_DICT[class] == nil then return end
+				if other_player_name and other_player_name ~= sender then
+					return
+				end
+				if level == nil or tonumber(level) == nil or tonumber(level) < 1 or tonumber(level) > 80 then
+					return
+				end
+				if class == nil or CLASS_DICT[class] == nil then
+					return
+				end
 
 				local commMessage = COMM_COMMANDS[11] .. COMM_COMMAND_DELIM .. data
 				CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
@@ -2113,8 +2115,8 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		end
 		if command == COMM_COMMANDS[4] then -- Received hc character data
 			local name, _ = string.split("-", sender)
-			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str,
-						 verif_status, verif_details = string.split(COMM_FIELD_DELIM, data)
+			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, verif_status, verif_details =
+				string.split(COMM_FIELD_DELIM, data)
 			local achievements_l = { string.split(COMM_SUBFIELD_DELIM, achievements_str) }
 			other_achievements_ds = {}
 			for i, id in ipairs(achievements_l) do
@@ -2152,7 +2154,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				last_received = time(),
 				hardcore_player_name = hc_tag,
 				verification_status = verif_status,
-				verification_details = verif_details
+				verification_details = verif_details,
 			}
 			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
 			return
@@ -2189,8 +2191,8 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			return
 		end
 		if command == COMM_COMMANDS[20] then
-		  HardcoreDeathlog_receiveSharedMsg(data)
-		  return
+			HardcoreDeathlog_receiveSharedMsg(data)
+			return
 		end
 		if DEPRECATED_COMMANDS[command] or alert_msg_time[command] == nil then
 			return
@@ -2228,7 +2230,8 @@ end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
+	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ =
+		CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then
 		if not (source_name == nil) then
@@ -2239,21 +2242,21 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 		end
 	end
 	if ev == "ENVIRONMENTAL_DAMAGE" then
-	  if target_guid == UnitGUID("player") then
-	    if environmental_type == "Drowning" then
-	      DeathLog_Last_Attack_Source = -2
-	    elseif environmental_type == "Falling" then
-	      DeathLog_Last_Attack_Source = -3
-	    elseif environmental_type == "Fatigue" then
-	      DeathLog_Last_Attack_Source = -4
-	    elseif environmental_type == "Fire" then
-	      DeathLog_Last_Attack_Source = -5
-	    elseif environmental_type == "Lava" then
-	      DeathLog_Last_Attack_Source = -6
-	    elseif environmental_type == "Slime" then
-	      DeathLog_Last_Attack_Source = -7
-	    end
-	  end
+		if target_guid == UnitGUID("player") then
+			if environmental_type == "Drowning" then
+				DeathLog_Last_Attack_Source = -2
+			elseif environmental_type == "Falling" then
+				DeathLog_Last_Attack_Source = -3
+			elseif environmental_type == "Fatigue" then
+				DeathLog_Last_Attack_Source = -4
+			elseif environmental_type == "Fire" then
+				DeathLog_Last_Attack_Source = -5
+			elseif environmental_type == "Lava" then
+				DeathLog_Last_Attack_Source = -6
+			elseif environmental_type == "Slime" then
+				DeathLog_Last_Attack_Source = -7
+			end
+		end
 	end
 end
 
@@ -2293,7 +2296,8 @@ function Hardcore:SetRecentMsg(...)
 		PLAYERGUID = UnitGUID("player")
 	end
 
-	if senderGUID == PLAYERGUID then
+	local automated_text_found = string.find(text, "Our brave")
+	if senderGUID == PLAYERGUID and automated_text_found == nil then
 		recent_msg["text"] = text
 		return true
 	end
@@ -2335,7 +2339,7 @@ function Hardcore:GUILD_ROSTER_UPDATE(...)
 	end
 end
 
-function Hardcore:PLAYER_MONEY( ... )
+function Hardcore:PLAYER_MONEY(...)
 	--Hardcore_GoldTrackerPlayerMoney()
 end
 
@@ -2351,7 +2355,7 @@ end
 -- end
 
 function Hardcore:Print(...)
-	local args = {...}
+	local args = { ... }
 	local str = table.concat(args, ", ")
 	print("|cffed9121Hardcore|r: " .. str)
 end
@@ -2369,12 +2373,11 @@ end
 
 function Hardcore:Debug(...)
 	if debug then
-		local args = {...}
+		local args = { ... }
 		local str = table.concat(args, ", ")
 		print("|cfffd9122HCDebug|r: " .. str)
 	end
 end
-  
 
 function Hardcore:Monitor(msg)
 	if true == Hardcore_Settings.monitor then
@@ -2423,7 +2426,7 @@ end
 
 -- Exported version of ShowAlertFrame with HC_red style (used in DungeonTracker, ALERT_STYLES is local)
 function Hardcore:ShowRedAlertFrame(message)
-	Hardcore:ShowAlertFrame(ALERT_STYLES.hc_red, message )
+	Hardcore:ShowAlertFrame(ALERT_STYLES.hc_red, message)
 end
 
 function Hardcore:ShowPassiveAchievementFrame(icon_path, message, delay)
@@ -2454,10 +2457,12 @@ function Hardcore:Add(data, sender, command)
 			for i = 1, GetNumGuildMembers() do
 				local name, _, _, guildLevel, _, zone, _, _, _, _, class = GetGuildRosterInfo(i)
 				if name == sender then
-				  	if recent_death_alert_sender[sender] ~= nil then return end
-				 	recent_death_alert_sender[sender] = 1
+					if recent_death_alert_sender[sender] ~= nil then
+						return
+					end
+					recent_death_alert_sender[sender] = 1
 					C_Timer.After(DEATH_ALERT_COOLDOWN, function()
-					  recent_death_alert_sender[sender] = nil
+						recent_death_alert_sender[sender] = nil
 					end)
 					if mapID then
 						local mapData = C_Map.GetMapInfo(mapID) -- In case some idiot sends an invalid map ID, it won't cause mass lua errors.
@@ -2492,7 +2497,7 @@ function Hardcore:Add(data, sender, command)
 end
 
 function Hardcore:TriggerDeathAlert(msg)
-  Hardcore:ShowAlertFrame(ALERT_STYLES.death, msg)
+	Hardcore:ShowAlertFrame(ALERT_STYLES.death, msg)
 end
 
 function Hardcore:Levels(all)
@@ -3064,7 +3069,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 	local numAppeals = Hardcore_Character.appeals and #Hardcore_Character.appeals or 0
 	local numRealDeaths = Hardcore_Character.deaths and #Hardcore_Character.deaths or 0
 
-	local perc = string.format("tracked_time=%.1f%%", math.floor(Hardcore_Character.tracked_played_percentage * 10)/10)
+	local perc =
+		string.format("tracked_time=%.1f%%", math.floor(Hardcore_Character.tracked_played_percentage * 10) / 10)
 	local numTrades = #Hardcore_Character.trade_partners
 	local numBubs = #Hardcore_Character.bubble_hearth_incidents
 	local numRepRuns = Hardcore_Character.dt.repeated_runs
@@ -3083,7 +3089,7 @@ function Hardcore:GenerateVerificationStatusStrings()
 		numOverLevelRuns = 0
 	end
 
-	if Hardcore_Character.appeals ~= nil then	
+	if Hardcore_Character.appeals ~= nil then
 		-- Match Deaths and Appeals, removing a death count for each one
 		for i, v in ipairs(Hardcore_Character.appeals) do
 			for j, w in ipairs(Hardcore_Character.deaths) do
@@ -3147,7 +3153,7 @@ function Hardcore:GenerateVerificationStatusStrings()
 	else
 		table.insert(reds, "data_file=" .. dataFileSecurity)
 	end
-	
+
 	if Hardcore_Character.tracked_played_percentage >= 95 then
 		table.insert(greens, perc)
 	elseif Hardcore_Character.tracked_played_percentage >= 90 then
@@ -3177,16 +3183,15 @@ end
 -- Stores a clean version of the verification verdict and details inside Hardcore_Character
 
 function Hardcore:UpdateVerificationStatus()
-
 	local my_verif_status = "?"
 	local verdict, details = Hardcore:GenerateVerificationStatusStrings()
 	if verdict ~= nil then
 		-- Strip off any coloring or other extra junk except for the words "PASS" and "FAIL"
-		local x, y = string.find( verdict, "PASS" )
+		local x, y = string.find(verdict, "PASS")
 		if x ~= nil then
 			my_verif_status = "PASS"
 		end
-		x, y = string.find( verdict, "FAIL" )
+		x, y = string.find(verdict, "FAIL")
 		if x ~= nil then
 			my_verif_status = "FAIL"
 		end
@@ -3194,7 +3199,7 @@ function Hardcore:UpdateVerificationStatus()
 
 	Hardcore_Character.verification_status = my_verif_status
 	-- Show everything that is in red (so up to the next colour)
-	details = string.match( details, COLOR_RED .. "(.-) |c00" )
+	details = string.match(details, COLOR_RED .. "(.-) |c00")
 	if details ~= nil then
 		Hardcore_Character.verification_details = "(" .. details .. ")"
 	else
@@ -3202,22 +3207,20 @@ function Hardcore:UpdateVerificationStatus()
 	end
 end
 
-
 -- GetCleanVerificationStatus()
 --
 -- Gives a cleaned-up version of the colorized status string
 
 function Hardcore:GetCleanVerificationStatus()
-
 	local my_verif_status = "?"
 	local verdict, _ = Hardcore:GenerateVerificationStatusStrings()
 	if verdict ~= nil then
 		-- Strip off any coloring or other extra junk except for the words "PASS" and "FAIL"
-		local x, y = string.find( verdict, "PASS" )
+		local x, y = string.find(verdict, "PASS")
 		if x ~= nil then
 			my_verif_status = "PASS"
 		end
-		x, y = string.find( verdict, "FAIL" )
+		x, y = string.find(verdict, "FAIL")
 		if x ~= nil then
 			my_verif_status = "FAIL"
 		end
@@ -3226,7 +3229,7 @@ function Hardcore:GetCleanVerificationStatus()
 	return my_verif_status
 end
 
-function Hardcore:ToggleDebug( )
+function Hardcore:ToggleDebug()
 	debug = not debug
 	return debug
 end
@@ -3341,7 +3344,7 @@ function Hardcore:SendCharacterData(dest)
 		commMessage = commMessage .. Hardcore_Character.verification_status
 		commMessage = commMessage .. COMM_FIELD_DELIM
 		commMessage = commMessage .. Hardcore_Character.verification_details
-		
+
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", dest)
 	end
 end
@@ -3375,7 +3378,9 @@ function Hardcore:InitiatePulsePlayed()
 
 	--time accumulator
 	C_Timer.NewTicker(TIME_TRACK_PULSE, function()
-		if player_logged_out == true then return end
+		if player_logged_out == true then
+			return
+		end
 		Hardcore_Character.time_tracked = Hardcore_Character.time_tracked + TIME_TRACK_PULSE
 		if RECEIVED_FIRST_PLAYED_TIME_MSG == true then
 			Hardcore_Character.accumulated_time_diff = Hardcore_Character.time_played - Hardcore_Character.time_tracked
@@ -3531,7 +3536,7 @@ end)
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(frame, event, message, sender, ...)
 	if message:match("No player named") and message:match("is currently playing") then
-	  return true, nil, sender, ... 
+		return true, nil, sender, ...
 	end
 	return false, message, sender, ... -- don't hide this message
 end)
@@ -3650,16 +3655,16 @@ local options = {
 					desc = "Show death log",
 					get = function()
 						if Hardcore_Settings.death_log_show == nil or Hardcore_Settings.death_log_show == true then
-						  return true
-						else 
-						  return false 
+							return true
+						else
+							return false
 						end
 					end,
 					set = function()
 						if Hardcore_Settings.death_log_show == nil then
-						  Hardcore_Settings.death_log_show = true 
+							Hardcore_Settings.death_log_show = true
 						end
-						Hardcore_Settings.death_log_show = not Hardcore_Settings.death_log_show 
+						Hardcore_Settings.death_log_show = not Hardcore_Settings.death_log_show
 						deathlogApplySettings(Hardcore_Settings)
 					end,
 					order = 1,
@@ -3675,7 +3680,7 @@ local options = {
 					},
 					get = function()
 						if Hardcore_Settings.death_log_types == nil then
-						  Hardcore_Settings.death_log_types = "faction_wide"
+							Hardcore_Settings.death_log_types = "faction_wide"
 						end
 						return Hardcore_Settings.death_log_types
 					end,
@@ -3696,17 +3701,17 @@ local options = {
 					},
 					get = function()
 						if Hardcore_Settings.notify then
-						  if Hardcore_Settings.alert_subset then
-						    return Hardcore_Settings.alert_subset
-						  end
-						  return "guild_only"
+							if Hardcore_Settings.alert_subset then
+								return Hardcore_Settings.alert_subset
+							end
+							return "guild_only"
 						end
 						return "off"
 					end,
 					set = function(info, value)
 						if value == off then
-						  Hardcore_Settings.notify = false
-						  return
+							Hardcore_Settings.notify = false
+							return
 						end
 						Hardcore_Settings.alert_subset = value
 						Hardcore_Settings.notify = true
@@ -3764,7 +3769,7 @@ local options = {
 					name = "Reset death log pos.",
 					desc = "Reset the death log pos.",
 					func = function(info, value)
-						hardcore_settings["death_log_pos"] = {['x'] = 0, ['y'] = 0}
+						hardcore_settings["death_log_pos"] = { ["x"] = 0, ["y"] = 0 }
 						deathlogApplySettings(Hardcore_Settings)
 					end,
 					order = 5,
@@ -4041,9 +4046,9 @@ local options = {
 						end
 					end,
 					set = function(info, val)
-						if tonumber( val ) and tonumber(val) >= 0 then
+						if tonumber(val) and tonumber(val) >= 0 then
 							Hardcore_Settings.reload_reminder_interval = tonumber(val)
-							ReloadReminderSetInterval( tonumber(val) )
+							ReloadReminderSetInterval(tonumber(val))
 						end
 					end,
 					order = 15,
@@ -4102,7 +4107,7 @@ local options = {
 				Hardcore_Settings.ignore_xguild_alerts = false
 				Hardcore_Settings.ignore_xguild_chat = false
 				Hardcore_Settings.reload_reminder_show = true
-				Hardcore_Settings.reload_reminder_interval = 0				
+				Hardcore_Settings.reload_reminder_interval = 0
 				Hardcore:ApplyAlertFrameSettings()
 			end,
 			order = 20,
