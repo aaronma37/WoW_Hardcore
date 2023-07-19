@@ -1,7 +1,7 @@
 ## Interface: 11403
 ## Title: Hardcore 0.11.40
 ## Notes: Supports Classic Hardcore
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author 
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
 ## Version: 0.11.40
@@ -13,6 +13,7 @@
 
 embeds.xml
 
+Libs/ascii85/ascii85.lua
 CustomLayouts.lua
 utils.lua
 Security.lua
