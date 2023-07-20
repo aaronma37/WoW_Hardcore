@@ -310,7 +310,7 @@ local function DrawGeneralTab(container)
 
 	CreateHeadingLabel("11.41", scroll_frame)
 	CreateDescriptionLabel(
-		"- Added appeal utilities\n- Bug fixes for WotLK, achievement animation\n- Corrected grounded achievement forcing naturalist for druids\n- Fix grammer in verification screen; Uses undead instead of scourge.",
+		"- Added appeal utilities\n- Bug fixes for WotLK, achievement animation\n- Corrected grounded achievement forcing naturalist for druids\n- Fix grammer in verification screen; Uses undead instead of scourge\n- Better description for minimum alert level",
 		scroll_frame
 	)
 
