@@ -3755,7 +3755,7 @@ local options = {
 				minimum_alert_level = {
 					type = "input",
 					name = "Minimum Alert Level",
-					desc = "Minimum Alert Level",
+					desc = "Only show death alerts for players who died at or above the specified level.",
 					get = function()
 						return Hardcore_Settings.minimum_show_death_alert_lvl or "0"
 					end,
