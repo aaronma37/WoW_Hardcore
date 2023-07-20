@@ -22,6 +22,10 @@ local function applyAppealCode(args)
 		Hardcore:Print("Wrong syntax: Missing first argument")
 		return
 	end
+	if Hardcore_Character["used_appeal_codes"] and Hardcore_Character["used_appeal_codes"][ver_code] then
+		Hardcore:Print("You have already used this appeal code.")
+		return
+	end
 	if cmd == nil then
 		Hardcore:Print("Wrong syntax: Missing Second argument")
 		return
@@ -32,8 +36,44 @@ local function applyAppealCode(args)
 		return
 	end
 
-	loadstring(ascii85Decode(cmd))()
-	Hardcore:Print("Inputed appeal.")
+	local load_func = loadstring(ascii85Decode(cmd))
+
+	if load_func == nil then
+		Hardcore:Print("Appeal code was malformed.  Double check with your moderator that you have the correct code.")
+		return
+	end
+
+	local function OnOkayClick()
+		load_func()
+		if Hardcore_Character["used_appeal_codes"] == nil then
+			Hardcore_Character["used_appeal_codes"] = {}
+		end
+		Hardcore_Character["used_appeal_codes"][ver_code] = 1
+		Hardcore:Print("Inputed appeal. /reload to save when convenient.")
+		StaticPopup_Hide("ConfirmAppealCode")
+		ReloadUI()
+	end
+
+	local function OnCancelClick()
+		Hardcore:Print("Appeal code cancelled.")
+		StaticPopup_Hide("ConfirmAppealCode")
+	end
+
+	local text =
+		"Are you sure that you want to apply this appeal code.  Only apply appeal codes you have received from a moderator or dev.  Hitting OKAY will apply and reload to save appeal."
+
+	StaticPopupDialogs["ConfirmAppealCode"] = {
+		text = text,
+		button1 = OKAY,
+		button2 = CANCEL,
+		OnAccept = OnOkayClick,
+		OnCancel = OnCancelClick,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+
+	local dialog = StaticPopup_Show("ConfirmAppealCode")
 end
 
 local function extract_arguments(args)
