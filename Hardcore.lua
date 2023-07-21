@@ -146,6 +146,7 @@ local guild_versions_status = {}
 local guild_online = {}
 local guild_highest_version = "0.0.0"
 local guild_roster_loading = false
+local shown_60_toasts = {}
 
 local bubble_hearth_vars = {
 	spell_id = 8690,
@@ -2272,9 +2273,40 @@ function Hardcore:CHAT_MSG_SAY(...)
 	end
 end
 
+local function levelToast(rea_name, rea_class, rea_level)
+	if rea_name == nil or rea_class == nil or rea_level == nil then
+		return
+	end
+	-- Todo: Parameterize this
+	if tostring(rea_level) ~= "60" then
+		return
+	end
+	if shown_60_toasts[rea_name .. rea_level] then
+		return
+	end
+
+	for i = 1, GetNumGuildMembers() do
+		local name, _, _, level, class_str, _, _, _, _, _, class = GetGuildRosterInfo(i)
+
+		if string.split("-", name) == rea_name and tostring(level) == tostring(rea_level) then
+			if HC_showLegendaryFrame then
+				HC_showLegendaryFrame(rea_name, rea_class, rea_level)
+			end
+			shown_60_toasts[rea_name .. rea_level] = 1
+			break
+		end
+	end
+end
+
 function Hardcore:CHAT_MSG_GUILD(...)
 	if self:SetRecentMsg(...) then
 		recent_msg["type"] = 2
+	end
+
+	local message, sn, LN, CN, p2, sF, zcI, cI, cB, unu, lI, senderGUID = ...
+	local rea_name, rea_class, rea_level = string.match(message, "(%w+) the (%w+) has reached level (%w+)!")
+	if rea_name and rea_class and rea_level then
+		levelToast(rea_name, rea_class, rea_level)
 	end
 
 	local arg = { ... }
