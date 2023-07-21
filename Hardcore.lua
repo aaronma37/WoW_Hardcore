@@ -2273,7 +2273,7 @@ function Hardcore:CHAT_MSG_SAY(...)
 	end
 end
 
-function levelToast(rea_name, rea_class, rea_level)
+local function levelToast(rea_name, rea_class, rea_level)
 	if rea_name == nil or rea_class == nil or rea_level == nil then
 		return
 	end
@@ -2288,7 +2288,7 @@ function levelToast(rea_name, rea_class, rea_level)
 	for i = 1, GetNumGuildMembers() do
 		local name, _, _, level, class_str, _, _, _, _, _, class = GetGuildRosterInfo(i)
 
-		if string.split("-", name) == rea_name and level == rea_level then
+		if string.split("-", name) == rea_name and tostring(level) == tostring(rea_level) then
 			if HC_showLegendaryFrame then
 				HC_showLegendaryFrame(rea_name, rea_class, rea_level)
 			end
