@@ -1,10 +1,10 @@
-## Interface: 11403
-## Title: Hardcore 0.11.31
+## Interface: 11404
+## Title: Hardcore 0.11.43
 ## Notes: Supports Classic Hardcore
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author 
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
-## Version: 0.11.31
+## Version: 0.11.43
 
 
 ## DefaultState: enabled
@@ -13,6 +13,7 @@
 
 embeds.xml
 
+Libs/ascii85/ascii85.lua
 CustomLayouts.lua
 utils.lua
 Security.lua
@@ -154,6 +155,7 @@ CharacterStatusScreen.lua
 InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
+ReloadReminder.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
@@ -164,6 +166,7 @@ id_to_npc_classic.lua
 npc_to_id_classic.lua
 DeathLog.lua
 SlashCommands.lua
+LevelToast.lua
 Hardcore.lua
 
 Libs/GreenWall/Constants.lua

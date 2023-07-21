@@ -260,22 +260,20 @@ local function spairs(t, order)
 		end
 	end
 end
-local function CreateHeadingLabel (title, frame)
+local function CreateHeadingLabel(title, frame)
 	local label = AceGUI:Create("Label")
 	label:SetWidth(500)
 	label:SetText("\n" .. title)
 	label:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
 	frame:AddChild(label)
-	
 end
-local function CreateDescriptionLabel (text, frame)
+local function CreateDescriptionLabel(text, frame)
 	local label = AceGUI:Create("Label")
 	label:SetWidth(900)
-	label:SetText(text) 
+	label:SetText(text)
 	label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	frame:AddChild(label)
 end
-
 
 local function DrawGeneralTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -310,27 +308,56 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
-	CreateHeadingLabel("11.30", scroll_frame)
-	CreateDescriptionLabel("- Dungeon tracker improvements\n- Inspect tab improvements\n- File handling upgrades", scroll_frame)
-	
+	CreateHeadingLabel("11.43", scroll_frame)
+	CreateDescriptionLabel(
+		"- Added appeal utilities\n- Bug fixes for WotLK, achievement animation\n- Corrected grounded achievement forcing naturalist for druids\n- Fix grammer in verification screen; Uses undead instead of scourge\n- Better description for minimum alert level\n- Added 60 announcement toast",
+		scroll_frame
+	)
+
+	CreateHeadingLabel("11.40", scroll_frame)
+	CreateDescriptionLabel(
+		"- Asian client support for death alerts, death logs and levels\n- Dungeon tracker improvements\n- Achievement bugfixes\n- File handling upgrades\n- Reload reminder\n- Miscellaneous bug fixes",
+		scroll_frame
+	)
+
+	CreateHeadingLabel("11.31", scroll_frame)
+	CreateDescriptionLabel(
+		"- Dungeon tracker improvements\n- Inspect tab improvements\n- File handling upgrades",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.22", scroll_frame)
-	CreateDescriptionLabel("- Added elemental balance achievement for mage. Complete the Hardcore challenge without at any point casting two elemental damage spells of the same element (fire or ice) in a row. Arcane spells that deal damage are not allowed to be cast.\n- Added Shadow and Flame achievement for warlock. Complete the Hardcore challenge without at any point casting two shadow or two flame spells in a row during combat.\n- Fixes for death log when greenwall only is enabled and for grief protection.\n- Improvements for dungeon tracker and new warning for entering dungeon when you shouldn't.\n- Added Death Statistics Page, which shows your statistics of deaths that you have witnessed via the death log.", scroll_frame)
+	CreateDescriptionLabel(
+		"- Added elemental balance achievement for mage. Complete the Hardcore challenge without at any point casting two elemental damage spells of the same element (fire or ice) in a row. Arcane spells that deal damage are not allowed to be cast.\n- Added Shadow and Flame achievement for warlock. Complete the Hardcore challenge without at any point casting two shadow or two flame spells in a row during combat.\n- Fixes for death log when greenwall only is enabled and for grief protection.\n- Improvements for dungeon tracker and new warning for entering dungeon when you shouldn't.\n- Added Death Statistics Page, which shows your statistics of deaths that you have witnessed via the death log.",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.21", scroll_frame)
-	CreateDescriptionLabel("- Faction-wide death alerts now require the sender to be in a guild\n- Update to dungeon tracking\n- Make death alerts sending more robust; about half of all deaths were previously broadcasted\n- Added option to reset death log position in interface options\n- Fix bug where death log icon wouldn't get hidden when it was specified in interface options", scroll_frame)
+	CreateDescriptionLabel(
+		"- Faction-wide death alerts now require the sender to be in a guild\n- Update to dungeon tracking\n- Make death alerts sending more robust; about half of all deaths were previously broadcasted\n- Added option to reset death log position in interface options\n- Fix bug where death log icon wouldn't get hidden when it was specified in interface options",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.20", scroll_frame)
-	CreateDescriptionLabel("- Add class colors to faction-wide death alerts\n- Added minimize function to death log\n- Fix bug where death marker stays on map after viewing death location from death log\n- Updated messages regarding dataloss and mod pinging\n- Dungeon tracker; re-introduced dungeon kills per mod id\n- Added diagnostic information to verify tab\n- Record death log entries for statistics (capped at 100 for now)\n- Bug fixes related to travelling between continents with death log frame\n- Block failing starting achievements when max level", scroll_frame)
+	CreateDescriptionLabel(
+		"- Add class colors to faction-wide death alerts\n- Added minimize function to death log\n- Fix bug where death marker stays on map after viewing death location from death log\n- Updated messages regarding dataloss and mod pinging\n- Dungeon tracker; re-introduced dungeon kills per mod id\n- Added diagnostic information to verify tab\n- Record death log entries for statistics (capped at 100 for now)\n- Bug fixes related to travelling between continents with death log frame\n- Block failing starting achievements when max level",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.19", scroll_frame)
-	CreateDescriptionLabel("- Fixed minimum level alerts for faction-wide death alerts\n- Fixed issue where death alerts channel always takes the first channel spot\n- Fixed conflict with other addons where system messages wouldn't show up\n- Players can now see death locations by right clicking on death log entry and choosing the see death location item\n- Level filtering in LFG GW mode fixed", scroll_frame)
-	
+	CreateDescriptionLabel(
+		"- Fixed minimum level alerts for faction-wide death alerts\n- Fixed issue where death alerts channel always takes the first channel spot\n- Fixed conflict with other addons where system messages wouldn't show up\n- Players can now see death locations by right clicking on death log entry and choosing the see death location item\n- Level filtering in LFG GW mode fixed",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.18", scroll_frame)
-	CreateDescriptionLabel("- Enabled greenwall! Greenwall is back with limited support.  Death alerts, last words, and level up announcements shared via\n greenwall have been disabled. Death alerts and last words will be configurable via the death log.  Level up announcements will \nuse a similar interface.  \n- Death log added.  Death log keeps track of deaths that occur faction wide.  You can now enable death alerts faction wide (see\n interface options). Via the interface options you can also disable the death log frame.  You can open up interface options by \nright clicking the logo on the death log. \n- Dungeon tracker improvements", scroll_frame)
+	CreateDescriptionLabel(
+		"- Enabled greenwall! Greenwall is back with limited support.  Death alerts, last words, and level up announcements shared via\n greenwall have been disabled. Death alerts and last words will be configurable via the death log.  Level up announcements will \nuse a similar interface.  \n- Death log added.  Death log keeps track of deaths that occur faction wide.  You can now enable death alerts faction wide (see\n interface options). Via the interface options you can also disable the death log frame.  You can open up interface options by \nright clicking the logo on the death log. \n- Dungeon tracker improvements",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.16", scroll_frame)
 	CreateDescriptionLabel("- Disable greenwall\n", scroll_frame)
-
 
 	---
 
@@ -340,18 +367,16 @@ local function DrawGeneralTab(container)
 			.. "- HC Defense fix; resurrecting no longer causes alert\n"
 			.. "- LF mode fixes; no longer crashes for lower version players.\n"
 			.. "- Disable automatic recovery methods\n"
-			.. "- Removed summon mounts from failing Imp Master\n"
-	, scroll_frame)
-	
+			.. "- Removed summon mounts from failing Imp Master\n",
+		scroll_frame
+	)
 
 	---
 
 	CreateHeadingLabel("11.14", scroll_frame)
 
-	CreateDescriptionLabel(
-		"- Fix minor crash on quest turn in\n"
-	, scroll_frame)
-	
+	CreateDescriptionLabel("- Fix minor crash on quest turn in\n", scroll_frame)
+
 	---
 
 	CreateHeadingLabel("11.13", scroll_frame)
@@ -368,10 +393,9 @@ local function DrawGeneralTab(container)
 			.. "- Automatic DC recovery\n"
 			.. "- Automatic server/name change recovery\n"
 			.. "- Fixed Kill the Betrayer achievement\n"
-			.. "- Fixed achievements from not showing up in accountability tab\n"
-	, scroll_frame)
-	
-
+			.. "- Fixed achievements from not showing up in accountability tab\n",
+		scroll_frame
+	)
 
 	---
 
@@ -385,95 +409,98 @@ local function DrawGeneralTab(container)
 			.. "- Improved in-guild muting\n"
 			.. "- Option to block death messages from levels/guilds\n"
 			.. "- Fix Thunderstruck achievement\n"
-			.. "- Fix Against Lord Shalzaru achievement\n"
-	, scroll_frame)
-	
+			.. "- Fix Against Lord Shalzaru achievement\n",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.10", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Various wording changes\n- Added more quests to pvp flag warning\n- Added banned guilds in greenwall\n- Fix to <MOD>\n- Felfire skull fix\n- Dungeon tracker improvements"
-	, scroll_frame)
-	
+		"- Various wording changes\n- Added more quests to pvp flag warning\n- Added banned guilds in greenwall\n- Fix to <MOD>\n- Felfire skull fix\n- Dungeon tracker improvements",
+		scroll_frame
+	)
 
 	---
 
 	CreateHeadingLabel("11.9", scroll_frame)
 
 	CreateDescriptionLabel("- Added `Hardcore contract` to intro splash", scroll_frame)
-	
 
 	---
 
 	CreateHeadingLabel("11.8", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Small trio fix where countdown would immediately fail\n- Fixed minor crash for achievements\n- Fixed earthen arise, Goggeroc kills not registering\n- Player pronouns added\n- auto appeal griefing for under 40 characters.\n- Fixed bug where 60 characters can get achievements intended for non-60s"
-	, scroll_frame)
-	
+		"- Small trio fix where countdown would immediately fail\n- Fixed minor crash for achievements\n- Fixed earthen arise, Goggeroc kills not registering\n- Player pronouns added\n- auto appeal griefing for under 40 characters.\n- Fixed bug where 60 characters can get achievements intended for non-60s",
+		scroll_frame
+	)
+
 	---
 
 	CreateHeadingLabel("11.7", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Fixed Deep in the Ban'ethil Barrow Den from missing Rageclaw kill\n- Fixed kill target for Death to Goggeroc\n- Made profession achievements more reliable and check on reload\n- Fixed minor crash on forced achievement selection\n- Removed checks for duo/trios when 60+"
-	, scroll_frame)
-	
+		"- Fixed Deep in the Ban'ethil Barrow Den from missing Rageclaw kill\n- Fixed kill target for Death to Goggeroc\n- Made profession achievements more reliable and check on reload\n- Fixed minor crash on forced achievement selection\n- Removed checks for duo/trios when 60+",
+		scroll_frame
+	)
+
 	---
 
 	CreateHeadingLabel("11.6", scroll_frame)
 
 	CreateDescriptionLabel("- Better WoTLK patch compatibility (Overhauled AceGUI)", scroll_frame)
-	
+
 	---
 
 	CreateHeadingLabel("11.5", scroll_frame)
 
 	CreateDescriptionLabel("-WoTLK patch compatibility", scroll_frame)
-	
+
 	---
 
 	CreateHeadingLabel("11.4", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Fixed stinkys escape for Alliance\n- Fixed the crown of will showing for horde\n- Fixed Kromgrul from not showing up in achievement list\n- Added new achievement `Serum to the Forsaken`."
-	, scroll_frame)
-	
+		"- Fixed stinkys escape for Alliance\n- Fixed the crown of will showing for horde\n- Fixed Kromgrul from not showing up in achievement list\n- Added new achievement `Serum to the Forsaken`.",
+		scroll_frame
+	)
+
 	---
 
 	CreateHeadingLabel("11.3", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Fixed burning shadow specific bug\n- Tuned achievement animation\n- Dungeon tracking fixes"
-	, scroll_frame)
-	
+		"- Fixed burning shadow specific bug\n- Tuned achievement animation\n- Dungeon tracking fixes",
+		scroll_frame
+	)
+
 	---
 
 	CreateHeadingLabel("11.2", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Made a variety of new achievements more robust\n- duo/trio will no longer fail at lvl 1\n- <MOD> tag no longer applied to say\n- Added legacy support for duo/trio trades"
-	, scroll_frame)
-	
+		"- Made a variety of new achievements more robust\n- duo/trio will no longer fail at lvl 1\n- <MOD> tag no longer applied to say\n- Added legacy support for duo/trio trades",
+		scroll_frame
+	)
 
 	---
 
 	CreateHeadingLabel("11.1", scroll_frame)
 
 	CreateDescriptionLabel(
-		"- Fixed bug with Stadics' challenge\n- Added Achievement Animation (see interface addons menu to test with `show`\n- Fixed bug with PartnerUp! which failed when players had class achievements\n- Dungeon tracking additions; removed infractions for lvl 60's, added appeals\n- Fixed some spelling and grammar for new achievements\n- Fixed bug where quests which have a level requirement would not award achievement if turning in quest leveled up the character."
-	, scroll_frame)
-	
+		"- Fixed bug with Stadics' challenge\n- Added Achievement Animation (see interface addons menu to test with `show`\n- Fixed bug with PartnerUp! which failed when players had class achievements\n- Dungeon tracking additions; removed infractions for lvl 60's, added appeals\n- Fixed some spelling and grammar for new achievements\n- Fixed bug where quests which have a level requirement would not award achievement if turning in quest leveled up the character.",
+		scroll_frame
+	)
+
 	---
 
 	CreateHeadingLabel("11.0", scroll_frame)
 	CreateDescriptionLabel(
-		"- Added a dungeon tab for tracking dungeon stats and completion.\n- Changes to actively prevent illegal trades (addon will block trades from non-trade partners unless you are lvl 60).\n- Increased rep. requirement for Stadic's to 45,000\n- Added 50+ new achievements.  New achievements do not need to be selected at level 1.  See the Achievements tab for more information.\n- Added Duo/Trio appeal codes"
-	, scroll_frame)
-	
-	---
+		"- Added a dungeon tab for tracking dungeon stats and completion.\n- Changes to actively prevent illegal trades (addon will block trades from non-trade partners unless you are lvl 60).\n- Increased rep. requirement for Stadic's to 45,000\n- Added 50+ new achievements.  New achievements do not need to be selected at level 1.  See the Achievements tab for more information.\n- Added Duo/Trio appeal codes",
+		scroll_frame
+	)
 
-	
+	---
 end
 
 local function DrawRulesTab(container)
@@ -611,6 +638,8 @@ end
 
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
+	local string_format_new = false
+	local first_menu_description
 	local function GenerateVerificationString()
 		local version = GetAddOnMetadata("Hardcore", "Version")
 		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
@@ -645,11 +674,26 @@ local function DrawVerifyTab(container, _hardcore_character)
 		local bubbleHearthIncidentsVerificationString =
 			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
 		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
-		return Hardcore_join({
-			baseVerificationString,
-			bubbleHearthIncidentsVerificationString,
-			playedtimeGapsVerificationString,
-		}, ATTRIBUTE_SEPARATOR)
+		if string_format_new == false then
+			return Hardcore_join({
+				baseVerificationString,
+				bubbleHearthIncidentsVerificationString,
+				playedtimeGapsVerificationString,
+			}, ATTRIBUTE_SEPARATOR)
+		else
+			local d1, d2 = DungeonTrackerGetVerificationData()
+			return Hardcore_join({
+				baseVerificationString,
+				bubbleHearthIncidentsVerificationString,
+				playedtimeGapsVerificationString,
+				Hardcore_stringOrNumberToUnicode(d1),
+				Hardcore_stringOrNumberToUnicode(d2),
+				Hardcore_stringOrNumberToUnicode(""), -- Future expansion for dungeon data
+				Hardcore_stringOrNumberToUnicode(Hardcore_GetSecurityStatus()),
+				Hardcore_stringOrNumberToUnicode(Hardcore_Character.last_segment_time_resolution), -- Probably don't need this here
+				Hardcore_stringOrNumberToUnicode(""), -- Future expansion for other data
+			}, ATTRIBUTE_SEPARATOR)
+		end
 	end
 
 	local version = GetAddOnMetadata("Hardcore", "Version")
@@ -658,7 +702,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 	local level = UnitLevel("player")
 	local party_mode = _hardcore_character.party_mode
 	local team_1, team_2 = "", ""
-	if _hardcore_character.team ~= nil then		
+	if _hardcore_character.team ~= nil then
 		team_1 = _hardcore_character.team[1] or "None"
 		team_2 = _hardcore_character.team[2] or "None"
 	end
@@ -682,7 +726,6 @@ local function DrawVerifyTab(container, _hardcore_character)
 		max_level = 80
 	end
 
-
 	local first_menu_description_title = AceGUI:Create("Label")
 	first_menu_description_title:SetWidth(500)
 	first_menu_description_title:SetText("Verify Your Character - " .. version)
@@ -692,16 +735,30 @@ local function DrawVerifyTab(container, _hardcore_character)
 	local character_and_level_label = AceGUI:Create("Label")
 	character_and_level_label:SetWidth(_menu_width)
 	character_and_level_label:SetText(
-			"\n\n" .. name 
-		.. " (lvl " .. level .. " " .. race .. " " .. class .. ") on " .. realm
-		.. "\n [" .. party_mode .. ", " 
-		.. team_1 .. ", " .. team_2 .. "]\n"
-		.. "Played: " .. math.floor(0.5 + _hardcore_character.time_played / 360) / 10 .. " hrs\n\n"
+		"\n\n"
+			.. name
+			.. " (lvl "
+			.. level
+			.. " "
+			.. UnitRace("player")
+			.. " "
+			.. UnitClass("player")
+			.. ") on "
+			.. realm
+			.. "\n ["
+			.. party_mode
+			.. ", "
+			.. team_1
+			.. ", "
+			.. team_2
+			.. "]\n"
+			.. "Played: "
+			.. math.floor(0.5 + _hardcore_character.time_played / 360) / 10
+			.. " hrs\n\n"
 	)
 
 	character_and_level_label:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
 	scroll_frame:AddChild(character_and_level_label)
-
 
 	local extra_lines = ""
 	if UnitLevel("player") < max_level then
@@ -713,12 +770,26 @@ local function DrawVerifyTab(container, _hardcore_character)
 		extra_lines = "\n\n\n"
 	else
 		local general_rules_description = AceGUI:Create("Label")
-		general_rules_description:SetWidth(_menu_width)
-		general_rules_description:SetText("\n\nTo get verified, copy the string below and visit the classichc website.")
+		general_rules_description:SetWidth(600)
+		general_rules_description:SetText("\nTo get verified, copy the string below and visit the classichc website.")
 		general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		scroll_frame:AddChild(general_rules_description)
 
-		local first_menu_description = AceGUI:Create("MultiLineEditBox")
+		local switch_format_button = AceGUI:Create("Button")
+		switch_format_button:SetText("Use new format")
+		switch_format_button:SetWidth(130)
+		scroll_frame:AddChild(switch_format_button)
+		switch_format_button:SetCallback("OnClick", function()
+			if string_format_new == false then
+				switch_format_button:SetText("Use old format")
+			else
+				switch_format_button:SetText("Use new format")
+			end
+			string_format_new = not string_format_new
+			first_menu_description:SetText(GenerateVerificationString())
+		end)
+
+		first_menu_description = AceGUI:Create("MultiLineEditBox")
 		first_menu_description.button:Hide()
 		first_menu_description:SetMaxLetters(0)
 		first_menu_description:SetHeight(850)
@@ -739,7 +810,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 	local character_status_label = AceGUI:Create("Label")
 	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
-	local text = statusString1 .. "\n" .. statusString2
+	local text = "\n" .. statusString1 .. "\n" .. statusString2
 	character_status_label:SetText(text)
 	character_status_label:SetWidth(700)
 	character_status_label:SetFontObject(GameFontHighlightMedium)
@@ -1089,13 +1160,13 @@ local function DrawDungeonsTab(container, _hardcore_character)
 			else
 				total_kill_string = "?"
 			end
-			num_bosses, max_bosses, main_boss_kill_time = DungeonTrackerGetBossKillDataForRun( run )
+			num_bosses, max_bosses, main_boss_kill_time = DungeonTrackerGetBossKillDataForRun(run)
 			if num_bosses >= 0 then
 				boss_kill_string = num_bosses .. "/" .. max_bosses .. " "
 				if main_boss_kill_time > 0 then
 					boss_kill_string = boss_kill_string .. "(" .. SecondsToTime(main_boss_kill_time) .. ")"
 				else
-					boss_kill_string = boss_kill_string .. "(N/A)" 		-- Dungeon done, but end boss not killed
+					boss_kill_string = boss_kill_string .. "(N/A)" -- Dungeon done, but end boss not killed
 				end
 			else
 				boss_kill_string = "?" -- No info
@@ -1114,7 +1185,7 @@ local function DrawDungeonsTab(container, _hardcore_character)
 
 		local function GetEntryCountString(run)
 			if run.num_entries ~= nil and run.num_entries > 1 then
-					return " [" .. run.num_entries .. "]"
+				return " [" .. run.num_entries .. "]"
 			end
 			return ""
 		end
@@ -1141,7 +1212,13 @@ local function DrawDungeonsTab(container, _hardcore_character)
 			num_lines = num_lines + 1
 		end
 		for i, v in pairs(_dt_pending) do
-			name_str = name_str .. "|c00FFFF00" .. v.name .. GetEntryCountString(v) .. " (" .. SecondsToTime(v.idle) .. ")\n"
+			name_str = name_str
+				.. "|c00FFFF00"
+				.. v.name
+				.. GetEntryCountString(v)
+				.. " ("
+				.. SecondsToTime(v.idle)
+				.. ")\n"
 			id_str = id_str .. GetInstanceIDString(v) .. "\n"
 			level_str = level_str .. v.level .. "\n"
 			played_str = played_str .. SecondsToTime(v.time_inside) .. "\n"
@@ -1191,7 +1268,7 @@ local function DrawDungeonsTab(container, _hardcore_character)
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetFullWidth(true)
 	first_menu_description:SetText(
-			   "Dungeons marked with (legacy) are old dungeon runs derived from completed quests. "
+		"Dungeons marked with (legacy) are old dungeon runs derived from completed quests. "
 			.. "A run marked in white is finalised and the dungeon may not be entered again. "
 			.. "A run marked in|c00FFFF00 yellow|c00FFFFFF is pending, and will be finalised after a time of inactivity. "
 			.. "The indicated idle time is not an indicator for the validity of the dungeon ID! "
@@ -1322,9 +1399,17 @@ local function DrawDungeonsTab(container, _hardcore_character)
 	-- Status label at the bottom
 	local status_label = AceGUI:Create("Label")
 	status_label:SetWidth(350)
-	status_label:SetText("|c00FFFF00You've run " 
-				.. #_hardcore_character.dt.runs .. " dungeons. (" 
-				.. GetAddOnMetadata("Hardcore", "Version") .. ", " .. UnitName("player") .. ", " .. UnitLevel("player") .. ")|r")
+	status_label:SetText(
+		"|c00FFFF00You've run "
+			.. #_hardcore_character.dt.runs
+			.. " dungeons. ("
+			.. GetAddOnMetadata("Hardcore", "Version")
+			.. ", "
+			.. UnitName("player")
+			.. ", "
+			.. UnitLevel("player")
+			.. ")|r"
+	)
 	status_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	tabcontainer:AddChild(status_label)
 
@@ -1877,8 +1962,8 @@ local function DrawOfficerToolsTab(container)
 	announcement_edit_text:DisableButton(false)
 
 	announcement_edit_text:SetCallback("OnEnterPressed", function()
-	  local text = announcement_edit_text:GetText()
-	  gw.config.channel.guild:send(GW_MTYPE_HC_ANNOUNCEMENT, text)
+		local text = announcement_edit_text:GetText()
+		gw.config.channel.guild:send(GW_MTYPE_HC_ANNOUNCEMENT, text)
 	end)
 
 	officer_announcement_container:AddChild(announcement_edit_text)
@@ -1894,29 +1979,34 @@ local function DrawOfficerToolsTab(container)
 
 	local peer_guild_text = "    Peer Guilds:\n        "
 
-	for k,v in pairs(gw.config.peer) do
-	  peer_guild_text = peer_guild_text .. "|c0000FFFF" .. k .. "|r "
+	for k, v in pairs(gw.config.peer) do
+		peer_guild_text = peer_guild_text .. "|c0000FFFF" .. k .. "|r "
 	end
 
-	peer_guild_text = peer_guild_text .. "\n\n    Custom Options:\n" 
-	
+	peer_guild_text = peer_guild_text .. "\n\n    Custom Options:\n"
+
 	if hc_self_block_flag and hc_self_block_flag == true then
-	  peer_guild_text = peer_guild_text .. "        |c00FFFF00Defense Mode|r  - Players from this guild will not emit death alerts\n"
+		peer_guild_text = peer_guild_text
+			.. "        |c00FFFF00Defense Mode|r  - Players from this guild will not emit death alerts\n"
 	end
 
 	if hc_gw_lfgm_mode and hc_gw_lfgm_mode == true then
-	  peer_guild_text = peer_guild_text .. "        |c00FFFF00LF Mode|r  - Only `looking for` +/- 10 levels, death alerts, and hc notifications will be communicated across guilds\n"
+		peer_guild_text = peer_guild_text
+			.. "        |c00FFFF00LF Mode|r  - Only `looking for` +/- 10 levels, death alerts, and hc notifications will be communicated across guilds\n"
 	end
 
 	if hc_mute_inguild and tonumber(hc_mute_inguild) > 0 then
-	  peer_guild_text = peer_guild_text .. "        |c00FFFF00Mute low level|r  - Players in this guild under level " .. tonumber(hc_mute_inguild) .. " will be muted\n"
+		peer_guild_text = peer_guild_text
+			.. "        |c00FFFF00Mute low level|r  - Players in this guild under level "
+			.. tonumber(hc_mute_inguild)
+			.. " will be muted\n"
 	end
 
-	peer_guild_text = peer_guild_text .. "\n\n    Banned Tags:\n        " 
+	peer_guild_text = peer_guild_text .. "\n\n    Banned Tags:\n        "
 	if gw_banned_tags then
-	  for k,v in pairs(gw_banned_tags) do
-	    peer_guild_text = peer_guild_text .. k .. " "
-	  end
+		for k, v in pairs(gw_banned_tags) do
+			peer_guild_text = peer_guild_text .. k .. " "
+		end
 	end
 
 	peer_guild_text = peer_guild_text .. "\n\n"
@@ -1925,7 +2015,6 @@ local function DrawOfficerToolsTab(container)
 
 	current_gw_config_text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
 	green_wall_config_container:AddChild(current_gw_config_text)
-
 
 	local officer_notes_guide_container = AceGUI:Create("InlineGroup")
 	officer_notes_guide_container:SetFullWidth(true)
@@ -1941,7 +2030,6 @@ local function DrawOfficerToolsTab(container)
 	)
 	officer_notes_guide_text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
 	officer_notes_guide_container:AddChild(officer_notes_guide_text)
-
 end
 
 local function DrawDeathStatisticsTab(container, _hardcore_settings)
@@ -1961,11 +2049,17 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	-- first_menu_description_title:SetPoint("TOP", 2,5)
 	scroll_frame:AddChild(first_menu_description_title)
-	if _hardcore_settings["death_log_entries"] == nil then return end
+	if _hardcore_settings["death_log_entries"] == nil then
+		return
+	end
 
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetWidth(_menu_width)
-	first_menu_description:SetText("Statistics for deaths that you have witnessed. You have witnessed " .. #_hardcore_settings["death_log_entries"] .. " deaths.\n\n\n")
+	first_menu_description:SetText(
+		"Statistics for deaths that you have witnessed. You have witnessed "
+			.. #_hardcore_settings["death_log_entries"]
+			.. " deaths.\n\n\n"
+	)
 	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	scroll_frame:AddChild(first_menu_description)
 
@@ -1975,74 +2069,75 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	death_map_button:SetWidth(200)
 
 	death_map_button:SetCallback("OnClick", function()
-	  local WorldMapButton = WorldMapFrame:GetCanvas()
-	  local death_tomb_frame = CreateFrame('frame', nil, WorldMapButton)
-	  death_tomb_frame:SetAllPoints()
-	  death_tomb_frame:SetFrameLevel(15000)
-	  death_tomb_frame.entry_textures = {}
+		local WorldMapButton = WorldMapFrame:GetCanvas()
+		local death_tomb_frame = CreateFrame("frame", nil, WorldMapButton)
+		death_tomb_frame:SetAllPoints()
+		death_tomb_frame:SetFrameLevel(15000)
+		death_tomb_frame.entry_textures = {}
 
+		for k, v in ipairs(_hardcore_settings["death_log_entries"]) do
+			if v["map_id"] and v["map_pos"] then
+				local death_tomb_frame_tex = death_tomb_frame:CreateTexture(nil, "OVERLAY")
+				death_tomb_frame_tex:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame-Skull")
+				death_tomb_frame_tex:SetDrawLayer("OVERLAY", 4)
+				death_tomb_frame_tex:SetHeight(25)
+				death_tomb_frame_tex:SetWidth(25)
+				death_tomb_frame_tex:Hide()
 
-	  for k,v in ipairs(_hardcore_settings["death_log_entries"]) do
-	    if v["map_id"] and v["map_pos"] then
-		  local death_tomb_frame_tex = death_tomb_frame:CreateTexture(nil, 'OVERLAY')
-		  death_tomb_frame_tex:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame-Skull")
-		  death_tomb_frame_tex:SetDrawLayer("OVERLAY", 4)
-		  death_tomb_frame_tex:SetHeight(25)
-		  death_tomb_frame_tex:SetWidth(25)
-		  death_tomb_frame_tex:Hide()
+				death_tomb_frame_tex.map_id = v["map_id"]
+				local x, y = strsplit(",", v["map_pos"], 2)
+				death_tomb_frame_tex.coordinates = { x, y }
+				table.insert(death_tomb_frame.entry_textures, death_tomb_frame_tex)
+			end
+		end
+		WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
+		local map_id = WorldMapFrame:GetMapID()
+		local mWidth, mHeight = WorldMapFrame:GetCanvas():GetSize()
+		for k, v in ipairs(death_tomb_frame.entry_textures) do
+			if v.map_id == map_id then
+				v:SetPoint("CENTER", WorldMapButton, "TOPLEFT", mWidth * v.coordinates[1], -mHeight * v.coordinates[2])
+				v:Show()
+			end
+		end
 
-		  death_tomb_frame_tex.map_id = v["map_id"]
-		  local x, y = strsplit(",", v["map_pos"],2)
-		  death_tomb_frame_tex.coordinates = {x,y}
-		  table.insert(death_tomb_frame.entry_textures, death_tomb_frame_tex)
-	    end
-	  end
-	  WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
-	  local map_id = WorldMapFrame:GetMapID()
-	  local mWidth, mHeight = WorldMapFrame:GetCanvas():GetSize()
-	  for k,v in ipairs(death_tomb_frame.entry_textures) do
-	    if v.map_id == map_id then
-	      v:SetPoint('CENTER', WorldMapButton, 'TOPLEFT', mWidth*v.coordinates[1], -mHeight*v.coordinates[2])
-	      v:Show()
-	    end
-	  end
-
-	  WorldMapFrame:HookScript("OnHide", function()
-	    if death_tomb_frame == nil then return end
-	    if death_tomb_frame.entry_textures == nil then return end
-	    for k,v in ipairs(death_tomb_frame.entry_textures) do
-		v:Hide()
-		v = nil
-	    end
-	    death_tomb_frame = nil
-	  end)
-
+		WorldMapFrame:HookScript("OnHide", function()
+			if death_tomb_frame == nil then
+				return
+			end
+			if death_tomb_frame.entry_textures == nil then
+				return
+			end
+			for k, v in ipairs(death_tomb_frame.entry_textures) do
+				v:Hide()
+				v = nil
+			end
+			death_tomb_frame = nil
+		end)
 	end)
 	scroll_frame:AddChild(death_map_button)
 
-
 	local function getDefaultStats()
-	    return {["sum"] = 0, ["num"] = 0}
+		return { ["sum"] = 0, ["num"] = 0 }
 	end
 	local stats = {}
 	stats["avg_level"] = getDefaultStats()
 	stats["avg_level_class"] = {}
 
-	local detected_classes = {
-	}
-	for i,v in pairs(_hardcore_settings["death_log_entries"]) do
-	  if v["level"] then
-	    stats["avg_level"]["sum"] = stats["avg_level"]["sum"] + v["level"]
-	    stats["avg_level"]["num"] = stats["avg_level"]["num"] + 1
-	    if v["class_id"] then
-	      if stats["avg_level_class"][v["class_id"]] == nil then
-		stats["avg_level_class"][v["class_id"]] = getDefaultStats()
-	      end
-	      detected_classes[v["class_id"]] = 1
-	      stats["avg_level_class"][v["class_id"]]["sum"] = stats["avg_level_class"][v["class_id"]]["sum"] + v["level"]
-	      stats["avg_level_class"][v["class_id"]]["num"] = stats["avg_level_class"][v["class_id"]]["num"] + 1
-	    end
-	  end
+	local detected_classes = {}
+	for i, v in pairs(_hardcore_settings["death_log_entries"]) do
+		if v["level"] then
+			stats["avg_level"]["sum"] = stats["avg_level"]["sum"] + v["level"]
+			stats["avg_level"]["num"] = stats["avg_level"]["num"] + 1
+			if v["class_id"] then
+				if stats["avg_level_class"][v["class_id"]] == nil then
+					stats["avg_level_class"][v["class_id"]] = getDefaultStats()
+				end
+				detected_classes[v["class_id"]] = 1
+				stats["avg_level_class"][v["class_id"]]["sum"] = stats["avg_level_class"][v["class_id"]]["sum"]
+					+ v["level"]
+				stats["avg_level_class"][v["class_id"]]["num"] = stats["avg_level_class"][v["class_id"]]["num"] + 1
+			end
+		end
 	end
 
 	local class_stats_container = AceGUI:Create("InlineGroup")
@@ -2050,35 +2145,37 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	scroll_frame:AddChild(class_stats_container)
 
 	local subtitles = {
-	  {"Class", 0},
-	  {"# Recorded", 90},
-	  {"%", 180},
-	  {"Avg. Death Lvl.", 275},
+		{ "Class", 0 },
+		{ "# Recorded", 90 },
+		{ "%", 180 },
+		{ "Avg. Death Lvl.", 275 },
 	}
 
-	local class_types = {
-	}
+	local class_types = {}
 
 	local entry_data = {}
-	for k,_ in pairs(detected_classes) do 
-	  class_types[k] = 1
-	  stats["avg_level_class"][k]["avg"] = stats["avg_level_class"][k]["sum"]/stats["avg_level_class"][k]["num"]
-	  local class_str, _, _ = GetClassInfo(k)
-	  entry_data[k] = {}
-	  entry_data[k]["Class"] = class_str
-	  entry_data[k]["# Recorded"] = stats["avg_level_class"][k]["num"] 
-	  entry_data[k]["%"] = string.format("%.1f", stats["avg_level_class"][k]["num"] / stats["avg_level"]["num"] * 100.0) .. "%"
-	  entry_data[k]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level_class"][k]["avg"])  
+	for k, _ in pairs(detected_classes) do
+		class_types[k] = 1
+		stats["avg_level_class"][k]["avg"] = stats["avg_level_class"][k]["sum"] / stats["avg_level_class"][k]["num"]
+		local class_str, _, _ = GetClassInfo(k)
+		entry_data[k] = {}
+		entry_data[k]["Class"] = class_str
+		entry_data[k]["# Recorded"] = stats["avg_level_class"][k]["num"]
+		entry_data[k]["%"] = string.format(
+			"%.1f",
+			stats["avg_level_class"][k]["num"] / stats["avg_level"]["num"] * 100.0
+		) .. "%"
+		entry_data[k]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level_class"][k]["avg"])
 	end
 
 	class_types["All"] = 1
-	stats['avg_level']['avg'] = stats["avg_level"]["sum"]/stats["avg_level"]["num"]
+	stats["avg_level"]["avg"] = stats["avg_level"]["sum"] / stats["avg_level"]["num"]
 
 	entry_data["All"] = {}
 	entry_data["All"]["Class"] = "All"
 	entry_data["All"]["# Recorded"] = stats["avg_level"]["num"]
 	entry_data["All"]["%"] = "100%"
-	entry_data["All"]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level"]["avg"]) 
+	entry_data["All"]["Avg. Death Lvl."] = string.format("%.1f", stats["avg_level"]["avg"])
 
 	local header = AceGUI:Create("Label")
 	header:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
@@ -2086,52 +2183,49 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 	class_stats_container:SetWidth(400)
 	header.font_strings = {}
 	for _, v in ipairs(subtitles) do
-	  header.font_strings[v[1]] = header.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	  header.font_strings[v[1]]:SetPoint("LEFT", header.frame, "LEFT", v[2], 0)
-	  header.font_strings[v[1]]:SetText(v[1])
+		header.font_strings[v[1]] = header.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		header.font_strings[v[1]]:SetPoint("LEFT", header.frame, "LEFT", v[2], 0)
+		header.font_strings[v[1]]:SetText(v[1])
 	end
 	class_stats_container:AddChild(header)
 
 	local entries = {}
-	for k,_ in pairs(class_types) do
-	  local entry = AceGUI:Create("Label")
-	  table.insert(entries, entry)
-	  entry:SetText(" ")
-	  entry.font_strings = {}
-	  for _, v in ipairs(subtitles) do
-	    entry.font_strings[v[1]] = entry.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	    entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
-	    entry.font_strings[v[1]]:SetPoint("LEFT", entry.frame, "LEFT", v[2], 0)
-	    entry.font_strings[v[1]]:SetTextColor(1,1,1)
-	    entry.font_strings[v[1]]:SetText(entry_data[k][v[1]])
-	  end
-	  class_stats_container:AddChild(entry)
+	for k, _ in pairs(class_types) do
+		local entry = AceGUI:Create("Label")
+		table.insert(entries, entry)
+		entry:SetText(" ")
+		entry.font_strings = {}
+		for _, v in ipairs(subtitles) do
+			entry.font_strings[v[1]] = entry.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
+			entry.font_strings[v[1]]:SetPoint("LEFT", entry.frame, "LEFT", v[2], 0)
+			entry.font_strings[v[1]]:SetTextColor(1, 1, 1)
+			entry.font_strings[v[1]]:SetText(entry_data[k][v[1]])
+		end
+		class_stats_container:AddChild(entry)
 	end
 
 	scroll_frame.frame:HookScript("OnHide", function()
-	  death_tomb_frame = nil
-	  if header ~= nil then
-	    for k,_ in pairs(header.font_strings) do 
-	      header.font_strings[k]:Hide()
-	      header.font_strings[k] = nil
-	    end
-	    header = nil 
-	  end
+		death_tomb_frame = nil
+		if header ~= nil then
+			for k, _ in pairs(header.font_strings) do
+				header.font_strings[k]:Hide()
+				header.font_strings[k] = nil
+			end
+			header = nil
+		end
 
-	  if entries ~= nil then
-	    for _,v in ipairs(entries) do
-	      for k,_ in pairs(v.font_strings) do 
-		v.font_strings[k]:Hide()
-		v.font_strings[k] = nil
-	      end
-	      v = nil 
-	    end
-	    entries = nil
-	  end
+		if entries ~= nil then
+			for _, v in ipairs(entries) do
+				for k, _ in pairs(v.font_strings) do
+					v.font_strings[k]:Hide()
+					v.font_strings[k] = nil
+				end
+				v = nil
+			end
+			entries = nil
+		end
 	end)
-
-
-
 end
 
 function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_function)
@@ -2174,7 +2268,7 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		{ value = "DeathStatisticsTab", text = "Death Statistics" },
 	}
 	if hc_guild_rank_index and hc_guild_rank_index < 2 then -- 0 is GM, 1 is generally officer
-	  table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
+		table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
 	end
 
 	tabcontainer:SetTabs(tab_table)

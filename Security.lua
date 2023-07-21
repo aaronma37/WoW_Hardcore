@@ -150,3 +150,140 @@ function Hardcore_VerifyChecksum()
 		end
 	end
 end
+
+-- Store the relevant verification data to the Hardcore_Character
+-- This should not be called too soon after login, because then some variables aren't ready yet
+function Hardcore_StoreCharacterInfo( level )
+
+	if Hardcore_Character.char_info == nil then
+		Hardcore_Character.char_info = {}
+	end
+
+	-- Check if we aren't running this too soon after 
+	local class, race, name, realm
+	local guid = UnitGUID("player")
+	if guid ~= nil then
+		_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	end
+	realm = GetRealmName()
+	if guid == nil or class == nil or race == nil or name == nil or realm == nil then
+		--Hardcore:Print( "GUID / name / race / realm = nil, postponing by one second")
+		C_Timer.After(1, function()
+			Hardcore_StoreCharacterInfo( level )
+		end)
+		return
+	end
+	Hardcore_Character.char_info.race = race
+	Hardcore_Character.char_info.class = class
+	Hardcore_Character.char_info.name = name
+	Hardcore_Character.char_info.realm = realm
+	Hardcore_Character.char_info.version = GetAddOnMetadata("Hardcore", "Version")
+	if level == nil then
+		Hardcore_Character.char_info.level = UnitLevel("player")
+	else
+		Hardcore_Character.char_info.level = level
+	end
+
+	-- Calculate the checksum, mix in the GUID to prevent copying this in from someone else
+	local _ci = Hardcore_Character.char_info
+	local data = _ci.version .. _ci.realm .. _ci.level .. _ci.race .. _ci.class .. _ci.name .. UnitGUID("player")
+	Hardcore_Character.char_info.checksum = Hardcore_Checksum(data)
+
+end
+
+
+local function Hardcore_GoldTrackerChecksum()
+
+	-- Fool proofing. If any of these variables don't exist, the checksum is invalid
+	if Hardcore_Character.gt.time_stamp == nil or
+		Hardcore_Character.gt.played == nil or
+		Hardcore_Character.gt.amount == nil or
+		Hardcore_Character.gt.track_start == nil or
+		Hardcore_Character.gt.events == nil
+	then
+		return -1
+	end
+
+	local data = Hardcore_Character.gt.time_stamp .. Hardcore_Character.gt.amount .. Hardcore_Character.gt.played
+	data = data .. Hardcore_Character.gt.track_start .. Hardcore_Character.guid
+
+	-- Add the money difference events to the checksum
+	for i,v in ipairs( Hardcore_Character.gt.events ) do
+		data = data .. v.time_stamp_old .. v.time_stamp_new .. v.played_old .. v.played_new .. v.difference
+	end
+
+	-- Store the checksum
+	return Hardcore_Checksum( data )
+
+end
+
+-- Hardcore_GoldTrackerCheck
+--
+-- Checks if there were changes in gold since the last logout
+
+function Hardcore_GoldTrackerCheck()
+
+	-- First time we are called, then there is nothing to do
+	-- If the user just throws away all his gold tracker data, it will show in the track_start
+	if Hardcore_Character.gt == nil then
+		return
+	end
+
+	-- See if the GUID is available already. If not, postpone by a second and try again
+	local guid = UnitGUID("player")
+	if guid == nil then
+		C_Timer.After(1, function()
+			Hardcore_GoldTrackerCheck()
+		end)
+		return
+	end
+
+	-- Calculate the checksum, if we have all the data
+	local checksum_calc = Hardcore_GoldTrackerChecksum()
+
+	-- Now check if the checksum is still valid
+	if checksum_calc ~= Hardcore_Character.gt.checksum then
+		Hardcore:Print( "You have tampered with the data file -- your run is now invalid!")
+		tampered_status = true
+	end
+
+	-- Now check if the gold amount has changed
+	local difference = GetMoney() - Hardcore_Character.gt.amount
+	if difference ~= 0 then
+		MONEY_DIFF = {}
+		MONEY_DIFF.time_stamp_old = Hardcore_Character.gt.time_stamp
+		MONEY_DIFF.time_stamp_new = date("%m/%d/%y %H:%M:%S")
+		MONEY_DIFF.played_old = Hardcore_Character.gt.played
+		MONEY_DIFF.played_new = Hardcore_Character.time_played
+		MONEY_DIFF.difference = difference
+		table.insert( Hardcore_Character.gt.events, MONEY_DIFF )
+
+		Hardcore:Print( "Detected that the amount of money on your character has changed since last logout")
+		Hardcore:Print( "The Hardcore mods will be notified.")
+
+		-- Now recalculate the checksum with the actual amount
+		Hardcore_Character.gt.amount = GetMoney()
+		Hardcore_Character.gt.checksum = Hardcore_GoldTrackerChecksum()
+	end
+end
+
+
+-- Hardcore_GoldTrackerPlayerMoney 
+--
+-- Fired after the PLAYER_MONEY event. 
+-- Stores the current gold to the data file
+
+function Hardcore_GoldTrackerPlayerMoney()
+	if Hardcore_Character ~= nil then
+		local now = date("%m/%d/%y %H:%M:%S")
+		if Hardcore_Character.gt == nil then
+			Hardcore_Character.gt = {}
+			Hardcore_Character.gt.events = {}
+			Hardcore_Character.gt.track_start = now
+		end
+		Hardcore_Character.gt.time_stamp = now
+		Hardcore_Character.gt.played = Hardcore_Character.time_played
+		Hardcore_Character.gt.amount = GetMoney()
+		Hardcore_Character.gt.checksum = Hardcore_GoldTrackerChecksum()
+	end
+end

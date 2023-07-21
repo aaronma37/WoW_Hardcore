@@ -498,7 +498,7 @@ local function DungeonTrackerWarnInfraction()
 	local chat_color = "\124cffFF0000"
 
 	-- We only warn if there is still chance to get out in time
-	local time_left = DT_INSIDE_MAX_TIME - Hardcore_Character.dt.current.time_inside
+	local time_left = DT_INSIDE_MAX_TIME_NO_KILLS - Hardcore_Character.dt.current.time_inside
 	if time_left <= 0 then
 		return
 	end
@@ -1571,6 +1571,29 @@ local function DungeonTrackerFindMergeableRuns()
 	return something_removed
 end
 
+-- DungeonTrackerGetVerificationData()
+--
+-- Returns the three fields of data that need to go into the verification string
+
+function DungeonTrackerGetVerificationData()
+
+	local overleveled_runs = 0
+	local repeated_runs = 0
+
+	if Hardcore_Character.dt ~= nil then
+		if Hardcore_Character.dt.repeated_runs ~= nil then
+			repeated_runs = Hardcore_Character.dt.repeated_runs
+		end
+		if Hardcore_Character.dt.overleveled_runs ~= nil then
+			overleveled_runs = Hardcore_Character.dt.overleveled_runs
+		end
+	end
+
+	return repeated_runs, overleveled_runs
+
+end
+
+
 
 -- DungeonTracker
 --
@@ -1605,6 +1628,9 @@ local function DungeonTracker()
 		Hardcore_Character.dt.version = DT_VERSION
 		DungeonTrackerUpgradeLogVersion3()
 	end
+
+	-- Tell the watchdog we are still alive
+	ReloadReminderDungeonTrackerUpdate()
 
 	-- Sometimes, runs don't get logged correctly, like when they are pending and the addon is updated to a version
 	-- with a different format or when runs are deleted through appeal commands. In those cases, runs might disappear
