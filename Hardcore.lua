@@ -72,7 +72,7 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
-  mute_death_alert_sounds = false, 
+    mute_death_alert_sounds = false, 
 	reload_reminder_interval = 0,
 }
 
