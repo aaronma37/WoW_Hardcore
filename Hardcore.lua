@@ -34,7 +34,7 @@ local CLASSES = {
 	[3] = "Hunter",
 	[4] = "Rogue",
 	[5] = "Priest",
-	[6] = "Death Knight", -- new Death Knight ID
+	[6] = "Death Knight", 
 	[7] = "Shaman",
 	[8] = "Mage",
 	[9] = "Warlock",
@@ -55,7 +55,6 @@ local CLASS_DICT = {
 }
 
 --[[ Global saved variables ]]
---
 Hardcore_Settings = {
 	level_list = {},
 	notify = true,
@@ -73,13 +72,13 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
+    mute_death_alert_sounds = false, 
 	reload_reminder_interval = 0,
 }
 
 WARNING = ""
 
 --[[ Character saved variables ]]
---
 Hardcore_Character = {
 	guid = "",
 	time_tracked = 0, -- seconds
@@ -109,7 +108,6 @@ Hardcore_Character = {
 Backup_Character_Data = {}
 
 --[[ Local variables ]]
---
 _G.hc_online_player_ranks = {}
 local speedrun_levels = {
 	[10] = 1,
@@ -2444,9 +2442,9 @@ function Hardcore:ShowAlertFrame(styleConfig, message)
 
 	frame:Show()
 
-	if alertSound then
-		PlaySound(alertSound)
-	end
+    if alertSound and not hardcore_settings.mute_death_alert_sounds then
+        PlaySound(alertSound)
+    end
 
 	-- HACK:
 	-- There's a bug here where a sequence of overlapping notifications share one 'hide' timer
@@ -3750,6 +3748,18 @@ local options = {
 					end,
 					order = 2,
 				},
+				mute_death_alert_sounds = {
+					type = "toggle",
+					name = "Mute death alert sound",
+					desc = "When left unchecked, a sound will play when a death alert is displyed. Checking this box will mute the sound, but the popups will continue to appear if the \"Death alerts\" setting is not set to \"off\".",
+					get = function()
+                        return Hardcore_Settings.mute_death_alert_sounds
+					end,
+					set = function()
+                        Hardcore_Settings.mute_death_alert_sounds = not Hardcore_Settings.mute_death_alert_sounds
+					end,
+					order = 1,
+				},
 				grief_alerts = {
 					type = "select",
 					name = "Grief alerts",
@@ -3786,8 +3796,8 @@ local options = {
 				},
 				minimum_alert_level = {
 					type = "input",
-					name = "Minimum Alert Level",
-					desc = "Only show death alerts for players who died at or above the specified level.",
+					name = "Minimum alert level",
+					desc = "Death alert popups, if enabled, will only appear for characters who have died above this level.",
 					get = function()
 						return Hardcore_Settings.minimum_show_death_alert_lvl or "0"
 					end,
