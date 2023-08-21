@@ -565,7 +565,7 @@ function selfDeathAlert(death_source_str)
 	local position = nil
 	if map then 
 		position = C_Map.GetPlayerMapPosition(map, "player")
-		local continentID, worldPosition = C_Map.GetWorldPosFromMapPos(map, position)
+		--local continentID, worldPosition = C_Map.GetWorldPosFromMapPos(map, position)   -- BREAKS IN DUNGEONS
 	else
 	  local _, _, _, _, _, _, _, _instance_id, _, _ = GetInstanceInfo()
 	  instance_id = _instance_id
