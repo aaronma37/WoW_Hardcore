@@ -113,6 +113,7 @@ Achievements/MasterHerbalism.lua
 Achievements/MasterFishing.lua
 Achievements/MasterCooking.lua
 Achievements/MasterFirstAid.lua
+Achievements/Parkour.lua
 Achievements/Tainted.lua
 Achievements/TheDungeonCrawler.lua
 Achievements/SpeedrunnerTen.lua
