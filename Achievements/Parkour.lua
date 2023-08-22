@@ -189,16 +189,13 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 	local arg = { ... }
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		local unit, cast_guid, spell_id = ...
-		-- print( unit .. "," .. cast_guid .. "," .. spell_id )
 		if unit ~= "player" then
 			return
 		end
-		-- Checks where the position is confirmed by First Aid range to a mob
+		-- Store the name of the first aid spell in the local language
 		if spell_id == 746 or spell_id == 1159 or spell_id == 3267 or spell_id == 3268 or
 			spell_id == 7926 or spell_id == 7927 or spell_id == 10838 or spell_id == 10839 or
 			spell_id == 18608 or spell_id == 23696 then
-			-- Check if we are in the Orgrimmar bank ledge and the target is Rokhstrom
-			--Hardcore:Debug( "You cast first aid, " .. unit .. ", " .. cast_guid .. ", " .. spell_id )
 			first_aid_name = GetSpellInfo(spell_id)
 		end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
@@ -212,7 +209,6 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 				if source_guid ~= UnitGUID("player") then
 					return
 				end
-
 				-- Check if it was Rokhstrom that got bandaged
 				local target_type, _, server, map_id, instance_id, target_type_id = string.split("-", dest_guid)
 				map_id = tonumber( map_id )
