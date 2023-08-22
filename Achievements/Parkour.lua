@@ -25,7 +25,7 @@ local parkour_x, parkour_y				-- Retrieved once per callback event to prevent we
 local parkour_map_id = 0
 local parkour_id_names = {
 	["ORGAH"] = "the Orgrimmar Auction House Ledge",
-	["ORGB1"] = "the Orgrimmar Bank Ledge",
+	["ORGB1"] = "Keanu's Korner",
 	["ORGB2"] = "Krueger's Point",		-- Dedicated to the player that introduced me to WOW Parkour :-)
 }
 
@@ -45,8 +45,8 @@ local function UpdateParkourPoints()
 	end
 
 	local points = 0
-	for i, v in ipairs( Hardcore_Character.parkour ) do
-		if parkour_id_names[ v.id ] ~= nil then
+	for k, v in pairs( Hardcore_Character.parkour ) do
+		if parkour_id_names[ k ] ~= nil then
 			points = points + v.points
 		end
 	end
@@ -87,7 +87,7 @@ local function UpdateParkourAchievement( parkour_id )
 
 	-- Add or replace the existing parkour spot
 	local PARKOUR_DATA = {}
-	PARKOUR_DATA.id = parkour_id
+	--PARKOUR_DATA.id = parkour_id
 	PARKOUR_DATA.points = 1								-- How many parkour level points for this place
 	PARKOUR_DATA.coords = { parkour_x, parkour_y }		-- Store this for later, in case something changes
 	PARKOUR_DATA.map_id = parkour_map_id				-- Store this for later, in case something changes
@@ -100,6 +100,9 @@ local function UpdateParkourAchievement( parkour_id )
 	-- Print congratulation message
 	Hardcore:Print( "You have reached " .. parkour_id_names[ parkour_id ] .. again )
 	Hardcore:Print( "You currently have " .. points .. " Parkour points")
+
+	-- Call the general succeed function to log it in the achievement system
+	_achievement.succeed_function_executor.Succeed(_achievement.name)
 
 	return
 end
@@ -146,7 +149,7 @@ end
 
 -- TODO TODO : Fill this with the coords from Keanu / Krueger
 local function OnOrgrimmarBankLedgeTwo()
-	if IsPointWithinTriangle( parkour_x, parkour_y, 0,0, 0,0, 0,0 ) then
+	if IsPointWithinTriangle( parkour_x, parkour_y, 1610.1, -4373.3, 1611.1, -4376.1, 1610.9, -4377.4 ) then
 		return true
 	end
 	return false
@@ -225,9 +228,6 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 				elseif OnOrgrimmarBankLedgeTwo() == true then
 					UpdateParkourAchievement("ORGB2")
 				end
-
-				print( "Achievement awarded!" )
-				_achievement.succeed_function_executor.Succeed(_achievement.name)
 			end
 		end
 	elseif event == "CHAT_MSG_TEXT_EMOTE" then			-- For debugging purposes
@@ -237,9 +237,9 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 				StoreRoundedPlayerPosition()
 				parkour_map_id = mapID
 				if OnOrgrimmarBankLedge() then
-					Hardcore:Print( "You are on the Orgrimmar Bank ledge, bandage Ambassador Rokhstrom for the Parkour achievement" )
+					Hardcore:Print( "You are near " .. parkour_id_names[ "ORGB1" ] .. ", bandage Ambassador Rokhstrom for the Parkour achievement" )
 				elseif OnOrgrimmarBankLedgeTwo() then
-					Hardcore:Print( "You are on Krueger's Point, bandage Ambassador Rokhstrom for the Parkour achievement" )
+					Hardcore:Print( "You are near " .. parkour_id_names[ "ORGB2" ] .. ", bandage Ambassador Rokhstrom for the Parkour achievement" )
 				elseif OnOrgrimmarAuctionHouseLedge() then
 					UpdateParkourAchievement("ORGAH")
 				end
