@@ -199,13 +199,14 @@ local function Hardcore_GoldTrackerChecksum()
 		Hardcore_Character.gt.played == nil or
 		Hardcore_Character.gt.amount == nil or
 		Hardcore_Character.gt.track_start == nil or
+		Hardcore_Character.gt.amount_start == nil or
 		Hardcore_Character.gt.events == nil
 	then
 		return -1
 	end
 
 	local data = Hardcore_Character.gt.time_stamp .. Hardcore_Character.gt.amount .. Hardcore_Character.gt.played
-	data = data .. Hardcore_Character.gt.track_start .. Hardcore_Character.guid
+	data = data .. Hardcore_Character.gt.track_start .. Hardcore_Character.gt.amount_start .. Hardcore_Character.guid
 
 	-- Add the money difference events to the checksum
 	for i,v in ipairs( Hardcore_Character.gt.events ) do
@@ -280,6 +281,7 @@ function Hardcore_GoldTrackerPlayerMoney()
 			Hardcore_Character.gt = {}
 			Hardcore_Character.gt.events = {}
 			Hardcore_Character.gt.track_start = now
+			Hardcore_Character.gt.amount_start = GetMoney()
 		end
 		Hardcore_Character.gt.time_stamp = now
 		Hardcore_Character.gt.played = Hardcore_Character.time_played
