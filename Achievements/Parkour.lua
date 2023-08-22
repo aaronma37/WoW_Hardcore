@@ -24,7 +24,7 @@ local first_aid_name = "First Aid"		-- Will be overwritten in the local language
 local parkour_x, parkour_y				-- Retrieved once per callback event to prevent weirdness when you change halfway
 local parkour_map_id = 0
 local parkour_id_names = {
-	["ORGAH"] = "the Orgrimmar Auction House Ledge",
+	["ORGAH"] = "Vanillaman's Lair",
 	["ORGB1"] = "Keanu's Korner",
 	["ORGB2"] = "Krueger's Point",		-- Dedicated to the player that introduced me to WOW Parkour :-)
 }
