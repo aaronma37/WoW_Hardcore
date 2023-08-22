@@ -288,7 +288,7 @@ function Hardcore_AdjustTimeResolutions()
 		local i = 0
 		local k = 0
 		_h = 0
-		if Hardcore_Character.last_segment_time_resolution == nil or Hardcore_Character.tracked_played_percentage == 0 then
+		if Hardcore_Character.last_segment_time_resolution == nil or Hardcore_Character.tracked_played_percentage == nil or Hardcore_Character.tracked_played_percentage == 0 then
 			Hardcore_Character.last_segment_time_resolution = 0			-- Fix bad habit of shortening variable names
 			return
 		end
@@ -307,7 +307,7 @@ function Hardcore_AdjustTimeResolutions()
 		if i == 0 then return end
 
 		local new_tracked = Hardcore_RecalculateTrackedPercentage()
-		if (math.abs(new_tracked - Hardcore_Character.tracked_played_percentage) > 1e-8)  or (_h ~= (9-k)) then
+		if (math.abs(new_tracked - Hardcore_Character.tracked_played_percentage) > 1e-8) or (_h ~= (9-k)) then
 			if _h < 9 then _h = _h + 1 end
 		end
 		Hardcore_Character.last_segment_time_resolution = _h

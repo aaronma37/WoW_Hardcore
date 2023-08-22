@@ -592,6 +592,7 @@ function Hardcore:ForceResetSavedVariables()
 	Hardcore_Character.dungeon_kill_targets = nil
 	Hardcore_Character.dungeon_kill_targets_solo = nil
 	Hardcore_Character.kill_list_dict = nil
+	Hardcore_Character.gt = nil
 end
 
 function Hardcore:InitializeSettingsSavedVariables()
@@ -928,7 +929,7 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("CHAT_MSG_PARTY")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_GUILD")
-	--self:RegisterEvent("PLAYER_MONEY")
+	self:RegisterEvent("PLAYER_MONEY")
 
 	-- Register spell cast events for paladin for checking bubble hearth
 	self:RegisterEvent("UNIT_SPELLCAST_START")
@@ -961,7 +962,7 @@ function Hardcore:PLAYER_LOGIN()
 	-- Do the security check
 	Hardcore_VerifyChecksum()
 	Hardcore:UpdateVerificationStatus()
-	--Hardcore_GoldTrackerCheck()
+	Hardcore_GoldTrackerCheck()
 
 	local any_acheivement_registered = false
 	for i, v in ipairs(Hardcore_Character.achievements) do
@@ -2370,7 +2371,7 @@ function Hardcore:GUILD_ROSTER_UPDATE(...)
 end
 
 function Hardcore:PLAYER_MONEY(...)
-	--Hardcore_GoldTrackerPlayerMoney()
+	Hardcore_GoldTrackerPlayerMoney()
 end
 
 --[[ Utility Methods ]]
