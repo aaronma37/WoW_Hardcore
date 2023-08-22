@@ -198,7 +198,7 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 			spell_id == 7926 or spell_id == 7927 or spell_id == 10838 or spell_id == 10839 or
 			spell_id == 18608 or spell_id == 23696 then
 			-- Check if we are in the Orgrimmar bank ledge and the target is Rokhstrom
-			Hardcore:Debug( "You cast first aid, " .. unit .. ", " .. cast_guid .. ", " .. spell_id )
+			--Hardcore:Debug( "You cast first aid, " .. unit .. ", " .. cast_guid .. ", " .. spell_id )
 			first_aid_name = GetSpellInfo(spell_id)
 		end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
