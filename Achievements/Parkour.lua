@@ -236,7 +236,11 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 				end
 			end
 		end
-	elseif event == "CHAT_MSG_TEXT_EMOTE" then			-- For debugging purposes
+	elseif event == "CHAT_MSG_TEXT_EMOTE" then			-- 
+		_, _, _, _, _, _, _, _, _, _, _, guid = ...
+		if guid == nil or guid ~= UnitGUID("player") then
+			return
+		end
 		if IsInInstance() == false then
 			local mapID = C_Map.GetBestMapForUnit("player")
 			if mapID == 1454 then						-- Orgrimmar
