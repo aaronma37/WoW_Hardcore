@@ -197,24 +197,42 @@ local function Hardcore_GoldTrackerChecksum()
 	-- Fool proofing. If any of these variables don't exist, the checksum is invalid
 	if Hardcore_Character.gt.time_stamp == nil or
 		Hardcore_Character.gt.played == nil or
-		Hardcore_Character.gt.amount == nil or
-		Hardcore_Character.gt.track_start == nil or
-		Hardcore_Character.gt.amount_start == nil or
-		Hardcore_Character.gt.events == nil
+		Hardcore_Character.gt.amount == nil
 	then
 		return -1
 	end
 
-	local data = Hardcore_Character.gt.time_stamp .. Hardcore_Character.gt.amount .. Hardcore_Character.gt.played
-	data = data .. Hardcore_Character.gt.track_start .. Hardcore_Character.gt.amount_start .. Hardcore_Character.guid
+	-- Add the basic variables to the checksum
+	local data = Hardcore_Character.gt.time_stamp .. Hardcore_Character.gt.amount .. Hardcore_Character.gt.played .. Hardcore_Character.guid
 
 	-- Add the money difference events to the checksum
-	for i,v in ipairs( Hardcore_Character.gt.events ) do
-		data = data .. v.time_stamp_old .. v.time_stamp_new .. v.played_old .. v.played_new .. v.difference
+	if Hardcore_Character.gt.events ~= nil then
+		for i,v in ipairs( Hardcore_Character.gt.events ) do
+			data = data .. v.time_stamp_old .. v.time_stamp_new .. v.played_old .. v.played_new .. v.difference
+		end
+	end
+	-- Add the tamper events to the checksum
+	if Hardcore_Character.gt.tampers ~= nil then
+		for i,v in ipairs( Hardcore_Character.gt.tampers ) do
+			data = data .. v.date .. v.checksum1 .. v.checksum2
+		end
 	end
 
 	-- Store the checksum
 	return Hardcore_Checksum( data )
+
+end
+
+local function Hardcore_GoldTrackerAddEvent( time_stamp_old, time_stamp_new, played_old, played_new, difference )
+
+	MONEY_DIFF = {}
+	MONEY_DIFF.time_stamp_old = time_stamp_old
+	MONEY_DIFF.time_stamp_new = time_stamp_new
+	MONEY_DIFF.played_old = played_old
+	MONEY_DIFF.played_new = played_new
+	MONEY_DIFF.difference = difference
+
+	table.insert( Hardcore_Character.gt.events, MONEY_DIFF )
 
 end
 
@@ -225,7 +243,7 @@ end
 function Hardcore_GoldTrackerCheck()
 
 	-- First time we are called, then there is nothing to do
-	-- If the user just throws away all his gold tracker data, it will show in the track_start
+	-- If the user just throws away all his gold tracker data, it will show in the first event's date
 	if Hardcore_Character.gt == nil then
 		return
 	end
@@ -244,23 +262,30 @@ function Hardcore_GoldTrackerCheck()
 
 	-- Now check if the checksum is still valid
 	if checksum_calc ~= Hardcore_Character.gt.checksum then
-		Hardcore:Print( "You have tampered with the data file -- your run is now invalid!")
-		tampered_status = true
+		Hardcore:Print( "Warning: Your gold tracker data appears tampered. Contact a MOD" )
+		TAMPER = {}
+		TAMPER.date = date("%m/%d/%y %H:%M:%S")
+		TAMPER.checksum1 = checksum_calc
+		TAMPER.checksum2 = Hardcore_Character.gt.checksum
+		if Hardcore_Character.gt.tampers == nil then
+			Hardcore_Character.gt.tampers = {}
+		end
+		table.insert(Hardcore_Character.gt.tampers, TAMPER)
+		Hardcore_Character.gt.checksum = Hardcore_GoldTrackerChecksum()
+
+		-- The following two lines could be enabled after some testing in the field
+		--Hardcore:Print( "You have tampered with the data file (gt) -- your run is now invalid!")
+		--tampered_status = true			
 	end
 
 	-- Now check if the gold amount has changed
 	local difference = GetMoney() - Hardcore_Character.gt.amount
 	if difference ~= 0 then
-		MONEY_DIFF = {}
-		MONEY_DIFF.time_stamp_old = Hardcore_Character.gt.time_stamp
-		MONEY_DIFF.time_stamp_new = date("%m/%d/%y %H:%M:%S")
-		MONEY_DIFF.played_old = Hardcore_Character.gt.played
-		MONEY_DIFF.played_new = Hardcore_Character.time_played
-		MONEY_DIFF.difference = difference
-		table.insert( Hardcore_Character.gt.events, MONEY_DIFF )
+		Hardcore_GoldTrackerAddEvent(Hardcore_Character.gt.time_stamp,date("%m/%d/%y %H:%M:%S"),
+			Hardcore_Character.gt.played, Hardcore_Character.time_played, difference )
 
-		Hardcore:Print( "Detected that the amount of money on your character has changed since last logout")
-		Hardcore:Print( "The Hardcore mods will be notified.")
+		Hardcore:Print( "Detected that the amount of money on your character has changed since last logout.")
+		Hardcore:Print( "This may be due to a crash, or due to having the addon deactivated.")
 
 		-- Now recalculate the checksum with the actual amount
 		Hardcore_Character.gt.amount = GetMoney()
@@ -280,8 +305,7 @@ function Hardcore_GoldTrackerPlayerMoney()
 		if Hardcore_Character.gt == nil then
 			Hardcore_Character.gt = {}
 			Hardcore_Character.gt.events = {}
-			Hardcore_Character.gt.track_start = now
-			Hardcore_Character.gt.amount_start = GetMoney()
+			Hardcore_GoldTrackerAddEvent("-", now, -1, Hardcore_Character.time_played, GetMoney() )
 		end
 		Hardcore_Character.gt.time_stamp = now
 		Hardcore_Character.gt.played = Hardcore_Character.time_played

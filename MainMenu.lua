@@ -308,6 +308,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.44", scroll_frame)
+	CreateDescriptionLabel(
+		"- Fixed bug for death message in dungeons\n- Added Gold Tracker\n- Added Parkour achievement",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.43", scroll_frame)
 	CreateDescriptionLabel(
 		"- Added appeal utilities\n- Bug fixes for WotLK, achievement animation\n- Corrected grounded achievement forcing naturalist for druids\n- Fix grammer in verification screen; Uses undead instead of scourge\n- Better description for minimum alert level\n- Added 60 announcement toast",
