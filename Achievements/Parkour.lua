@@ -162,6 +162,17 @@ local function OnOrgrimmarAuctionHouseLedge()
 	return false
 end
 
+-- RegisterSpellEventHandlers()
+--
+-- Registers the spell handlers for the First Aid range check
+-- We only do this after a /flex in the right spot, for performance reasons
+
+local function RegisterSpellEventHandlers()
+
+	_achievement:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")			-- Can't get target reliably from this
+	_achievement:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+end
 
 ---------------------------------
 ---- GLOBAL FUNCTIONS
@@ -171,10 +182,11 @@ end
 -- Registers
 function _achievement:Register(succeed_function_executor)
 	_achievement.succeed_function_executor = succeed_function_executor
-	_achievement:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")			-- Can't get target reliably from this
 	_achievement:RegisterEvent("CHAT_MSG_TEXT_EMOTE")
-	_achievement:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	UpdateParkourPoints()
+
+	-- We don't do the registers for spellcast_succeeded and combat_log here, for performance reasons
+	-- They get activated by a flex, until the next reload / logout. 
 end
 
 function _achievement:Unregister()
@@ -186,9 +198,8 @@ end
 
 -- Event handling
 _achievement:SetScript("OnEvent", function(self, event, ...)
-	local arg = { ... }
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
-		local unit, cast_guid, spell_id = ...
+		local unit, _, spell_id = ...
 		if unit ~= "player" then
 			return
 		end
@@ -202,7 +213,6 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 		local _, subevent, _, source_guid, _, _, _,	dest_guid, _, _, _,	_, spell_name, _ = CombatLogGetCurrentEventInfo()
 		if subevent == "SPELL_CAST_SUCCESS" then
 			-- Check if it was a bandage
-			--print(spell_id .. spell_name .. spell_school )
 			if spell_name == first_aid_name then
 				-- Check if we are in the Orgrimmar bank ledge and the target is Rokhstrom
 				-- Check if it was the player who cast the bandage
@@ -210,7 +220,7 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 					return
 				end
 				-- Check if it was Rokhstrom that got bandaged
-				local target_type, _, server, map_id, instance_id, target_type_id = string.split("-", dest_guid)
+				local target_type, _, _, map_id, _, target_type_id = string.split("-", dest_guid)
 				map_id = tonumber( map_id )
 				target_type_id = tonumber( target_type_id )
 				if target_type ~= "Creature" or map_id ~= 1 or target_type_id ~= 13842 then
@@ -233,9 +243,11 @@ _achievement:SetScript("OnEvent", function(self, event, ...)
 				StoreRoundedPlayerPosition()
 				parkour_map_id = mapID
 				if OnOrgrimmarBankLedge() then
-					Hardcore:Print( "You are near " .. parkour_id_names[ "ORGB1" ] .. ", bandage Ambassador Rokhstrom for the Parkour achievement" )
+					Hardcore:Print( "You are at " .. parkour_id_names[ "ORGB1" ] .. ", bandage Ambassador Rokhstrom from here for the Parkour achievement" )
+					RegisterSpellEventHandlers()
 				elseif OnOrgrimmarBankLedgeTwo() then
-					Hardcore:Print( "You are near " .. parkour_id_names[ "ORGB2" ] .. ", bandage Ambassador Rokhstrom for the Parkour achievement" )
+					Hardcore:Print( "You are at " .. parkour_id_names[ "ORGB2" ] .. ", bandage Ambassador Rokhstrom from here for the Parkour achievement" )
+					RegisterSpellEventHandlers()
 				elseif OnOrgrimmarAuctionHouseLedge() then
 					UpdateParkourAchievement("ORGAH")
 				end
