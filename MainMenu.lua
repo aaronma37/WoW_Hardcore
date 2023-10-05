@@ -308,6 +308,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.45", scroll_frame)
+	CreateDescriptionLabel(
+		"- Fixed Grounded achievement",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.44", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fixed bug for death message in dungeons\n- Added Gold Tracker\n- Added Parkour achievement",
