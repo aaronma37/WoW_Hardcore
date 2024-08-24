@@ -14,6 +14,7 @@ HCU_rule_ids = {
 	[7] = "No Trading",
 	[8] = "Guild Only Trading",
 	[9] = "No Petri Hearth",
+	[10] = "Guild Only Grouping",
 }
 
 HCU_rule_name_to_id = {}
@@ -129,45 +130,42 @@ local function unregisterFunction(event, rule_id)
 end
 
 ---- Rule definitions
-name = "No Auction House"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["No Auction House"]] = {
+	["name"] = "No Auction House",
 	["icon"] = "ICONS\\INV_Misc_Coin_01",
 	["description"] = "Disables the auction house.",
 	["enable"] = function()
-		registerFunction("AUCTION_HOUSE_SHOW", HCU_rule_name_to_id[name], function()
+		registerFunction("AUCTION_HOUSE_SHOW", HCU_rule_name_to_id["No Auction House"], function()
 			Hardcore:Print("Auction house is blocked by `No Auction House` rule.")
 			CloseAuctionHouse()
 		end)
 	end,
 	["disable"] = function()
-		unregisterFunction("AUCTION_HOUSE_SHOW", HCU_rule_name_to_id[name])
+		unregisterFunction("AUCTION_HOUSE_SHOW", HCU_rule_name_to_id["No Auction House"])
 	end,
 }
 
-name = "No Mailbox"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["No Mailbox"]] = {
+	["name"] = "No Mailbox",
 	["icon"] = "ICONS\\INV_Letter_17",
 	["description"] = "Disables the mailbox.",
 	["enable"] = function()
-		registerFunction("MAIL_SHOW", HCU_rule_name_to_id[name], function()
+		registerFunction("MAIL_SHOW", HCU_rule_name_to_id["No Mailbox"], function()
 			Hardcore:Print("Mail is blocked by `No Mailbox` rule.")
 			CloseMail()
 		end)
 	end,
 	["disable"] = function()
-		unregisterFunction("MAIL_SHOW", HCU_rule_name_to_id[name])
+		unregisterFunction("MAIL_SHOW", HCU_rule_name_to_id["No Mailbox"])
 	end,
 }
 
-name = "No Bubble Hearth"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["No Bubble Hearth"]] = {
+	["name"] = "No Bubble Hearth",
 	["icon"] = "ICONS\\Spell_Holy_DivineIntervention",
 	["description"] = "Cancels bubble aura when casting hearthstone.",
 	["enable"] = function()
-		registerFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id[name], function(...)
+		registerFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id["No Bubble Hearth"], function(...)
 			local unit, _, spell_id, _, _ = ...
 			if unit == "player" and spell_id == bubble_hearth_vars.spell_id then
 				for i = 1, 40 do
@@ -187,70 +185,65 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 		end)
 	end,
 	["disable"] = function()
-		unregisterFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id[name])
+		unregisterFunction("UNIT_SPELLCAST_START", HCU_rule_name_to_id["No Bubble Hearth"])
 	end,
 }
 
-name = "Solo"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["Solo"]] = {
+	["name"] = "Solo",
 	["icon"] = "ICONS\\Spell_Holy_DivineSpirit",
 	["description"] = "Max group size.",
 	["enable"] = function() end,
 	["disable"] = function() end,
 }
 
-name = "Max Group Size: 2"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["Max Group Size: 2"]] = {
+	["name"] = "Max Group Size: 2",
 	["icon"] = "ICONS\\Spell_Nature_MassTeleport",
 	["description"] = "Max group size.",
 	["enable"] = function() end,
 	["disable"] = function() end,
 }
 
-name = "Max Group Size: 3"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["Max Group Size: 3"]] = {
+	["name"] = "Max Group Size: 3",
 	["icon"] = "ICONS\\Spell_Holy_PrayerofSpirit",
 	["description"] = "Max group size.",
 	["enable"] = function() end,
 	["disable"] = function() end,
 }
 
-name = "No Trading"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["No Trading"]] = {
+	["name"] = "No Trading",
 	["icon"] = "ICONS\\INV_Scroll_03.PNG",
 	["enabled"] = false,
 	["loaded"] = false,
 	["description"] = "Disallows trading.",
 	["enable"] = function()
-		HCU_rules[HCU_rule_name_to_id[name]].enabled = true
-		if HCU_rules[HCU_rule_name_to_id[name]].loaded == false then
+		HCU_rules[HCU_rule_name_to_id["No Trading"]].enabled = true
+		if HCU_rules[HCU_rule_name_to_id["No Trading"]].loaded == false then
 			hooksecurefunc("TradeFrame_OnShow", function(self, button)
-				if HCU_rules[HCU_rule_name_to_id[name]].enabled then
+				if HCU_rules[HCU_rule_name_to_id["No Trading"]].enabled then
 					_G["TradeFrame"]:Hide()
 				end
 			end)
 		end
-		HCU_rules[HCU_rule_name_to_id[name]].loaded = true
+		HCU_rules[HCU_rule_name_to_id["No Trading"]].loaded = true
 	end,
 	["disable"] = function(self)
-		HCU_rules[HCU_rule_name_to_id[name]].enabled = false
+		HCU_rules[HCU_rule_name_to_id["No Trading"]].enabled = false
 	end,
 }
 
-name = "Guild Only Trading"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
+	["name"] = "Guild Only Trading",
 	["icon"] = "ICONS\\INV_Misc_Gift_01.PNG",
 	["enabled"] = false,
 	["loaded"] = false,
 	["description"] = "Disallows trading outside of the guild.",
 	["enable"] = function()
-		HCU_rules[HCU_rule_name_to_id[name]].enabled = true
-		if HCU_rules[HCU_rule_name_to_id[name]].loaded == false then
+		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled = true
+		if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded == false then
 			hooksecurefunc("TradeFrame_OnShow", function(self, button)
 				C_Timer.After(0.1, function()
 					local recv_name = _G["TradeFrameRecipientNameText"]:GetText()
@@ -263,29 +256,28 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 							break
 						end
 					end
-					if HCU_rules[HCU_rule_name_to_id[name]].enabled and in_guild == false then
+					if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled and in_guild == false then
 						print("Target trade recepient not in guild. " .. recv_name)
 						_G["TradeFrame"]:Hide()
 					end
 				end)
 			end)
 		end
-		HCU_rules[HCU_rule_name_to_id[name]].loaded = true
+		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded = true
 	end,
 	["disable"] = function(self)
-		HCU_rules[HCU_rule_name_to_id[name]].enabled = false
+		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled = false
 	end,
 }
 
-name = "No Petri Hearth"
-HCU_rules[HCU_rule_name_to_id[name]] = {
-	["name"] = name,
+HCU_rules[HCU_rule_name_to_id["No Petri Hearth"]] = {
+	["name"] = "No Petri Hearth",
 	["icon"] = "ICONS\\INV_Potion_26.PNG",
 	["enabled"] = false,
 	["loaded"] = false,
 	["description"] = "Cancels petrification aura if in instance without a party or raid.",
 	["enable"] = function()
-		registerFunction("UNIT_AURA", HCU_rule_name_to_id[name], function()
+		registerFunction("UNIT_AURA", HCU_rule_name_to_id["No Petri Hearth"], function()
 			local is_in_instance, _ = IsInInstance()
 			if is_in_instance == nil or is_in_instance == False then
 				return
@@ -310,6 +302,44 @@ HCU_rules[HCU_rule_name_to_id[name]] = {
 		end)
 	end,
 	["disable"] = function(self)
-		unregisterFunction("UNIT_AURA", HCU_rule_name_to_id[name])
+		unregisterFunction("UNIT_AURA", HCU_rule_name_to_id["No Petri Hearth"])
+	end,
+}
+
+-- Guild Only Grouping
+HCU_rules[HCU_rule_name_to_id["Guild Only Grouping"]] = {
+	["name"] = "Guild Only Grouping",
+	["icon"] = "ICONS\\INV_Shirt_GuildTabard_01.PNG",
+	["enabled"] = false,
+	["loaded"] = false,
+	["description"] = "Disallows grouping outside of the guild.",
+	["enable"] = function()
+		local _name = "Guild Only Grouping"
+		HCU_rules[10].enabled = true
+		if HCU_rules[10].loaded == false then
+			C_Timer.NewTicker(2, function(self)
+				if IsInGroup() then
+					local identifiers = {
+						"party1",
+						"party2",
+						"party3",
+						"party4",
+					}
+					local my_guild_name, _, _ = GetGuildInfo("player")
+
+					for _, id in ipairs(identifiers) do
+						local other_guild_name, _, _ = GetGuildInfo(id)
+						if my_guild_name ~= other_guild_name then
+							print("HCU - Leaving group. Detected party member not in guild.")
+							LeaveParty()
+						end
+					end
+				end
+			end)
+		end
+		HCU_rules[HCU_rule_name_to_id["Guild Only Grouping"]].loaded = true
+	end,
+	["disable"] = function(self)
+		HCU_rules[HCU_rule_name_to_id["Guild Only Grouping"]].enabled = false
 	end,
 }
