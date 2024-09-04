@@ -559,6 +559,35 @@ local function DrawGeneralTab(container)
 	rule_pool_frame.copy_paste_code.text:SetText("Officer Code")
 	rule_pool_frame.copy_paste_code.text:Show()
 
+	if rule_pool_frame.whitelist_code == nil then
+		rule_pool_frame.whitelist_code = CreateFrame("EditBox", nil, rule_pool_frame, "InputBoxTemplate")
+	end
+	if rule_pool_frame.whitelist_code.text == nil then
+		rule_pool_frame.whitelist_code.text = rule_pool_frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	end
+
+	rule_pool_frame.whitelist_code:SetPoint("TOP", rule_pool_frame.rules_heading, "BOTTOM", 200, -270)
+	rule_pool_frame.whitelist_code:SetPoint("BOTTOM", rule_pool_frame.rules_heading, "BOTTOM", 200, -300)
+	rule_pool_frame.whitelist_code:SetWidth(220)
+	rule_pool_frame.whitelist_code:SetFont("Fonts\\blei00d.TTF", 14, "")
+	rule_pool_frame.whitelist_code:SetMovable(false)
+	rule_pool_frame.whitelist_code:SetBlinkSpeed(1)
+	rule_pool_frame.whitelist_code:SetAutoFocus(false)
+	rule_pool_frame.whitelist_code:SetMultiLine(false)
+	rule_pool_frame.whitelist_code:SetMaxLetters(60)
+	rule_pool_frame.whitelist_code:SetText(HCU_whitelist_temp or "")
+	rule_pool_frame.whitelist_code.text:SetPoint("LEFT", rule_pool_frame.whitelist_code, "LEFT", 0, 15)
+	rule_pool_frame.whitelist_code.text:SetFont("Fonts\\blei00d.TTF", 12, "")
+	rule_pool_frame.whitelist_code.text:SetTextColor(255 / 255, 215 / 255, 0)
+	rule_pool_frame.whitelist_code.text:SetText("Whitelist Code")
+	if HCU_whitelist_temp == nil or HCU_whitelist_temp == "" then
+		rule_pool_frame.whitelist_code.text:Hide()
+		rule_pool_frame.whitelist_code:Hide()
+	else
+		rule_pool_frame.whitelist_code.text:Show()
+		rule_pool_frame.whitelist_code:Show()
+	end
+
 	refreshShownRules()
 
 	rule_container.frame:HookScript("OnHide", function()

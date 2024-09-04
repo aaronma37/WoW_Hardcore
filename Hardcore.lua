@@ -88,6 +88,7 @@ HardcoreUnlocked_Character = {
 	game_version = "",
 	hardcore_player_name = "",
 	custom_pronoun = false,
+	whitelist = {},
 }
 
 Backup_Character_Data = {}
@@ -468,6 +469,12 @@ local function SlashHandler(msg, editbox)
 				end
 			end
 		end
+	elseif cmd == "wl" then
+		local wl_acc = ""
+		for substring in args:gmatch("%S+") do
+			wl_acc = substring
+		end
+		HCU_whitelist(HardcoreUnlocked_Character, wl_acc)
 	elseif cmd == "dk" then
 		-- sacrifice your current lvl 55 char to allow for making DK
 		local dk_convert_option = ""
