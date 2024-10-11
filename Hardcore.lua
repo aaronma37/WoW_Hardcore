@@ -2185,7 +2185,11 @@ function Hardcore:initMinimapButton()
 	-- Minimap button click function
 	local function MiniBtnClickFunc(arg1)
 		-- Prevent options panel from showing if Blizzard options panel is showing
-		if InterfaceOptionsFrame:IsShown() or VideoOptionsFrame:IsShown() or ChatConfigFrame:IsShown() then
+		if
+			(InterfaceOptionsFrame ~= nil and InterfaceOptionsFrame:IsShown())
+			or (VideoOptionsFrame ~= nil and VideoOptionsFrame:IsShown())
+			or ChatConfigFrame:IsShown()
+		then
 			return
 		end
 		-- Prevent options panel from showing if Blizzard Store is showing
