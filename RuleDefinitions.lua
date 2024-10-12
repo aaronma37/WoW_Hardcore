@@ -371,7 +371,9 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Grouping"]] = {
 					local my_guild_name, _, _ = GetGuildInfo("player")
 
 					for _, id in ipairs(identifiers) do
-						if
+						if UnitName(id) == nil then
+						--continue
+						elseif
 							hcu_character_g.whitelist ~= nil
 							and hcu_character_g.whitelist[UnitName(id)] ~= nil
 							and UnitLevel("player") <= hcu_character_g.whitelist[UnitName(id)]
@@ -419,7 +421,8 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Mailbox"]] = {
 				local in_guild = function(_n)
 					for g_idx = 1, GetNumGuildMembers() do
 						member_name, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(g_idx)
-						if member_name == _n then
+						local player_name_short = string.split("-", member_name)
+						if player_name_short == _n then
 							return true
 						end
 					end
